@@ -20,16 +20,16 @@
 
 ## Phase 2 — Authentication & RBAC
 
-- [ ] Prisma schema — `users`, `refresh_tokens`
-- [ ] `POST /api/auth/login` — verify credentials, issue JWT
-- [ ] `POST /api/auth/refresh` — refresh access token from cookie
-- [ ] `POST /api/auth/logout` — revoke refresh token
-- [ ] `POST /api/auth/change-password`
-- [ ] JWT middleware — verify access token on every protected route
-- [ ] RBAC middleware — check role against allowed roles per route
-- [ ] Account lockout after 5 failed attempts
-- [ ] Seed script — create first SUPER_ADMIN user
-- [ ] Test all auth endpoints
+- [x] Prisma schema — `users`, `refresh_tokens`
+- [x] `POST /api/auth/login` — verify credentials, issue JWT
+- [x] `POST /api/auth/refresh` — refresh access token from cookie
+- [x] `POST /api/auth/logout` — revoke refresh token
+- [x] `POST /api/auth/change-password`
+- [x] JWT middleware — verify access token on every protected route
+- [x] RBAC middleware — check role against allowed roles per route
+- [x] Account lockout after 5 failed attempts
+- [x] Seed script — create first SUPER_ADMIN user
+- [x] Test all auth endpoints
 
 ---
 

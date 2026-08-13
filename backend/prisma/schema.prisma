@@ -44,16 +44,18 @@ enum AthleteStatus {
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
-  id              String    @id @default(uuid())
-  fullName        String    @map("full_name")
-  email           String    @unique
-  passwordHash    String    @map("password_hash")
-  role            UserRole
-  isActive        Boolean   @default(true) @map("is_active")
-  phoneNumber     String?   @map("phone_number")
-  profilePhotoUrl String?   @map("profile_photo_url")
-  lastLoginAt     DateTime? @map("last_login_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
+  id                   String    @id @default(uuid())
+  fullName             String    @map("full_name")
+  email                String    @unique
+  passwordHash         String    @map("password_hash")
+  role                 UserRole
+  isActive             Boolean   @default(true) @map("is_active")
+  phoneNumber          String?   @map("phone_number")
+  profilePhotoUrl      String?   @map("profile_photo_url")
+  lastLoginAt          DateTime? @map("last_login_at")
+  failedLoginAttempts  Int       @default(0) @map("failed_login_attempts")
+  lockedUntil          DateTime? @map("locked_until")
+  createdAt            DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
   deletedAt       DateTime? @map("deleted_at")
 

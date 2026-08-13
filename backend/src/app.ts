@@ -6,12 +6,11 @@ import cookieParser from 'cookie-parser';
 import { rateLimit } from 'express-rate-limit';
 
 import { healthRouter } from './modules/health/health.routes';
+import { authRouter } from './modules/auth/auth.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
-import { logger } from './config/logger';
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
 
 // Security headers
 app.use(helmet());
@@ -44,6 +43,7 @@ app.use(requestLogger);
 
 // Routes
 app.use('/api/health', healthRouter);
+app.use('/api/auth', authRouter);
 
 // 404 handler
 app.use((_req, res) => {
@@ -52,9 +52,5 @@ app.use((_req, res) => {
 
 // Global error handler
 app.use(errorHandler);
-
-app.listen(PORT, () => {
-  logger.info(`API running on port ${PORT} [${process.env.NODE_ENV}]`);
-});
 
 export default app;
