@@ -35,16 +35,16 @@
 
 ## Phase 3 — Student-Athletes
 
-- [ ] Prisma schema — `student_athletes`, `sport_affiliations`, `medical_declarations`
-- [ ] `GET /api/athletes` — list with filters
-- [ ] `POST /api/athletes` — create athlete
-- [ ] `GET /api/athletes/:id` — single athlete
-- [ ] `GET /api/athletes/:id/profile` — 360° profile
-- [ ] `PATCH /api/athletes/:id` — update athlete
-- [ ] `DELETE /api/athletes/:id` — soft delete
-- [ ] Athlete type logic (REGULAR / SCHOLARSHIP / CONTRACT)
-- [ ] Seed script — sample athletes
-- [ ] Test all athlete endpoints
+- [x] Prisma schema — `student_athletes`, `sport_affiliations`, `medical_declarations`
+- [x] `GET /api/athletes` — list with filters
+- [x] `POST /api/athletes` — create athlete
+- [x] `GET /api/athletes/:id` — single athlete
+- [x] `GET /api/athletes/:id/profile` — 360° profile
+- [x] `PATCH /api/athletes/:id` — update athlete
+- [x] `DELETE /api/athletes/:id` — soft delete
+- [x] Athlete type logic (REGULAR / SCHOLARSHIP / CONTRACT)
+- [x] Seed script — sample athletes
+- [x] Test all athlete endpoints
 
 ---
 

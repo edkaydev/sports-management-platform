@@ -7,6 +7,7 @@ import { rateLimit } from 'express-rate-limit';
 
 import { healthRouter } from './modules/health/health.routes';
 import { authRouter } from './modules/auth/auth.routes';
+import { athletesRouter } from './modules/athletes/athletes.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -44,6 +45,7 @@ app.use(requestLogger);
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/athletes', athletesRouter);
 
 // 404 handler
 app.use((_req, res) => {
