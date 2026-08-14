@@ -46,6 +46,23 @@ enum SportCategory {
   INDIVIDUAL
 }
 
+enum TeamStaffRole {
+  HEAD_COACH
+  ASSISTANT_COACH
+  TEAM_MANAGER
+  FITNESS_TRAINER
+  PHYSIO
+  OTHER
+}
+
+enum SquadMemberStatus {
+  ACTIVE
+  INJURED
+  SUSPENDED
+  TRANSFERRED
+  RELEASED
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -66,6 +83,8 @@ model User {
 
   refreshTokens RefreshToken[]
   studentAthlete StudentAthlete?
+  teamStaff      TeamStaff[]
+  seasonsCreated Season[]
 
   @@map("users")
 }
@@ -91,10 +110,13 @@ model Season {
   startDate  DateTime @map("start_date")
   endDate    DateTime @map("end_date")
   isCurrent  Boolean  @default(false) @map("is_current")
+  createdBy  String?  @map("created_by")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  teams Team[]
+  teams      Team[]
+  squadEntries TeamSquad[]
+  createdByUser User? @relation(fields: [createdBy], references: [id])
 
   @@map("seasons")
 }
@@ -123,6 +145,7 @@ model StudentAthlete {
   user               User?               @relation(fields: [userId], references: [id])
   affiliations       SportAffiliation[]
   medicalDeclaration MedicalDeclaration?
+  squadEntries       TeamSquad[]
 
   @@index([status])
   @@index([athleteType])
@@ -163,24 +186,71 @@ model Sport {
 }
 
 model Team {
-  id         String    @id @default(uuid())
-  name       String
-  shortName  String?   @map("short_name")
-  sportId    String    @map("sport_id")
-  seasonId   String?   @map("season_id")
-  gender     Gender
-  logoUrl    String?   @map("logo_url")
-  homeVenue  String?   @map("home_venue")
-  isActive   Boolean   @default(true) @map("is_active")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+  id           String    @id @default(uuid())
+  name         String
+  shortName    String?   @map("short_name")
+  sportId      String    @map("sport_id")
+  seasonId     String?   @map("season_id")
+  gender       Gender
+  logoUrl      String?   @map("logo_url")
+  homeVenue    String?   @map("home_venue")
+  foundingYear Int?      @map("founding_year")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
 
   sport        Sport               @relation(fields: [sportId], references: [id])
   season       Season?             @relation(fields: [seasonId], references: [id])
   affiliations SportAffiliation[]
+  squadEntries TeamSquad[]
+  staff        TeamStaff[]
 
+  @@index([sportId])
   @@map("teams")
+}
+
+model TeamSquad {
+  id           String            @id @default(uuid())
+  teamId       String            @map("team_id")
+  athleteId    String            @map("athlete_id")
+  seasonId     String            @map("season_id")
+  jerseyNumber Int?              @map("jersey_number")
+  position     String?
+  isCaptain    Boolean           @default(false) @map("is_captain")
+  isViceCaptain Boolean          @default(false) @map("is_vice_captain")
+  joinedDate   DateTime?         @map("joined_date")
+  status       SquadMemberStatus @default(ACTIVE)
+  notes        String?
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  team    Team           @relation(fields: [teamId], references: [id])
+  athlete StudentAthlete @relation(fields: [athleteId], references: [id])
+  season  Season         @relation(fields: [seasonId], references: [id])
+
+  @@unique([teamId, athleteId, seasonId])
+  @@index([athleteId])
+  @@map("team_squad")
+}
+
+model TeamStaff {
+  id           String        @id @default(uuid())
+  teamId       String        @map("team_id")
+  userId       String        @map("user_id")
+  role         TeamStaffRole
+  assignedDate DateTime?     @map("assigned_date")
+  isActive     Boolean       @default(true) @map("is_active")
+  notes        String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  team Team @relation(fields: [teamId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId, role])
+  @@index([userId])
+  @@map("team_staff")
 }
 
 model SportAffiliation {
