@@ -50,15 +50,15 @@
 
 ## Phase 4 — Sports & Teams
 
-- [ ] Prisma schema — `sports`, `teams`, `team_staff`, `team_squad`, `seasons`
-- [ ] CRUD endpoints for sports
-- [ ] CRUD endpoints for teams
-- [ ] CRUD endpoints for seasons
-- [ ] `GET /api/teams/:id/squad` — team roster
-- [ ] `POST /api/teams/:id/squad` — add athlete to team
-- [ ] `DELETE /api/teams/:id/squad/:athleteId` — remove from team
-- [ ] Seed script — 14 UMU sports, sample teams, current season
-- [ ] Test all team endpoints
+- [x] Prisma schema — `sports`, `teams`, `team_staff`, `team_squad`, `seasons`
+- [x] CRUD endpoints for sports
+- [x] CRUD endpoints for teams
+- [x] CRUD endpoints for seasons
+- [x] `GET /api/teams/:id/squad` — team roster
+- [x] `POST /api/teams/:id/squad` — add athlete to team
+- [x] `DELETE /api/teams/:id/squad/:athleteId` — remove from team
+- [x] Seed script — 14 UMU sports, sample teams, current season
+- [x] Test all team endpoints
 
 ---
 

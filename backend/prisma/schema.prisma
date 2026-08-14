@@ -24,6 +24,7 @@ enum UserRole {
 enum Gender {
   MALE
   FEMALE
+  MIXED
 }
 
 enum AthleteType {
