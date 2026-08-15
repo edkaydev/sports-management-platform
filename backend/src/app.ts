@@ -11,6 +11,7 @@ import { athletesRouter } from './modules/athletes/athletes.routes';
 import { seasonsRouter } from './modules/seasons/seasons.routes';
 import { sportsRouter } from './modules/sports/sports.routes';
 import { teamsRouter } from './modules/teams/teams.routes';
+import { academicRouter } from './modules/academic/academic.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -52,6 +53,7 @@ app.use('/api/athletes', athletesRouter);
 app.use('/api/seasons', seasonsRouter);
 app.use('/api/sports', sportsRouter);
 app.use('/api/teams', teamsRouter);
+app.use('/api/academic-records', academicRouter);
 
 // 404 handler
 app.use((_req, res) => {

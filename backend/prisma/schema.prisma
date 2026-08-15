@@ -64,6 +64,27 @@ enum SquadMemberStatus {
   RELEASED
 }
 
+enum AcademicStanding {
+  GOOD_STANDING
+  WARNING
+  PROBATION
+  ACADEMIC_SUSPENSION
+  WITHDRAWN
+}
+
+enum Semester {
+  SEM1
+  SEM2
+  RESIT
+}
+
+enum CourseResult {
+  PASS
+  FAIL
+  INCOMPLETE
+  WITHDRAWN
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -86,6 +107,7 @@ model User {
   studentAthlete StudentAthlete?
   teamStaff      TeamStaff[]
   seasonsCreated Season[]
+  academicRecordsEntered AcademicRecord[]
 
   @@map("users")
 }
@@ -147,6 +169,7 @@ model StudentAthlete {
   affiliations       SportAffiliation[]
   medicalDeclaration MedicalDeclaration?
   squadEntries       TeamSquad[]
+  academicRecords    AcademicRecord[]
 
   @@index([status])
   @@index([athleteType])
@@ -276,4 +299,52 @@ model SportAffiliation {
   @@unique([athleteId, sportId, teamId])
   @@index([sportId])
   @@map("sport_affiliations")
+}
+
+// ─── Academic Performance ─────────────────────────────────────────────────────
+
+model AcademicRecord {
+  id                       String           @id @default(uuid())
+  athleteId                String           @map("athlete_id")
+  academicYear             String           @map("academic_year") // e.g. "2025/2026"
+  semester                 Semester
+  yearOfStudy              Int?             @map("year_of_study")
+  gpa                      Decimal?         @db.Decimal(3, 2)
+  cgpa                     Decimal?         @db.Decimal(3, 2)
+  totalCreditUnitsTaken    Int?             @map("total_credit_units_taken")
+  totalCreditUnitsPassed   Int?             @map("total_credit_units_passed")
+  failedUnits              Int              @default(0) @map("failed_units")
+  attendancePercentage     Decimal?         @db.Decimal(5, 2) @map("attendance_percentage")
+  academicStanding         AcademicStanding @default(GOOD_STANDING) @map("academic_standing")
+  enteredBy                String?          @map("entered_by")
+  notes                    String?          @db.Text
+  createdAt                DateTime         @default(now()) @map("created_at")
+  updatedAt                DateTime         @updatedAt @map("updated_at")
+
+  athlete       StudentAthlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  enteredByUser User?          @relation(fields: [enteredBy], references: [id])
+  courseResults AcademicCourseResult[]
+
+  @@unique([athleteId, academicYear, semester])
+  @@index([athleteId])
+  @@index([academicStanding])
+  @@map("academic_records")
+}
+
+model AcademicCourseResult {
+  id               String       @id @default(uuid())
+  academicRecordId String       @map("academic_record_id")
+  courseCode       String       @map("course_code")
+  courseName       String       @map("course_name")
+  creditUnits      Int          @map("credit_units")
+  marks            Decimal?     @db.Decimal(5, 2)
+  grade            String?
+  result           CourseResult
+  retake           Boolean      @default(false)
+  createdAt        DateTime     @default(now()) @map("created_at")
+
+  academicRecord AcademicRecord @relation(fields: [academicRecordId], references: [id], onDelete: Cascade)
+
+  @@index([academicRecordId])
+  @@map("academic_course_results")
 }
