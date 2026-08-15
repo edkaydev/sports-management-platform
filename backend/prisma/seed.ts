@@ -58,6 +58,7 @@ async function main(): Promise<void> {
   await seedTrainingSession(admin.id, season.id);
   await seedProspectsAndTrials(admin.id);
   await seedNotifications(admin.id);
+  await seedNews(admin.id);
   console.log("Seed complete");
 }
 
@@ -705,6 +706,50 @@ async function seedNotifications(recipient: string): Promise<void> {
     skipDuplicates: true,
   });
   console.log("Notifications seeded");
+}
+
+const NEWS_POSTS: Array<{
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  tags: string;
+  featured: boolean;
+}> = [
+  {
+    title: "UMU Saints Complete Pre-Season Preparations",
+    slug: "umu-saints-pre-season-preparations",
+    excerpt: "The Saints wrapped up a productive pre-season block ahead of the 2026 gala season.",
+    content:
+      "Uganda Martyrs University's flagship football team completed its pre-season training block at the Nkozi Main Stadium. The squad, led by the head coach, focused on fitness, set-piece drills, and tactical work ahead of the Inter-University Football Gala scheduled for March 2026. All student-athletes reported in good physical condition.",
+    tags: "football, umu saints",
+    featured: true,
+  },
+  {
+    title: "Registration Opens for the 2026 Inter-University Gala",
+    slug: "registration-open-2026-inter-university-gala",
+    excerpt: "Teams and individuals can now register for this year's gala across football, netball, basketball, and more.",
+    content:
+      "The Sports Department has opened registration for the 2026 Inter-University Gala. The event will run from March 10-14 at the Nkozi Main Stadium and surrounding facilities. Interested teams should register before the deadline through the sports office. Individual sports include tennis, badminton, athletics, and swimming.",
+    tags: "events, gala, registration",
+    featured: false,
+  },
+];
+
+async function seedNews(authorId: string): Promise<void> {
+  for (const post of NEWS_POSTS) {
+    await prisma.newsPost.upsert({
+      where: { slug: post.slug },
+      update: {},
+      create: {
+        ...post,
+        status: "PUBLISHED",
+        publishedAt: new Date("2026-08-01T09:00:00.000Z"),
+        authorId,
+      },
+    });
+  }
+  console.log(`News posts ready: ${NEWS_POSTS.length} seeded`);
 }
 
 main()

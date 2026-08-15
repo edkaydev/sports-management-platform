@@ -352,6 +352,7 @@ model User {
   performancesRecorded PlayerMatchPerformance[]
   trainingSessionsCreated TrainingSession[]
   trainingAttendanceRecorded TrainingAttendance[]
+  newsPosts NewsPost[] @relation("newsPosts")
 
   @@map("users")
 }
@@ -1192,4 +1193,34 @@ model TrainingAttendance {
   @@unique([sessionId, athleteId])
   @@index([athleteId])
   @@map("training_attendance")
+}
+
+// ─── News & Announcements ───────────────────────────────────────────────────
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model NewsPost {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  excerpt     String?    @db.Text
+  content     String     @db.Text
+  coverImage  String?    @map("cover_image")
+  tags        String?
+  featured    Boolean    @default(false)
+  status      NewsStatus @default(DRAFT)
+  publishedAt DateTime?  @map("published_at")
+  authorId    String?    @map("author_id")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  author User? @relation("newsPosts", fields: [authorId], references: [id])
+
+  @@index([status])
+  @@index([publishedAt])
+  @@map("news_posts")
 }

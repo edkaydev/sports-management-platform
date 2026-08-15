@@ -22,6 +22,8 @@ import { eventsRouter } from './modules/events/events.routes';
 import { matchesRouter } from './modules/matches/matches.routes';
 import { performanceRouter } from './modules/performance/performance.routes';
 import { reportsRouter } from './modules/reports/reports.routes';
+import { newsRouter } from './modules/news/news.routes';
+import { publicRouter } from './modules/public/public.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -65,6 +67,7 @@ app.use(
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/public', publicRouter);
 app.use('/api/athletes', athletesRouter);
 app.use('/api/seasons', seasonsRouter);
 app.use('/api/sports', sportsRouter);
@@ -79,6 +82,7 @@ app.use('/api/events', eventsRouter);
 app.use('/api/matches', matchesRouter);
 app.use('/api', performanceRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/news', newsRouter);
 
 // 404 handler
 app.use((_req, res) => {
