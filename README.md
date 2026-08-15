@@ -8,10 +8,32 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 
 ## Stack
 
-- **Frontend** — React + TypeScript + Vite + Tailwind CSS
-- **Backend** — Node.js + Express + TypeScript + Prisma
+- **Frontend** — React + TypeScript + Vite + Tailwind CSS + React Router + TanStack Query
+- **Backend** — Node.js + Express + TypeScript + Prisma + Zod (Jest + Supertest for tests)
 - **Database** — MySQL 8
 - **Infrastructure** — Docker + Docker Compose
+
+---
+
+## Feature Modules (Backend)
+
+| Module | Base path | Highlights |
+|---|---|---|
+| Auth & Users | `/api/auth` | Login, refresh, logout, password change, RBAC |
+| Sports | `/api/sports` | Sport catalogue (team/individual) |
+| Seasons | `/api/seasons` | Academic/sporting season management |
+| Teams | `/api/teams` | Teams, squads, staff assignments |
+| Athletes | `/api/athletes` | CRUD, 360° profiles, affiliations |
+| Academic | `/api/academic` | Records, course results, CSV import |
+| Scholarships | `/api/scholarships` | Award, renew, revoke, at-risk dashboard |
+| Contracts | `/api/contracts` | Playing/coaching contracts, termination |
+| Recruitment | `/api/recruitment` | Prospects, trials, assessments, enrolment |
+| Documents | `/api/documents` | Upload, verify, expiry tracking |
+| Notifications | `/api/notifications` | In-app alerts, rule-based checks |
+| Events | `/api/events` | Competitions, participant registration |
+| Matches | `/api/matches` | Fixtures, lineups, match events, results, reports |
+| Performance | `/api/performances`, `/api/training-sessions` | Match performance, training attendance |
+| Reports | `/api/reports` | Department overview, athlete, academic, scholarship reports (JSON/CSV) |
 
 ---
 
@@ -48,11 +70,17 @@ This starts:
 - API on port `3000`
 - Client on port `5173`
 
-### 4. Run database migrations
+### 4. Run database migrations and seed demo data
 
 ```bash
 docker compose exec api npx prisma migrate dev
+docker compose exec api npx prisma db seed
 ```
+
+The seed creates an admin account and demo data (sports, teams, athletes, academic records, scholarships, contracts, events, fixtures, training, prospects).
+
+- **Admin login:** `admin@umu.ac.ug` / `Admin@2025`
+- **Coach login:** `coach@umu.ac.ug` / `Coach@2025`
 
 ### 5. Open the app
 
@@ -66,16 +94,16 @@ docker compose exec api npx prisma migrate dev
 ```
 sports-management-platform/
 ├── backend/              # Express API
-│   ├── prisma/           # Schema + migrations
+│   ├── prisma/           # Schema + migrations + seed
 │   └── src/
 │       ├── config/       # DB, logger
-│       ├── middleware/   # Auth, RBAC, error handler
-│       └── modules/      # Feature modules
+│       ├── middleware/   # Auth, RBAC, validation, error handler
+│       ├── modules/      # Feature modules (routes, controllers, services, schemas, tests)
+│       └── server.ts
 ├── frontend/             # React client
 │   └── src/
-│       ├── api/          # Axios + API calls
-│       ├── components/   # Shared UI components
-│       ├── features/     # Feature modules
+│       ├── components/   # Shared UI + layout components
+│       ├── lib/          # API client, auth context
 │       └── pages/        # Route pages
 ├── docs/                 # Specification documents (18 files)
 ├── docker-compose.yml
@@ -83,6 +111,22 @@ sports-management-platform/
 ├── COMMANDS.md
 └── DEPLOYMENT.md
 ```
+
+---
+
+## Testing
+
+```bash
+# Backend unit + integration tests (Jest + Supertest)
+cd backend
+npm test
+
+# Frontend type-check + production build
+cd frontend
+npm run build
+```
+
+The backend test suite runs against a real MySQL database and covers all 14 feature modules (153 tests).
 
 ---
 

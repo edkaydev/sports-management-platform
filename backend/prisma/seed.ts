@@ -5,6 +5,17 @@ import {
   AthleteType,
   SportCategory,
   TeamStaffRole,
+  AcademicStanding,
+  Semester,
+  CourseResult,
+  ScholarshipType,
+  ContractType,
+  EventType,
+  EventLevel,
+  EventFormat,
+  MatchType,
+  TrialStatus,
+  ProspectSource,
 } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -40,6 +51,14 @@ async function main(): Promise<void> {
   const teams = await seedTeams(season.id);
   await seedSquads(teams.umuSaintsId, season.id);
   await seedStaff(admin.id, teams.umuSaintsId);
+  await seedAcademicRecords(admin.id);
+  await seedScholarshipsAndContracts(admin.id);
+  const event = await seedEvent(admin.id, season.id);
+  await seedMatch(admin.id, season.id, teams.umuSaintsId, event);
+  await seedTrainingSession(admin.id, season.id);
+  await seedProspectsAndTrials(admin.id);
+  await seedNotifications(admin.id);
+  console.log("Seed complete");
 }
 
 const SPORTS: Array<{ name: string; gender: Gender; category: SportCategory }> =
@@ -419,6 +438,273 @@ async function seedStaff(
   });
 
   console.log(`STAFF ready: ${coach.fullName} (HEAD_COACH of UMU Saints)`);
+}
+
+async function seedAcademicRecords(enteredBy: string): Promise<void> {
+  const semesters: Array<{
+    year: string;
+    semester: Semester;
+    gpa: number;
+    failedUnits: number;
+    standing: AcademicStanding;
+  }> = [
+    { year: "2025/2026", semester: Semester.SEM1, gpa: 3.7, failedUnits: 0, standing: AcademicStanding.GOOD_STANDING },
+    { year: "2025/2026", semester: Semester.SEM2, gpa: 2.1, failedUnits: 1, standing: AcademicStanding.WARNING },
+  ];
+
+  for (const s of SAMPLE_ATHLETES) {
+    const athlete = await prisma.studentAthlete.findUnique({
+      where: { registrationNumber: s.registrationNumber },
+    });
+    if (!athlete) continue;
+
+    for (const rec of semesters) {
+      const gpa = s.registrationNumber === "2024/BSCS/001" ? rec.gpa : rec.gpa - 0.2;
+      await prisma.academicRecord.upsert({
+        where: {
+          athleteId_academicYear_semester: {
+            athleteId: athlete.id,
+            academicYear: rec.year,
+            semester: rec.semester,
+          },
+        },
+        update: {},
+        create: {
+          athleteId: athlete.id,
+          academicYear: rec.year,
+          semester: rec.semester,
+          yearOfStudy: s.yearOfStudy,
+          gpa,
+          cgpa: gpa,
+          totalCreditUnitsTaken: 18,
+          totalCreditUnitsPassed: 18 - rec.failedUnits,
+          failedUnits: rec.failedUnits,
+          attendancePercentage: rec.failedUnits > 0 ? 72 : 94,
+          academicStanding: rec.standing,
+          enteredBy,
+          courseResults: {
+            create: [
+              { courseCode: "UMU101", courseName: "Academic Writing", creditUnits: 3, marks: 78, grade: "B", result: CourseResult.PASS },
+              { courseCode: "UMU102", courseName: "Sports Science", creditUnits: 3, marks: 65, grade: "C", result: CourseResult.PASS },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log(`Academic records ready: ${SAMPLE_ATHLETES.length * semesters.length} seeded`);
+}
+
+async function seedScholarshipsAndContracts(awardedBy: string): Promise<void> {
+  const aisha = await prisma.studentAthlete.findUnique({
+    where: { registrationNumber: "2024/BBAM/014" },
+  });
+  if (aisha) {
+    await prisma.scholarship.upsert({
+      where: { id: `seed-scholarship-${aisha.id}` },
+      update: {},
+      create: {
+        id: `seed-scholarship-${aisha.id}`,
+        athleteId: aisha.id,
+        scholarshipType: ScholarshipType.PARTIAL,
+        sponsorName: "UMU Merit Fund",
+        coverageDescription: "50% tuition coverage",
+        coveragePercentage: 50,
+        startDate: new Date("2025-09-01"),
+        endDate: new Date("2026-08-31"),
+        renewable: true,
+        status: "ACTIVE",
+        academicRequirementGpa: 2.5,
+        awardedBy,
+        awardedAt: new Date("2025-09-01"),
+      },
+    });
+  }
+
+  const edward = await prisma.studentAthlete.findUnique({
+    where: { registrationNumber: "2024/BSCS/001" },
+  });
+  if (edward) {
+    await prisma.athleteContract.upsert({
+      where: { id: `seed-contract-${edward.id}` },
+      update: {},
+      create: {
+        id: `seed-contract-${edward.id}`,
+        athleteId: edward.id,
+        contractType: ContractType.PLAYING,
+        startDate: new Date("2025-09-01"),
+        endDate: new Date("2026-08-31"),
+        termsSummary: "Playing contract for UMU Saints, senior squad",
+        hasAccompanyingScholarship: false,
+        signedByAthlete: true,
+        signedAt: new Date("2025-08-20"),
+        status: "ACTIVE",
+        createdBy: awardedBy,
+      },
+    });
+  }
+  console.log("Scholarships & contracts ready");
+}
+
+async function seedEvent(createdBy: string, seasonId: string) {
+  const football = await prisma.sport.findUnique({ where: { name: "Football" } });
+  const existing = await prisma.event.findFirst({
+    where: { name: "Inter-University Football Gala 2025" },
+  });
+  if (existing) return existing;
+
+  return prisma.event.create({
+    data: {
+      name: "Inter-University Football Gala 2025",
+      type: EventType.GALA,
+      level: EventLevel.NATIONAL,
+      sportId: football?.id,
+      seasonId,
+      organizer: "UMU Sports Department",
+      hostInstitution: "Uganda Martyrs University",
+      venue: "Nkozi Main Stadium",
+      startDate: new Date("2026-03-10T09:00:00.000Z"),
+      endDate: new Date("2026-03-14T18:00:00.000Z"),
+      description: "Annual inter-university football gala",
+      status: "PLANNED",
+      format: EventFormat.ROUND_ROBIN,
+      maxTeams: 16,
+      createdBy,
+    },
+  });
+}
+
+async function seedMatch(
+  createdBy: string,
+  seasonId: string,
+  homeTeamId: string | undefined,
+  event: { id: string },
+): Promise<void> {
+  if (!homeTeamId) return;
+  const football = await prisma.sport.findUnique({ where: { name: "Football" } });
+  if (!football) return;
+
+  const existing = await prisma.match.findFirst({
+    where: { eventId: event.id, homeTeamId },
+  });
+  if (existing) return;
+
+  await prisma.match.create({
+    data: {
+      eventId: event.id,
+      sportId: football.id,
+      seasonId,
+      matchNumber: 1,
+      round: "Group A",
+      homeTeamId,
+      venue: "Nkozi Main Stadium",
+      scheduledDate: new Date("2026-03-10T14:00:00.000Z"),
+      scheduledTime: "14:00",
+      status: "SCHEDULED",
+      matchType: MatchType.GALA,
+      createdBy,
+    },
+  });
+}
+
+async function seedTrainingSession(
+  createdBy: string,
+  seasonId: string,
+): Promise<void> {
+  const football = await prisma.sport.findUnique({ where: { name: "Football" } });
+  if (!football) return;
+
+  const existing = await prisma.trainingSession.findFirst({
+    where: { title: "Tuesday Morning Skills Session" },
+  });
+  if (existing) return;
+
+  await prisma.trainingSession.create({
+    data: {
+      sportId: football.id,
+      seasonId,
+      title: "Tuesday Morning Skills Session",
+      location: "Nkozi Training Grounds",
+      sessionDate: new Date("2026-08-20T08:00:00.000Z"),
+      startTime: "08:00",
+      endTime: "10:00",
+      focusAreas: "Passing, shooting accuracy, conditioning",
+      intensity: "Medium",
+      status: "SCHEDULED",
+      createdBy,
+    },
+  });
+}
+
+async function seedProspectsAndTrials(createdBy: string): Promise<void> {
+  const football = await prisma.sport.findUnique({ where: { name: "Football" } });
+  if (!football) return;
+
+  const existingProspect = await prisma.prospect.findFirst({
+    where: { email: "james.kato@stmarys.ac.ug" },
+  });
+  if (!existingProspect) {
+    await prisma.prospect.create({
+      data: {
+        fullName: "James Kato",
+        email: "james.kato@stmarys.ac.ug",
+        phoneNumber: "0772000099",
+        gender: Gender.MALE,
+        schoolOrInstitution: "St. Mary's College Kisubi",
+        programmeApplied: "BSc Computer Science",
+        sportId: football.id,
+        position: "Winger",
+        previousLevel: "NATIONAL",
+        source: ProspectSource.COACH_REFERRAL,
+        status: "TRIAL_SCHEDULED",
+        createdBy,
+      },
+    });
+  }
+
+  const existingTrial = await prisma.trial.findFirst({
+    where: { venue: "Nkozi Main Stadium", trialDate: new Date("2026-09-05T10:00:00.000Z") },
+  });
+  if (!existingTrial) {
+    await prisma.trial.create({
+      data: {
+        sportId: football.id,
+        trialDate: new Date("2026-09-05T10:00:00.000Z"),
+        startTime: "10:00",
+        venue: "Nkozi Main Stadium",
+        conductedBy: createdBy,
+        description: "Open trials for the 2026/2027 squad",
+        status: TrialStatus.SCHEDULED,
+        createdBy,
+      },
+    });
+  }
+}
+
+async function seedNotifications(recipient: string): Promise<void> {
+  await prisma.notification.createMany({
+    data: [
+      {
+        type: "ACADEMIC_WARNING",
+        severity: "WARNING",
+        title: "Academic warning",
+        message: "Aisha Nakato's standing is WARNING for SEM2 2025/2026.",
+        recipientUserId: recipient,
+        relatedAthleteId: (
+          await prisma.studentAthlete.findUnique({ where: { registrationNumber: "2024/BBAM/014" } })
+        )?.id,
+      },
+      {
+        type: "SYSTEM",
+        severity: "INFO",
+        title: "Welcome to UMU Sports",
+        message: "The sports department dashboard is ready.",
+        recipientUserId: recipient,
+      },
+    ],
+    skipDuplicates: true,
+  });
+  console.log("Notifications seeded");
 }
 
 main()

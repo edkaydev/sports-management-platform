@@ -13,6 +13,7 @@ let coachToken: string;
 let sportId: string;
 let prospectId: string;
 let trialId: string;
+let athleteId: string;
 
 beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
@@ -59,16 +60,25 @@ afterAll(async () => {
   await prisma.trialParticipant.deleteMany({ where: { trialId } });
   await prisma.trial.deleteMany({ where: { id: trialId } });
   await prisma.prospect.deleteMany({ where: { id: prospectId } });
-  await prisma.studentAthlete.deleteMany({});
+
+  const athletes = await prisma.studentAthlete.findMany({
+    where: { email: { startsWith: 'prospect.' } },
+    select: { id: true },
+  });
+  const athleteIds = athletes.map((a) => a.id);
+  await prisma.sportAffiliation.deleteMany({ where: { athleteId: { in: athleteIds } } });
+  await prisma.studentAthlete.deleteMany({ where: { id: { in: athleteIds } } });
+
   await prisma.sport.deleteMany({ where: { id: sportId } });
   const userIds = (
     await prisma.user.findMany({
-      where: { email: { in: [ADMIN_EMAIL, COACH_EMAIL] } },
+      where: { email: { in: [ADMIN_EMAIL, COACH_EMAIL, 'prospect.one@example.com'] } },
       select: { id: true },
     })
   ).map((u) => u.id);
   await prisma.refreshToken.deleteMany({ where: { userId: { in: userIds } } });
   await prisma.user.deleteMany({ where: { id: { in: userIds } } });
+  await prisma.$disconnect();
 });
 
 describe('POST /api/recruitment/prospects', () => {
@@ -185,6 +195,7 @@ describe('POST /api/recruitment/prospects/:id/enroll', () => {
     expect(res.status).toBe(201);
     expect(res.body.data.athlete).toBeDefined();
     expect(res.body.data.recruitment).toBeDefined();
+    athleteId = res.body.data.athlete.id;
   });
 
   it('marks prospect as ENROLLED', async () => {
