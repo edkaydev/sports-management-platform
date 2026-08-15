@@ -17,6 +17,7 @@ import { scholarshipsRouter } from './modules/scholarships/scholarships.routes';
 import { contractsRouter } from './modules/scholarships/contracts.routes';
 import { recruitmentRouter } from './modules/recruitment/recruitment.routes';
 import { documentsRouter } from './modules/documents/documents.routes';
+import { notificationsRouter } from './modules/notifications/notifications.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -69,6 +70,7 @@ app.use('/api/scholarships', scholarshipsRouter);
 app.use('/api/contracts', contractsRouter);
 app.use('/api/recruitment', recruitmentRouter);
 app.use('/api/documents', documentsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // 404 handler
 app.use((_req, res) => {
