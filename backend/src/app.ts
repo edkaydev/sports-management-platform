@@ -14,6 +14,7 @@ import { teamsRouter } from './modules/teams/teams.routes';
 import { academicRouter } from './modules/academic/academic.routes';
 import { scholarshipsRouter } from './modules/scholarships/scholarships.routes';
 import { contractsRouter } from './modules/scholarships/contracts.routes';
+import { recruitmentRouter } from './modules/recruitment/recruitment.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -58,6 +59,7 @@ app.use('/api/teams', teamsRouter);
 app.use('/api/academic-records', academicRouter);
 app.use('/api/scholarships', scholarshipsRouter);
 app.use('/api/contracts', contractsRouter);
+app.use('/api/recruitment', recruitmentRouter);
 
 // 404 handler
 app.use((_req, res) => {

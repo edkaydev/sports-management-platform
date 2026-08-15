@@ -115,6 +115,55 @@ enum ContractStatus {
   SUSPENDED
 }
 
+enum ProspectStatus {
+  PROSPECT
+  REGISTERED
+  TRIAL_SCHEDULED
+  TRIAL_COMPLETED
+  SELECTED
+  REJECTED
+  ENROLLED
+  WITHDRAWN
+}
+
+enum ProspectSource {
+  SELF
+  SCOUT
+  COACH_REFERRAL
+  WALK_IN
+  OTHER
+}
+
+enum PreviousLevel {
+  SECONDARY
+  CLUB
+  DISTRICT
+  NATIONAL
+  INTERNATIONAL
+  NONE
+}
+
+enum TrialStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum Recommendation {
+  STRONGLY_RECOMMEND
+  RECOMMEND
+  NEUTRAL
+  NOT_RECOMMENDED
+}
+
+enum SelectionOutcome {
+  SELECTED
+  RESERVE
+  REJECTED
+  PENDING
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -143,6 +192,11 @@ model User {
   renewalsLogged         ScholarshipRenewal[]
   contractsCreated       AthleteContract[]
   contractsTerminated    AthleteContract[]    @relation("contractsTerminated")
+  prospectsCreated       Prospect[]           @relation("prospectsCreated")
+  trialsConducted        Trial[]              @relation("trialsConducted")
+  trialsCreated          Trial[]              @relation("trialsCreated")
+  assessmentsLogged      TrialAssessment[]
+  recruitsEnrolled       RecruitmentRecord[]
 
   @@map("users")
 }
@@ -174,6 +228,7 @@ model Season {
 
   teams         Team[]
   squadEntries  TeamSquad[]
+  trials        Trial[]
   createdByUser User?       @relation(fields: [createdBy], references: [id])
 
   @@map("seasons")
@@ -207,6 +262,7 @@ model StudentAthlete {
   academicRecords    AcademicRecord[]
   scholarships       Scholarship[]
   contracts          AthleteContract[]
+  recruitmentRecord  RecruitmentRecord?
 
   @@index([status])
   @@index([athleteType])
@@ -242,6 +298,8 @@ model Sport {
 
   affiliations SportAffiliation[]
   teams        Team[]
+  prospects    Prospect[]
+  trials       Trial[]
 
   @@map("sports")
 }
@@ -266,6 +324,7 @@ model Team {
   affiliations SportAffiliation[]
   squadEntries TeamSquad[]
   staff        TeamStaff[]
+  trials       Trial[]
 
   @@index([sportId])
   @@map("teams")
@@ -470,4 +529,134 @@ model AthleteContract {
   @@index([status])
   @@index([endDate])
   @@map("athlete_contracts")
+}
+
+// ─── Recruitment & Trials ─────────────────────────────────────────────────────
+
+model Prospect {
+  id                   String         @id @default(uuid())
+  fullName             String         @map("full_name")
+  email                String?
+  phoneNumber          String?        @map("phone_number")
+  gender               Gender
+  dateOfBirth          DateTime?      @map("date_of_birth")
+  schoolOrInstitution  String?        @map("school_or_institution")
+  programmeApplied     String?        @map("programme_applied")
+  sportId              String         @map("sport_id")
+  position             String?
+  previousLevel        PreviousLevel? @map("previous_level")
+  previousClubs        String?        @map("previous_clubs")
+  previousAchievements String?        @map("previous_achievements")
+  referredBy           String?        @map("referred_by")
+  source               ProspectSource @default(SELF)
+  status               ProspectStatus @default(PROSPECT)
+  notes                String?        @db.Text
+  createdBy            String?        @map("created_by")
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
+
+  sport         Sport              @relation(fields: [sportId], references: [id])
+  createdByUser User?              @relation("prospectsCreated", fields: [createdBy], references: [id])
+  trialEntries  TrialParticipant[]
+  assessments   TrialAssessment[]
+  recruitment   RecruitmentRecord?
+
+  @@index([sportId])
+  @@index([status])
+  @@map("prospects")
+}
+
+model Trial {
+  id          String      @id @default(uuid())
+  sportId     String      @map("sport_id")
+  teamId      String?     @map("team_id")
+  trialDate   DateTime    @map("trial_date")
+  startTime   String?     @map("start_time")
+  venue       String?
+  conductedBy String?     @map("conducted_by")
+  seasonId    String?     @map("season_id")
+  description String?     @db.Text
+  status      TrialStatus @default(SCHEDULED)
+  createdBy   String?     @map("created_by")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  sport              Sport               @relation(fields: [sportId], references: [id])
+  team               Team?               @relation(fields: [teamId], references: [id])
+  season             Season?             @relation(fields: [seasonId], references: [id])
+  conductedByUser    User?               @relation("trialsConducted", fields: [conductedBy], references: [id])
+  createdByUser      User?               @relation("trialsCreated", fields: [createdBy], references: [id])
+  participants       TrialParticipant[]
+  assessments        TrialAssessment[]
+  recruitmentRecords RecruitmentRecord[]
+
+  @@index([sportId])
+  @@index([trialDate])
+  @@map("trials")
+}
+
+model TrialParticipant {
+  id         String   @id @default(uuid())
+  trialId    String   @map("trial_id")
+  prospectId String   @map("prospect_id")
+  attended   Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  trial    Trial    @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  prospect Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+
+  @@unique([trialId, prospectId])
+  @@index([prospectId])
+  @@map("trial_participants")
+}
+
+model TrialAssessment {
+  id                  String           @id @default(uuid())
+  trialId             String           @map("trial_id")
+  prospectId          String           @map("prospect_id")
+  assessedBy          String?          @map("assessed_by")
+  assessedAt          DateTime         @default(now()) @map("assessed_at")
+  scoreTechnical      Decimal?         @map("score_technical") @db.Decimal(3, 1)
+  scorePhysical       Decimal?         @map("score_physical") @db.Decimal(3, 1)
+  scoreSpeed          Decimal?         @map("score_speed") @db.Decimal(3, 1)
+  scoreTactical       Decimal?         @map("score_tactical") @db.Decimal(3, 1)
+  scoreTeamwork       Decimal?         @map("score_teamwork") @db.Decimal(3, 1)
+  scoreDiscipline     Decimal?         @map("score_discipline") @db.Decimal(3, 1)
+  scoreAcademic       Decimal?         @map("score_academic") @db.Decimal(3, 1)
+  overallScore        Decimal?         @map("overall_score") @db.Decimal(3, 1)
+  recommendedPosition String?          @map("recommended_position")
+  recommendation      Recommendation   @default(NEUTRAL)
+  selectionOutcome    SelectionOutcome @default(PENDING)
+  coachNotes          String?          @map("coach_notes")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  trial          Trial    @relation(fields: [trialId], references: [id], onDelete: Cascade)
+  prospect       Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  assessedByUser User?    @relation(fields: [assessedBy], references: [id])
+
+  recruitmentRecord RecruitmentRecord?
+
+  @@unique([trialId, prospectId])
+  @@index([prospectId])
+  @@map("trial_assessments")
+}
+
+model RecruitmentRecord {
+  id           String    @id @default(uuid())
+  athleteId    String    @unique @map("athlete_id")
+  prospectId   String    @unique @map("prospect_id")
+  trialId      String?   @map("trial_id")
+  assessmentId String?   @unique @map("assessment_id")
+  enrolledDate DateTime? @map("enrolled_date")
+  enrolledBy   String?   @map("enrolled_by")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  athlete        StudentAthlete   @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  prospect       Prospect         @relation(fields: [prospectId], references: [id])
+  trial          Trial?           @relation(fields: [trialId], references: [id])
+  assessment     TrialAssessment? @relation(fields: [assessmentId], references: [id])
+  enrolledByUser User?            @relation(fields: [enrolledBy], references: [id])
+
+  @@index([athleteId])
+  @@map("recruitment_records")
 }
