@@ -85,40 +85,75 @@ enum CourseResult {
   WITHDRAWN
 }
 
+enum ScholarshipType {
+  FULL
+  PARTIAL
+  SPONSORSHIP
+  BURSARY
+}
+
+enum ScholarshipStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  REVOKED
+  RENEWED
+  PENDING
+}
+
+enum ContractType {
+  PLAYING
+  COACHING_DEVELOPMENT
+  AMBASSADOR
+  OTHER
+}
+
+enum ContractStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  SUSPENDED
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
-  id                   String    @id @default(uuid())
-  fullName             String    @map("full_name")
-  email                String    @unique
-  passwordHash         String    @map("password_hash")
-  role                 UserRole
-  isActive             Boolean   @default(true) @map("is_active")
-  phoneNumber          String?   @map("phone_number")
-  profilePhotoUrl      String?   @map("profile_photo_url")
-  lastLoginAt          DateTime? @map("last_login_at")
-  failedLoginAttempts  Int       @default(0) @map("failed_login_attempts")
-  lockedUntil          DateTime? @map("locked_until")
-  createdAt            DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  id                  String    @id @default(uuid())
+  fullName            String    @map("full_name")
+  email               String    @unique
+  passwordHash        String    @map("password_hash")
+  role                UserRole
+  isActive            Boolean   @default(true) @map("is_active")
+  phoneNumber         String?   @map("phone_number")
+  profilePhotoUrl     String?   @map("profile_photo_url")
+  lastLoginAt         DateTime? @map("last_login_at")
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  deletedAt           DateTime? @map("deleted_at")
 
-  refreshTokens RefreshToken[]
-  studentAthlete StudentAthlete?
-  teamStaff      TeamStaff[]
-  seasonsCreated Season[]
+  refreshTokens          RefreshToken[]
+  studentAthlete         StudentAthlete?
+  teamStaff              TeamStaff[]
+  seasonsCreated         Season[]
   academicRecordsEntered AcademicRecord[]
+  scholarshipsAwarded    Scholarship[]
+  scholarshipsRevoked    Scholarship[]        @relation("scholarshipsRevoked")
+  renewalsLogged         ScholarshipRenewal[]
+  contractsCreated       AthleteContract[]
+  contractsTerminated    AthleteContract[]    @relation("contractsTerminated")
 
   @@map("users")
 }
 
 model RefreshToken {
-  id         String   @id @default(uuid())
-  userId     String   @map("user_id")
-  tokenHash  String   @unique @map("token_hash")
-  expiresAt  DateTime @map("expires_at")
-  revoked    Boolean  @default(false)
-  createdAt  DateTime @default(now()) @map("created_at")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id])
 
@@ -128,18 +163,18 @@ model RefreshToken {
 // ─── Seasons ──────────────────────────────────────────────────────────────────
 
 model Season {
-  id         String   @id @default(uuid())
-  name       String   @unique // e.g. "2025/2026"
-  startDate  DateTime @map("start_date")
-  endDate    DateTime @map("end_date")
-  isCurrent  Boolean  @default(false) @map("is_current")
-  createdBy  String?  @map("created_by")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  name      String   @unique // e.g. "2025/2026"
+  startDate DateTime @map("start_date")
+  endDate   DateTime @map("end_date")
+  isCurrent Boolean  @default(false) @map("is_current")
+  createdBy String?  @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
-  teams      Team[]
-  squadEntries TeamSquad[]
-  createdByUser User? @relation(fields: [createdBy], references: [id])
+  teams         Team[]
+  squadEntries  TeamSquad[]
+  createdByUser User?       @relation(fields: [createdBy], references: [id])
 
   @@map("seasons")
 }
@@ -170,6 +205,8 @@ model StudentAthlete {
   medicalDeclaration MedicalDeclaration?
   squadEntries       TeamSquad[]
   academicRecords    AcademicRecord[]
+  scholarships       Scholarship[]
+  contracts          AthleteContract[]
 
   @@index([status])
   @@index([athleteType])
@@ -224,8 +261,8 @@ model Team {
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  sport        Sport               @relation(fields: [sportId], references: [id])
-  season       Season?             @relation(fields: [seasonId], references: [id])
+  sport        Sport              @relation(fields: [sportId], references: [id])
+  season       Season?            @relation(fields: [seasonId], references: [id])
   affiliations SportAffiliation[]
   squadEntries TeamSquad[]
   staff        TeamStaff[]
@@ -235,19 +272,19 @@ model Team {
 }
 
 model TeamSquad {
-  id           String            @id @default(uuid())
-  teamId       String            @map("team_id")
-  athleteId    String            @map("athlete_id")
-  seasonId     String            @map("season_id")
-  jerseyNumber Int?              @map("jersey_number")
-  position     String?
-  isCaptain    Boolean           @default(false) @map("is_captain")
-  isViceCaptain Boolean          @default(false) @map("is_vice_captain")
-  joinedDate   DateTime?         @map("joined_date")
-  status       SquadMemberStatus @default(ACTIVE)
-  notes        String?
-  createdAt    DateTime          @default(now()) @map("created_at")
-  updatedAt    DateTime          @updatedAt @map("updated_at")
+  id            String            @id @default(uuid())
+  teamId        String            @map("team_id")
+  athleteId     String            @map("athlete_id")
+  seasonId      String            @map("season_id")
+  jerseyNumber  Int?              @map("jersey_number")
+  position      String?
+  isCaptain     Boolean           @default(false) @map("is_captain")
+  isViceCaptain Boolean           @default(false) @map("is_vice_captain")
+  joinedDate    DateTime?         @map("joined_date")
+  status        SquadMemberStatus @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
 
   team    Team           @relation(fields: [teamId], references: [id])
   athlete StudentAthlete @relation(fields: [athleteId], references: [id])
@@ -278,19 +315,19 @@ model TeamStaff {
 }
 
 model SportAffiliation {
-  id           String        @id @default(uuid())
-  athleteId    String        @map("athlete_id")
-  sportId      String        @map("sport_id")
-  teamId       String?       @map("team_id")
-  position     String?
-  jerseyNumber Int?          @map("jersey_number")
-  isCaptain    Boolean       @default(false) @map("is_captain")
-  isViceCaptain Boolean      @default(false) @map("is_vice_captain")
-  joinedDate   DateTime?     @map("joined_date")
-  status       AthleteStatus @default(ACTIVE)
-  notes        String?
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id            String        @id @default(uuid())
+  athleteId     String        @map("athlete_id")
+  sportId       String        @map("sport_id")
+  teamId        String?       @map("team_id")
+  position      String?
+  jerseyNumber  Int?          @map("jersey_number")
+  isCaptain     Boolean       @default(false) @map("is_captain")
+  isViceCaptain Boolean       @default(false) @map("is_vice_captain")
+  joinedDate    DateTime?     @map("joined_date")
+  status        AthleteStatus @default(ACTIVE)
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
 
   athlete StudentAthlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
   sport   Sport          @relation(fields: [sportId], references: [id])
@@ -304,25 +341,25 @@ model SportAffiliation {
 // ─── Academic Performance ─────────────────────────────────────────────────────
 
 model AcademicRecord {
-  id                       String           @id @default(uuid())
-  athleteId                String           @map("athlete_id")
-  academicYear             String           @map("academic_year") // e.g. "2025/2026"
-  semester                 Semester
-  yearOfStudy              Int?             @map("year_of_study")
-  gpa                      Decimal?         @db.Decimal(3, 2)
-  cgpa                     Decimal?         @db.Decimal(3, 2)
-  totalCreditUnitsTaken    Int?             @map("total_credit_units_taken")
-  totalCreditUnitsPassed   Int?             @map("total_credit_units_passed")
-  failedUnits              Int              @default(0) @map("failed_units")
-  attendancePercentage     Decimal?         @db.Decimal(5, 2) @map("attendance_percentage")
-  academicStanding         AcademicStanding @default(GOOD_STANDING) @map("academic_standing")
-  enteredBy                String?          @map("entered_by")
-  notes                    String?          @db.Text
-  createdAt                DateTime         @default(now()) @map("created_at")
-  updatedAt                DateTime         @updatedAt @map("updated_at")
+  id                     String           @id @default(uuid())
+  athleteId              String           @map("athlete_id")
+  academicYear           String           @map("academic_year") // e.g. "2025/2026"
+  semester               Semester
+  yearOfStudy            Int?             @map("year_of_study")
+  gpa                    Decimal?         @db.Decimal(3, 2)
+  cgpa                   Decimal?         @db.Decimal(3, 2)
+  totalCreditUnitsTaken  Int?             @map("total_credit_units_taken")
+  totalCreditUnitsPassed Int?             @map("total_credit_units_passed")
+  failedUnits            Int              @default(0) @map("failed_units")
+  attendancePercentage   Decimal?         @map("attendance_percentage") @db.Decimal(5, 2)
+  academicStanding       AcademicStanding @default(GOOD_STANDING) @map("academic_standing")
+  enteredBy              String?          @map("entered_by")
+  notes                  String?          @db.Text
+  createdAt              DateTime         @default(now()) @map("created_at")
+  updatedAt              DateTime         @updatedAt @map("updated_at")
 
-  athlete       StudentAthlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
-  enteredByUser User?          @relation(fields: [enteredBy], references: [id])
+  athlete       StudentAthlete         @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  enteredByUser User?                  @relation(fields: [enteredBy], references: [id])
   courseResults AcademicCourseResult[]
 
   @@unique([athleteId, academicYear, semester])
@@ -347,4 +384,90 @@ model AcademicCourseResult {
 
   @@index([academicRecordId])
   @@map("academic_course_results")
+}
+
+// ─── Scholarships & Contracts ─────────────────────────────────────────────────
+
+model Scholarship {
+  id                     String            @id @default(uuid())
+  athleteId              String            @map("athlete_id")
+  scholarshipType        ScholarshipType   @map("scholarship_type")
+  sponsorName            String?           @map("sponsor_name")
+  coverageDescription    String?           @map("coverage_description")
+  coveragePercentage     Decimal?          @map("coverage_percentage") @db.Decimal(5, 2)
+  startDate              DateTime          @map("start_date")
+  endDate                DateTime          @map("end_date")
+  renewable              Boolean           @default(false)
+  renewalCount           Int               @default(0) @map("renewal_count")
+  status                 ScholarshipStatus @default(PENDING)
+  academicRequirementGpa Decimal?          @map("academic_requirement_gpa") @db.Decimal(3, 2)
+  sportsRequirement      String?           @map("sports_requirement")
+  awardedBy              String?           @map("awarded_by")
+  awardedAt              DateTime?         @default(now()) @map("awarded_at")
+  revokedBy              String?           @map("revoked_by")
+  revokedAt              DateTime?         @map("revoked_at")
+  revocationReason       String?           @map("revocation_reason")
+  notes                  String?           @db.Text
+  createdAt              DateTime          @default(now()) @map("created_at")
+  updatedAt              DateTime          @updatedAt @map("updated_at")
+
+  athlete       StudentAthlete       @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  awardedByUser User?                @relation(fields: [awardedBy], references: [id])
+  revokedByUser User?                @relation("scholarshipsRevoked", fields: [revokedBy], references: [id])
+  renewals      ScholarshipRenewal[]
+  contracts     AthleteContract[]
+
+  @@index([athleteId])
+  @@index([status])
+  @@index([endDate])
+  @@map("scholarships")
+}
+
+model ScholarshipRenewal {
+  id              String   @id @default(uuid())
+  scholarshipId   String   @map("scholarship_id")
+  previousEndDate DateTime @map("previous_end_date")
+  newEndDate      DateTime @map("new_end_date")
+  renewedBy       String   @map("renewed_by")
+  renewedAt       DateTime @default(now()) @map("renewed_at")
+  gpaAtRenewal    Decimal? @map("gpa_at_renewal") @db.Decimal(3, 2)
+  notes           String?  @db.Text
+  renewalNumber   Int      @map("renewal_number")
+
+  scholarship   Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+  renewedByUser User        @relation(fields: [renewedBy], references: [id])
+
+  @@index([scholarshipId])
+  @@map("scholarship_renewals")
+}
+
+model AthleteContract {
+  id                         String         @id @default(uuid())
+  athleteId                  String         @map("athlete_id")
+  contractType               ContractType   @map("contract_type")
+  startDate                  DateTime       @map("start_date")
+  endDate                    DateTime       @map("end_date")
+  termsSummary               String?        @map("terms_summary")
+  hasAccompanyingScholarship Boolean        @default(false) @map("has_accompanying_scholarship")
+  scholarshipId              String?        @map("scholarship_id")
+  signedByAthlete            Boolean        @default(false) @map("signed_by_athlete")
+  signedAt                   DateTime?      @map("signed_at")
+  status                     ContractStatus @default(ACTIVE)
+  createdBy                  String?        @map("created_by")
+  createdAt                  DateTime       @default(now()) @map("created_at")
+  terminatedBy               String?        @map("terminated_by")
+  terminationDate            DateTime?      @map("termination_date")
+  terminationReason          String?        @map("termination_reason")
+  notes                      String?        @db.Text
+  updatedAt                  DateTime       @updatedAt @map("updated_at")
+
+  athlete          StudentAthlete @relation(fields: [athleteId], references: [id], onDelete: Cascade)
+  scholarship      Scholarship?   @relation(fields: [scholarshipId], references: [id])
+  createdByUser    User?          @relation(fields: [createdBy], references: [id])
+  terminatedByUser User?          @relation("contractsTerminated", fields: [terminatedBy], references: [id])
+
+  @@index([athleteId])
+  @@index([status])
+  @@index([endDate])
+  @@map("athlete_contracts")
 }
