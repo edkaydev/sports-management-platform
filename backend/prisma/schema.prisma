@@ -237,6 +237,76 @@ enum NotificationSeverity {
   CRITICAL
 }
 
+enum EventType {
+  GALA
+  TOURNAMENT
+  LEAGUE
+  COMPETITION
+  FRIENDLY
+  TRIAL
+  TRAINING
+  FESTIVAL
+  SPECIAL
+}
+
+enum EventLevel {
+  CAMPUS
+  FACULTY
+  UNIVERSITY
+  LOCAL
+  NATIONAL
+  REGIONAL
+  INTERNATIONAL
+}
+
+enum EventFormat {
+  KNOCKOUT
+  ROUND_ROBIN
+  LEAGUE
+  GROUP_STAGE
+  SINGLE_MATCH
+  OTHER
+}
+
+enum EventStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  POSTPONED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  POSTPONED
+  ABANDONED
+}
+
+enum MatchType {
+  LEAGUE
+  KNOCKOUT
+  FRIENDLY
+  GALA
+  TRIAL
+  OTHER
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+  LATE
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -270,9 +340,18 @@ model User {
   trialsCreated          Trial[]              @relation("trialsCreated")
   assessmentsLogged      TrialAssessment[]
   recruitsEnrolled       RecruitmentRecord[]
-  documentsUploaded      Document[]
-  documentsVerified      Document[]           @relation("documentsVerified")
-  notificationsReceived  Notification[]
+  documentsUploaded Document[]
+  documentsVerified Document[] @relation("documentsVerified")
+  notificationsReceived Notification[]
+  eventsCreated Event[] @relation("eventsCreated")
+  matchesCreated Match[] @relation("matchesCreated")
+  lineupsSubmitted MatchLineup[]
+  matchEventsRecorded MatchEvent[] @relation("matchEventsRecorded")
+  matchResultsVerified MatchResult[] @relation("resultsVerified")
+  matchReportsSubmitted MatchReport[]
+  performancesRecorded PlayerMatchPerformance[]
+  trainingSessionsCreated TrainingSession[]
+  trainingAttendanceRecorded TrainingAttendance[]
 
   @@map("users")
 }
@@ -302,10 +381,13 @@ model Season {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  teams         Team[]
-  squadEntries  TeamSquad[]
-  trials        Trial[]
-  createdByUser User?       @relation(fields: [createdBy], references: [id])
+  teams      Team[]
+  squadEntries TeamSquad[]
+  trials     Trial[]
+  events     Event[]
+  matches    Match[]
+  trainingSessions TrainingSession[]
+  createdByUser User? @relation(fields: [createdBy], references: [id])
 
   @@map("seasons")
 }
@@ -340,6 +422,15 @@ model StudentAthlete {
   contracts          AthleteContract[]
   recruitmentRecord  RecruitmentRecord?
   documents          Document[]
+  eventParticipants  EventParticipant[]
+  homeIndividualMatches Match[] @relation("matchesHomeIndividual")
+  awayIndividualMatches Match[] @relation("matchesAwayIndividual")
+  matchLineupEntries MatchLineupEntry[]
+  matchEvents        MatchEvent[]
+  matchEventsSecondary MatchEvent[] @relation("matchEventsSecondary")
+  mvpReports         MatchReport[]
+  performances       PlayerMatchPerformance[]
+  trainingAttendance TrainingAttendance[]
   Notification       Notification[]
 
   @@index([status])
@@ -378,6 +469,9 @@ model Sport {
   teams        Team[]
   prospects    Prospect[]
   trials       Trial[]
+  events       Event[]
+  matches      Match[]
+  trainingSessions   TrainingSession[]
 
   @@map("sports")
 }
@@ -397,13 +491,21 @@ model Team {
   updatedAt    DateTime  @updatedAt @map("updated_at")
   deletedAt    DateTime? @map("deleted_at")
 
-  sport        Sport              @relation(fields: [sportId], references: [id])
-  season       Season?            @relation(fields: [seasonId], references: [id])
+  sport        Sport               @relation(fields: [sportId], references: [id])
+  season       Season?             @relation(fields: [seasonId], references: [id])
   affiliations SportAffiliation[]
   squadEntries TeamSquad[]
   staff        TeamStaff[]
   trials       Trial[]
   documents    Document[]
+  eventParticipants EventParticipant[]
+  homeMatches  Match[] @relation("matchesHome")
+  awayMatches  Match[] @relation("matchesAway")
+  lineups      MatchLineup[]
+  matchEvents  MatchEvent[]
+  matchResultsWon MatchResult[]
+  playerPerformances PlayerMatchPerformance[]
+  trainingSessions   TrainingSession[]
 
   @@index([sportId])
   @@map("teams")
@@ -668,6 +770,7 @@ model Trial {
   participants       TrialParticipant[]
   assessments        TrialAssessment[]
   recruitmentRecords RecruitmentRecord[]
+  documents          Document[]
 
   @@index([sportId])
   @@index([trialDate])
@@ -769,6 +872,9 @@ model Document {
 
   athlete        StudentAthlete? @relation(fields: [athleteId], references: [id])
   team           Team?           @relation(fields: [teamId], references: [id])
+  event          Event?          @relation(fields: [eventId], references: [id])
+  match          Match?          @relation(fields: [matchId], references: [id])
+  trial          Trial?          @relation(fields: [trialId], references: [id])
   uploadedByUser User            @relation(fields: [uploadedBy], references: [id])
   verifiedByUser User?           @relation("documentsVerified", fields: [verifiedBy], references: [id])
 
@@ -802,4 +908,288 @@ model Notification {
   @@index([recipientUserId, isRead])
   @@index([type])
   @@map("notifications")
+}
+
+// ─── Events & Competitions ────────────────────────────────────────────────────
+
+model Event {
+  id                    String      @id @default(uuid())
+  name                  String
+  type                  EventType
+  level                 EventLevel
+  sportId               String?     @map("sport_id")
+  seasonId              String?     @map("season_id")
+  organizer             String?
+  hostInstitution       String?     @map("host_institution")
+  venue                 String?
+  startDate             DateTime?   @map("start_date")
+  endDate               DateTime?   @map("end_date")
+  description           String?     @db.Text
+  status                EventStatus @default(PLANNED)
+  format                EventFormat @default(OTHER)
+  maxTeams              Int?        @map("max_teams")
+  maxParticipants       Int?        @map("max_participants")
+  registrationDeadline  DateTime?   @map("registration_deadline")
+  createdBy             String?     @map("created_by")
+  createdAt             DateTime    @default(now()) @map("created_at")
+  updatedAt             DateTime    @updatedAt @map("updated_at")
+
+  sport     Sport?         @relation(fields: [sportId], references: [id])
+  season    Season?        @relation(fields: [seasonId], references: [id])
+  createdByUser User?      @relation("eventsCreated", fields: [createdBy], references: [id])
+  participants EventParticipant[]
+  matches    Match[]
+  documents  Document[]
+
+  @@index([type])
+  @@index([level])
+  @@index([startDate])
+  @@map("events")
+}
+
+model EventParticipant {
+  id              String   @id @default(uuid())
+  eventId         String   @map("event_id")
+  participantType String   @map("participant_type") // TEAM | INDIVIDUAL
+  teamId          String?  @map("team_id")
+  athleteId       String?  @map("athlete_id")
+  registeredAt    DateTime @default(now()) @map("registered_at")
+  status          String   @default("REGISTERED")
+
+  event   Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  team    Team?           @relation(fields: [teamId], references: [id])
+  athlete StudentAthlete? @relation(fields: [athleteId], references: [id])
+
+  @@unique([eventId, teamId])
+  @@unique([eventId, athleteId])
+  @@index([eventId])
+  @@map("event_participants")
+}
+
+model Match {
+  id                 String      @id @default(uuid())
+  eventId            String      @map("event_id")
+  sportId            String      @map("sport_id")
+  seasonId           String?     @map("season_id")
+  matchNumber        Int?        @map("match_number")
+  round              String?
+  homeTeamId         String?     @map("home_team_id")
+  awayTeamId         String?     @map("away_team_id")
+  homeIndividualId   String?     @map("home_individual_id")
+  awayIndividualId   String?     @map("away_individual_id")
+  venue              String?
+  scheduledDate      DateTime    @map("scheduled_date")
+  scheduledTime      String?     @map("scheduled_time")
+  actualStartTime    DateTime?   @map("actual_start_time")
+  actualEndTime      DateTime?   @map("actual_end_time")
+  homeScore          Int?        @map("home_score")
+  awayScore          Int?        @map("away_score")
+  status             MatchStatus @default(SCHEDULED)
+  matchType          MatchType   @default(OTHER) @map("match_type")
+  notes              String?     @db.Text
+  createdBy          String?     @map("created_by")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+
+  event           Event           @relation(fields: [eventId], references: [id])
+  sport           Sport           @relation(fields: [sportId], references: [id])
+  season          Season?         @relation(fields: [seasonId], references: [id])
+  homeTeam        Team?           @relation("matchesHome", fields: [homeTeamId], references: [id])
+  awayTeam        Team?           @relation("matchesAway", fields: [awayTeamId], references: [id])
+  homeIndividual  StudentAthlete? @relation("matchesHomeIndividual", fields: [homeIndividualId], references: [id])
+  awayIndividual  StudentAthlete? @relation("matchesAwayIndividual", fields: [awayIndividualId], references: [id])
+  createdByUser   User?           @relation("matchesCreated", fields: [createdBy], references: [id])
+  lineups         MatchLineup[]
+  events          MatchEvent[]
+  results         MatchResult?
+  report          MatchReport?
+  documents       Document[]
+  performances    PlayerMatchPerformance[]
+
+  @@index([eventId])
+  @@index([scheduledDate])
+  @@index([status])
+  @@map("matches")
+}
+
+model MatchLineup {
+  id           String    @id @default(uuid())
+  matchId      String    @map("match_id")
+  teamId       String    @map("team_id")
+  submittedBy  String    @map("submitted_by")
+  submittedAt  DateTime  @default(now()) @map("submitted_at")
+  isConfirmed  Boolean   @default(false) @map("is_confirmed")
+
+  match      Match          @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team       Team           @relation(fields: [teamId], references: [id])
+  submittedByUser User      @relation(fields: [submittedBy], references: [id])
+  entries    MatchLineupEntry[]
+
+  @@unique([matchId, teamId])
+  @@map("match_lineups")
+}
+
+model MatchLineupEntry {
+  id            String  @id @default(uuid())
+  lineupId      String  @map("lineup_id")
+  athleteId     String  @map("athlete_id")
+  jerseyNumber  Int?    @map("jersey_number")
+  position      String?
+  isStarter     Boolean @default(false) @map("is_starter")
+  isCaptain     Boolean @default(false) @map("is_captain")
+  order         Int?
+
+  lineup  MatchLineup    @relation(fields: [lineupId], references: [id], onDelete: Cascade)
+  athlete StudentAthlete @relation(fields: [athleteId], references: [id])
+
+  @@index([lineupId])
+  @@map("match_lineup_entries")
+}
+
+model MatchEvent {
+  id                  String     @id @default(uuid())
+  matchId             String     @map("match_id")
+  eventType           String     @map("event_type")
+  minute              Int?       @map("minute")
+  teamId              String?    @map("team_id")
+  athleteId           String?    @map("athlete_id")
+  secondaryAthleteId  String?    @map("secondary_athlete_id")
+  details             String?    @db.Text
+  recordedBy          String?    @map("recorded_by")
+  recordedAt          DateTime   @default(now()) @map("recorded_at")
+
+  match            Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team             Team?           @relation(fields: [teamId], references: [id])
+  athlete          StudentAthlete? @relation(fields: [athleteId], references: [id])
+  secondaryAthlete StudentAthlete? @relation("matchEventsSecondary", fields: [secondaryAthleteId], references: [id])
+  recordedByUser   User?           @relation("matchEventsRecorded", fields: [recordedBy], references: [id])
+
+  @@index([matchId])
+  @@map("match_events")
+}
+
+model MatchResult {
+  id                 String     @id @default(uuid())
+  matchId            String     @unique @map("match_id")
+  homeScore          Int        @map("home_score")
+  awayScore          Int        @map("away_score")
+  winnerTeamId       String?    @map("winner_team_id")
+  resultType         String     @map("result_type") // HOME_WIN | AWAY_WIN | DRAW | penalties
+  homePenalties      Int?       @map("home_penalties")
+  awayPenalties      Int?       @map("away_penalties")
+  walkover           Boolean    @default(false)
+  verifiedBy         String?    @map("verified_by")
+  verifiedAt         DateTime?  @map("verified_at")
+
+  match        Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  winnerTeam   Team? @relation(fields: [winnerTeamId], references: [id])
+  verifiedByUser User? @relation("resultsVerified", fields: [verifiedBy], references: [id])
+
+  @@map("match_results")
+}
+
+model MatchReport {
+  id                String    @id @default(uuid())
+  matchId           String    @unique @map("match_id")
+  submittedBy       String    @map("submitted_by")
+  submittedAt       DateTime  @default(now()) @map("submitted_at")
+  summary           String?   @db.Text
+  mvpAthleteId      String?   @map("mvp_athlete_id")
+  attendanceCount   Int?      @map("attendance_count")
+  notableIncidents  String?   @map("notable_incidents") @db.Text
+  coachingNotes     String?   @map("coaching_notes") @db.Text
+
+  match        Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  submittedByUser User         @relation(fields: [submittedBy], references: [id])
+  mvpAthlete   StudentAthlete? @relation(fields: [mvpAthleteId], references: [id])
+
+  @@map("match_reports")
+}
+
+// ─── Player Performance ───────────────────────────────────────────────────────
+
+model PlayerMatchPerformance {
+  id                    String     @id @default(uuid())
+  matchId               String     @map("match_id")
+  athleteId             String     @map("athlete_id")
+  teamId                String     @map("team_id")
+  minutesPlayed         Int        @map("minutes_played")
+  points                Int?       @default(0)
+  assists               Int?       @default(0)
+  rebounds              Int?       @default(0)
+  steals                Int?       @default(0)
+  blocks                Int?       @default(0)
+  goals                 Int?       @default(0)
+  shotsOnTarget         Int?       @map("shots_on_target")
+  saves                 Int?       @default(0)
+  tackles               Int?       @default(0)
+  interceptions         Int?       @default(0)
+  passesCompleted       Int?       @map("passes_completed")
+  passesAttempted       Int?       @map("passes_attempted")
+  fouls                 Int?       @default(0)
+  yellowCards           Int?       @map("yellow_cards") @default(0)
+  redCards              Int?       @map("red_cards") @default(0)
+  sprints               Int?       @default(0)
+  distanceCoveredKm     Decimal?   @map("distance_covered_km") @db.Decimal(5, 2)
+  maxSpeedKph           Decimal?   @map("max_speed_kph") @db.Decimal(5, 2)
+  rating                Decimal?   @db.Decimal(3, 1)
+  notes                 String?    @db.Text
+  recordedBy            String     @map("recorded_by")
+  createdAt             DateTime   @default(now()) @map("created_at")
+  updatedAt             DateTime   @updatedAt @map("updated_at")
+
+  match         Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  athlete       StudentAthlete  @relation(fields: [athleteId], references: [id])
+  team          Team            @relation(fields: [teamId], references: [id])
+  recordedByUser User           @relation(fields: [recordedBy], references: [id])
+
+  @@unique([matchId, athleteId])
+  @@index([athleteId])
+  @@index([matchId])
+  @@map("player_match_performances")
+}
+
+model TrainingSession {
+  id            String         @id @default(uuid())
+  sportId       String         @map("sport_id")
+  teamId        String?        @map("team_id")
+  seasonId      String?        @map("season_id")
+  title         String
+  location      String?
+  sessionDate   DateTime       @map("session_date")
+  startTime     String?        @map("start_time")
+  endTime       String?        @map("end_time")
+  focusAreas    String?        @map("focus_areas") @db.Text
+  intensity     String?
+  status        TrainingStatus @default(SCHEDULED)
+  createdBy     String         @map("created_by")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  sport         Sport                    @relation(fields: [sportId], references: [id])
+  team          Team?                    @relation(fields: [teamId], references: [id])
+  season        Season?                  @relation(fields: [seasonId], references: [id])
+  createdByUser User                     @relation(fields: [createdBy], references: [id])
+  attendance    TrainingAttendance[]
+
+  @@index([sessionDate])
+  @@map("training_sessions")
+}
+
+model TrainingAttendance {
+  id            String           @id @default(uuid())
+  sessionId     String           @map("session_id")
+  athleteId     String           @map("athlete_id")
+  status        AttendanceStatus @default(PRESENT)
+  notes         String?          @db.Text
+  recordedBy    String?          @map("recorded_by")
+  recordedAt    DateTime         @default(now()) @map("recorded_at")
+
+  session      TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  athlete      StudentAthlete  @relation(fields: [athleteId], references: [id])
+  recordedByUser User?         @relation(fields: [recordedBy], references: [id])
+
+  @@unique([sessionId, athleteId])
+  @@index([athleteId])
+  @@map("training_attendance")
 }

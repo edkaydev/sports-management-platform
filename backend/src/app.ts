@@ -18,6 +18,10 @@ import { contractsRouter } from './modules/scholarships/contracts.routes';
 import { recruitmentRouter } from './modules/recruitment/recruitment.routes';
 import { documentsRouter } from './modules/documents/documents.routes';
 import { notificationsRouter } from './modules/notifications/notifications.routes';
+import { eventsRouter } from './modules/events/events.routes';
+import { matchesRouter } from './modules/matches/matches.routes';
+import { performanceRouter } from './modules/performance/performance.routes';
+import { reportsRouter } from './modules/reports/reports.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -71,6 +75,10 @@ app.use('/api/contracts', contractsRouter);
 app.use('/api/recruitment', recruitmentRouter);
 app.use('/api/documents', documentsRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/events', eventsRouter);
+app.use('/api/matches', matchesRouter);
+app.use('/api', performanceRouter);
+app.use('/api/reports', reportsRouter);
 
 // 404 handler
 app.use((_req, res) => {
