@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -15,6 +16,7 @@ import { academicRouter } from './modules/academic/academic.routes';
 import { scholarshipsRouter } from './modules/scholarships/scholarships.routes';
 import { contractsRouter } from './modules/scholarships/contracts.routes';
 import { recruitmentRouter } from './modules/recruitment/recruitment.routes';
+import { documentsRouter } from './modules/documents/documents.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -49,6 +51,12 @@ app.use(cookieParser());
 // Request logging
 app.use(requestLogger);
 
+// Serve uploaded documents
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '..', 'uploads'))
+);
+
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
@@ -60,6 +68,7 @@ app.use('/api/academic-records', academicRouter);
 app.use('/api/scholarships', scholarshipsRouter);
 app.use('/api/contracts', contractsRouter);
 app.use('/api/recruitment', recruitmentRouter);
+app.use('/api/documents', documentsRouter);
 
 // 404 handler
 app.use((_req, res) => {
