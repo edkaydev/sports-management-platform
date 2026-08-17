@@ -186,13 +186,13 @@ For large trials (e.g., 40 prospects at a gala trial):
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | RECRUITER | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| Create prospect | ✅ | ❌ | ✅ | ❌ |
-| Schedule trial | ✅ | ❌ | ✅ | ❌ |
-| Record trial attendance | ✅ | ✅ | ✅ | ❌ |
-| Submit assessment | ✅ | ✅ | ✅ | ❌ |
-| Make selection decision | ✅ | ❌ | ❌ | ❌ |
-| Convert prospect to athlete | ✅ | ❌ | ❌ | ❌ |
-| View own trial result | ✅ | 🔶 | 🔶 | 👁 own |
-| Export trial report | ✅ | ❌ | ✅ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create prospect | ✅ | ✅ |
+| Schedule trial | ✅ | ✅ |
+| Record trial attendance | ✅ | ✅ |
+| Submit assessment | ✅ | ✅ |
+| Make selection decision | ✅ | ✅ |
+| Convert prospect to athlete | ✅ | ✅ |
+| View trial results | ✅ | ✅ |
+| Export trial report | ✅ | ✅ |

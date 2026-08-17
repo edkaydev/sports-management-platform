@@ -2,7 +2,6 @@ import { Prisma, ProspectStatus, TrialStatus, SelectionOutcome } from '@prisma/c
 import { Decimal } from '@prisma/client/runtime/library';
 import prisma from '../../config/database';
 import { AppError } from '../../middleware/error.middleware';
-import bcrypt from 'bcrypt';
 import type {
   CreateProspectInput,
   UpdateProspectInput,
@@ -413,19 +412,7 @@ export async function enrollProspect(
     ? await prisma.user.findUnique({ where: { email: prospect.email } })
     : null;
 
-  let user = existingUser;
-  if (!user && prospect.email) {
-    const tempPassword = `Prospect${Math.floor(Math.random() * 9000 + 1000)}!`;
-    user = await prisma.user.create({
-      data: {
-        email: prospect.email,
-        fullName: prospect.fullName,
-        passwordHash: await bcrypt.hash(tempPassword, 10),
-        role: 'ATHLETE',
-        phoneNumber: prospect.phoneNumber,
-      },
-    });
-  }
+  const user = existingUser;
 
   const assessment = prospect.assessments[0];
 

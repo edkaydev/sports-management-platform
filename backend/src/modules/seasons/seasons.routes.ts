@@ -3,7 +3,6 @@ import * as seasonsController from "./seasons.controller";
 import { createSeasonSchema, updateSeasonSchema } from "./seasons.schema";
 import { validate } from "../../middleware/validate.middleware";
 import { verifyToken, requireRole } from "../../middleware/auth.middleware";
-import { UserRole } from "@prisma/client";
 
 export const seasonsRouter = Router();
 
@@ -14,18 +13,18 @@ seasonsRouter.get("/:id", seasonsController.getSeason);
 
 seasonsRouter.post(
   "/",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR", "SPORTS_REP"),
   validate(createSeasonSchema),
   seasonsController.createSeason,
 );
 seasonsRouter.patch(
   "/:id",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR", "SPORTS_REP"),
   validate(updateSeasonSchema),
   seasonsController.updateSeason,
 );
 seasonsRouter.delete(
   "/:id",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR"),
   seasonsController.deleteSeason,
 );

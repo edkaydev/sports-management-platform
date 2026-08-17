@@ -29,7 +29,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Reports Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   adminId = admin.id;
@@ -179,5 +179,27 @@ describe('GET /api/reports/athletes CSV export', () => {
     expect(res.status).toBe(200);
     expect(res.headers['content-type']).toContain('text/csv');
     expect(res.text).toContain('name');
+  });
+});
+
+describe('GET /api/reports/athletes PDF export', () => {
+  it('returns a PDF file', async () => {
+    const res = await request(app)
+      .get('/api/reports/athletes?format=pdf')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('application/pdf');
+    expect(res.headers['content-disposition']).toContain('athletes.pdf');
+    expect(res.body instanceof Buffer || typeof res.body === 'string').toBe(true);
+    expect(String(res.body).startsWith('%PDF')).toBe(true);
+  });
+
+  it('returns PDF for department overview', async () => {
+    const res = await request(app)
+      .get('/api/reports/overview?format=pdf')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('application/pdf');
+    expect(String(res.body).startsWith('%PDF')).toBe(true);
   });
 });

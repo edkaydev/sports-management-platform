@@ -16,10 +16,10 @@ beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
 
   await prisma.user.create({
-    data: { email: ADMIN_EMAIL, fullName: 'News Test Admin', passwordHash: hash, role: UserRole.SPORTS_ADMIN },
+    data: { email: ADMIN_EMAIL, fullName: 'News Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
   await prisma.user.create({
-    data: { email: COACH_EMAIL, fullName: 'News Test Coach', passwordHash: hash, role: UserRole.COACH },
+    data: { email: COACH_EMAIL, fullName: 'News Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
   });
 
   const adminLogin = await request(app).post('/api/auth/login').send({ email: ADMIN_EMAIL, password: TEST_PASSWORD });
@@ -47,12 +47,12 @@ describe('POST /api/news', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns 403 for COACH', async () => {
+  it('allows a SPORTS_REP to create news', async () => {
     const res = await request(app)
       .post('/api/news')
       .set('Authorization', `Bearer ${coachToken}`)
-      .send({ title: 'Denied', content: 'x'.repeat(20) });
-    expect(res.status).toBe(403);
+      .send({ title: 'Allowed', content: 'x'.repeat(20) });
+    expect(res.status).toBe(201);
   });
 
   it('creates a draft news post', async () => {

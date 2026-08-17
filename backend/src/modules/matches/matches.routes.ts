@@ -23,55 +23,55 @@ router.get('/:id/lineups', controller.getLineups);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createMatchSchema),
   controller.createMatch
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateMatchSchema),
   controller.updateMatch
 );
 
 router.patch(
   '/:id/status',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.updateStatus
 );
 
 router.post(
   '/:id/lineups',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH', 'TEAM_MANAGER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(submitLineupSchema),
   controller.submitLineup
 );
 
 router.post(
   '/:id/events',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH', 'OFFICIAL'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(recordMatchEventSchema),
   controller.recordMatchEvent
 );
 
 router.post(
   '/:id/result',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH', 'OFFICIAL'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(recordResultSchema),
   controller.recordResult
 );
 
 router.post(
   '/:id/report',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(submitMatchReportSchema),
   controller.submitMatchReport
 );
 
 router.delete(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR'),
   controller.deleteMatch
 );
 

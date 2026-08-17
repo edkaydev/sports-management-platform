@@ -33,7 +33,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Performance Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   adminId = admin.id;

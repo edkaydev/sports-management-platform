@@ -9,9 +9,15 @@ router.get('/results', controller.results);
 
 router.get('/sports', controller.sports);
 
+router.get('/sports/:id', controller.sportDetail);
+
 router.get('/teams', controller.teams);
 
+router.get('/teams/:id', controller.teamDetail);
+
 router.get('/events', controller.events);
+
+router.get('/events/:id', controller.eventDetail);
 
 router.get('/news/:slug', controller.newsBySlug);
 

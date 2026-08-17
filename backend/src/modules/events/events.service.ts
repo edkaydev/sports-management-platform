@@ -166,7 +166,7 @@ export async function registerParticipant(
   });
 
   const admins = await prisma.user.findMany({
-    where: { role: { in: ['SPORTS_ADMIN', 'SUPER_ADMIN'] } },
+    where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
     select: { id: true },
   });
   if (admins.length > 0) {

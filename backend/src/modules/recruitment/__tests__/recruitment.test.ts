@@ -18,12 +18,26 @@ let athleteId: string;
 beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
 
+  await prisma.refreshToken.deleteMany({
+    where: {
+      user: { email: { in: [ADMIN_EMAIL, COACH_EMAIL] } },
+    },
+  });
+  await prisma.notification.deleteMany({
+    where: {
+      recipient: { email: { in: [ADMIN_EMAIL, COACH_EMAIL] } },
+    },
+  });
+  await prisma.user.deleteMany({
+    where: { email: { in: [ADMIN_EMAIL, COACH_EMAIL] } },
+  });
+
   await prisma.user.create({
     data: {
       email: ADMIN_EMAIL,
       fullName: 'Recruitment Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
 
@@ -32,7 +46,7 @@ beforeAll(async () => {
       email: COACH_EMAIL,
       fullName: 'Recruitment Test Coach',
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -55,27 +69,34 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.recruitmentRecord.deleteMany({});
-  await prisma.trialAssessment.deleteMany({ where: { trialId } });
-  await prisma.trialParticipant.deleteMany({ where: { trialId } });
-  await prisma.trial.deleteMany({ where: { id: trialId } });
-  await prisma.prospect.deleteMany({ where: { id: prospectId } });
+  try {
+    if (sportId) {
+      await prisma.recruitmentRecord.deleteMany({ where: { prospect: { sportId } } });
+      await prisma.trialAssessment.deleteMany({ where: { trial: { sportId } } });
+      await prisma.trialParticipant.deleteMany({ where: { trial: { sportId } } });
+      await prisma.trial.deleteMany({ where: { sportId } });
+      await prisma.prospect.deleteMany({ where: { sportId } });
 
-  const athletes = await prisma.studentAthlete.findMany({
-    where: { email: { startsWith: 'prospect.' } },
-    select: { id: true },
-  });
-  const athleteIds = athletes.map((a) => a.id);
-  await prisma.sportAffiliation.deleteMany({ where: { athleteId: { in: athleteIds } } });
-  await prisma.studentAthlete.deleteMany({ where: { id: { in: athleteIds } } });
+      const athletes = await prisma.studentAthlete.findMany({
+        where: { email: { startsWith: 'prospect.' } },
+        select: { id: true },
+      });
+      const athleteIds = athletes.map((a) => a.id);
+      await prisma.sportAffiliation.deleteMany({ where: { athleteId: { in: athleteIds } } });
+      await prisma.studentAthlete.deleteMany({ where: { id: { in: athleteIds } } });
+      await prisma.sport.deleteMany({ where: { id: sportId } });
+    }
+  } catch {
+    // best-effort cleanup
+  }
 
-  await prisma.sport.deleteMany({ where: { id: sportId } });
   const userIds = (
     await prisma.user.findMany({
-      where: { email: { in: [ADMIN_EMAIL, COACH_EMAIL, 'prospect.one@example.com'] } },
+      where: { email: { in: [ADMIN_EMAIL, COACH_EMAIL] } },
       select: { id: true },
     })
   ).map((u) => u.id);
+  await prisma.notification.deleteMany({ where: { recipientUserId: { in: userIds } } });
   await prisma.refreshToken.deleteMany({ where: { userId: { in: userIds } } });
   await prisma.user.deleteMany({ where: { id: { in: userIds } } });
   await prisma.$disconnect();
@@ -102,12 +123,12 @@ describe('POST /api/recruitment/prospects', () => {
     prospectId = res.body.data.id;
   });
 
-  it('returns 403 for COACH', async () => {
+  it('allows a SPORTS_REP to create prospects', async () => {
     const res = await request(app)
       .post('/api/recruitment/prospects')
       .set('Authorization', `Bearer ${coachToken}`)
       .send({ fullName: 'Denied', gender: 'MALE', sportId });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });
 

@@ -27,7 +27,7 @@ beforeAll(async () => {
       email: TEST_ADMIN_EMAIL,
       fullName: "Seasons Test Admin",
       passwordHash: hash,
-      role: UserRole.SUPER_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   await prisma.user.create({
@@ -35,7 +35,7 @@ beforeAll(async () => {
       email: TEST_COACH_EMAIL,
       fullName: "Seasons Test Coach",
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -148,12 +148,12 @@ describe("POST /api/seasons", () => {
     expect(res.body.error).toBe("CONFLICT");
   });
 
-  it("forbids a coach from creating seasons", async () => {
+  it("allows a SPORTS_REP to create seasons", async () => {
     const res = await request(app)
       .post("/api/seasons")
       .set("Authorization", `Bearer ${coachToken}`)
       .send(seasonPayload());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 
   it("keeps a single current season when marked current", async () => {
@@ -246,12 +246,16 @@ describe("PATCH /api/seasons/:id", () => {
     expect(bad.body.error).toBe("VALIDATION_ERROR");
   });
 
-  it("forbids a coach from updating seasons", async () => {
-    const res = await request(app)
-      .patch("/api/seasons/00000000-0000-0000-0000-000000000000")
+  it("allows a SPORTS_REP to update seasons", async () => {
+    const create = await request(app)
+      .post("/api/seasons")
       .set("Authorization", `Bearer ${coachToken}`)
-      .send({ name: "nope" });
-    expect(res.status).toBe(403);
+      .send(seasonPayload());
+    const res = await request(app)
+      .patch(`/api/seasons/${create.body.data.id}`)
+      .set("Authorization", `Bearer ${coachToken}`)
+      .send({ name: `SR${Date.now()}` });
+    expect(res.status).toBe(200);
   });
 });
 

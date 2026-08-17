@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import { api, downloadFile } from '@/lib/api';
 import { PageHeader, Card, Table, Spinner, EmptyState, Button, Field, inputClass, statusColor, Badge } from '@/components/ui';
 
 export default function ReportsPage() {
@@ -60,34 +60,44 @@ export default function ReportsPage() {
 
       {report === 'overview' &&
         (overview ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card className="p-4">
-              <div className="text-sm text-muted">Total Athletes</div>
-              <div className="text-2xl font-semibold mt-1">{overview.totalAthletes}</div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-sm text-muted">Active Teams</div>
-              <div className="text-2xl font-semibold mt-1">{overview.activeTeams}</div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-sm text-muted">Active Scholarships</div>
-              <div className="text-2xl font-semibold mt-1">{overview.activeScholarships}</div>
-            </Card>
-            <Card className="p-4">
-              <div className="text-sm text-muted">Documents</div>
-              <div className="text-2xl font-semibold mt-1">{overview.totalDocuments}</div>
-            </Card>
-          </div>
+          <>
+            <div className="mb-6 flex gap-2">
+              <Button variant="secondary" onClick={() => downloadFile('/reports/overview?format=pdf', 'department-overview.pdf')}>
+                Download PDF
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <Card className="p-4">
+                <div className="text-sm text-muted">Total Athletes</div>
+                <div className="text-2xl font-semibold mt-1">{overview.totalAthletes}</div>
+              </Card>
+              <Card className="p-4">
+                <div className="text-sm text-muted">Active Teams</div>
+                <div className="text-2xl font-semibold mt-1">{overview.activeTeams}</div>
+              </Card>
+              <Card className="p-4">
+                <div className="text-sm text-muted">Active Scholarships</div>
+                <div className="text-2xl font-semibold mt-1">{overview.activeScholarships}</div>
+              </Card>
+              <Card className="p-4">
+                <div className="text-sm text-muted">Documents</div>
+                <div className="text-2xl font-semibold mt-1">{overview.totalDocuments}</div>
+              </Card>
+            </div>
+          </>
         ) : (
           <Spinner />
         ))}
 
       {report === 'athletes' && (
         <>
-          <div className="mb-4">
-            <a href="/api/reports/athletes?format=csv" target="_blank" rel="noreferrer">
-              <Button variant="secondary">Export CSV</Button>
-            </a>
+          <div className="mb-4 flex gap-2">
+            <Button variant="secondary" onClick={() => downloadFile('/reports/athletes?format=csv', 'athletes.csv')}>
+              Export CSV
+            </Button>
+            <Button variant="secondary" onClick={() => downloadFile('/reports/athletes?format=pdf', 'athletes.pdf')}>
+              Export PDF
+            </Button>
           </div>
           {loadingAthletes ? (
             <Spinner />
@@ -118,16 +128,19 @@ export default function ReportsPage() {
 
       {report === 'academic' && (
         <>
-          <div className="mb-4 flex gap-3 items-end flex-wrap">
-            <div className="max-w-[200px]">
-              <Field label="Season">
-                <input className={inputClass} value={season} onChange={(e) => setSeason(e.target.value)} />
-              </Field>
+            <div className="flex gap-2 items-end flex-wrap">
+              <div className="max-w-[200px]">
+                <Field label="Season">
+                  <input className={inputClass} value={season} onChange={(e) => setSeason(e.target.value)} />
+                </Field>
+              </div>
+              <Button variant="secondary" onClick={() => downloadFile(`/reports/academic-standing?season=${encodeURIComponent(season)}&format=csv`, 'academic-standing.csv')}>
+                Export CSV
+              </Button>
+              <Button variant="secondary" onClick={() => downloadFile(`/reports/academic-standing?season=${encodeURIComponent(season)}&format=pdf`, 'academic-standing.pdf')}>
+                Export PDF
+              </Button>
             </div>
-            <a href={`/api/reports/academic-standing?season=${season}&format=csv`} target="_blank" rel="noreferrer">
-              <Button variant="secondary">Export CSV</Button>
-            </a>
-          </div>
           {loadingAcademic ? (
             <Spinner />
           ) : !academic?.records?.length ? (

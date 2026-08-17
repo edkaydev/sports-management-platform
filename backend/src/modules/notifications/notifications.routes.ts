@@ -16,7 +16,7 @@ router.patch('/:id/read', controller.markAsRead);
 
 router.post(
   '/run-checks',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR'),
   controller.runChecks
 );
 

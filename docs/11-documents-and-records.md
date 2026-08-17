@@ -153,19 +153,20 @@ Some documents are not tied to a specific athlete but to the department:
 - Competition entry forms (team-level)
 - University sports policy documents
 - Training schedules
-- Budget documents (restricted to SPORTS_ADMIN)
+- Budget documents (restricted to TUTOR)
 - Inter-university correspondence
 
 ---
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | ATHLETE |
-|---|:---:|:---:|:---:|
-| Upload document (athlete) | ✅ | 🔶 own team | 🔶 own docs |
-| Upload document (team) | ✅ | 🔶 own team | ❌ |
-| Upload document (event/match) | ✅ | 🔶 | ❌ |
-| View athlete documents | ✅ | 🔶 own team | 👁 own only |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Upload document (athlete) | ✅ | ✅ |
+| Upload document (team) | ✅ | ✅ |
+| Upload document (event/match) | ✅ | ✅ |
+| View athlete documents | ✅ | ✅ |
+| Delete document | ✅ | ❌ |
 | Delete document | ✅ | ❌ | ❌ |
 | Verify document | ✅ | ❌ | ❌ |
 | View document checklist | ✅ | 🔶 | 👁 own only |

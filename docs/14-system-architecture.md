@@ -376,7 +376,7 @@ This table maps each architectural concept to where it is used in the system.
 | Concept | Where it appears in this project |
 |---|---|
 | **Authentication** | JWT access + refresh tokens. Login, token refresh, password reset. Defined in `16-permissions-and-security.md` and `17-api-specification.md` (`/api/auth/*`). |
-| **RBAC** | 9 roles (SUPER_ADMIN → ATHLETE). Every API route declares required roles. Data scoping enforced per role in the service layer. Defined in `02-users-and-roles.md` and `16-permissions-and-security.md`. |
+| **RBAC** | 2 roles: TUTOR (full access) and SPORTS_REP (content editing). Every API route declares required roles. Defined in `02-users-and-roles.md` and `16-permissions-and-security.md`. |
 | **Docker** | Full `docker-compose.yml` with three services: MySQL, Express API, React client. See Docker section above. |
 | **CORS** | Express API allows only the frontend domain. Configured via `cors` middleware with explicit `origin` whitelist. Defined in `16-permissions-and-security.md`. |
 | **Clean Architecture** | Backend is structured in layers: Routes → Controllers → Services → Prisma (DB). Business logic lives in the service layer only — controllers never touch the DB directly. This makes it easy to swap Prisma or MySQL without rewriting business rules. |

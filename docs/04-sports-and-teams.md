@@ -27,7 +27,7 @@ UMU currently offers the following sports (from the official registration form):
 | 13 | Chess | Mixed | |
 | 14 | Scrabble | Mixed | |
 
-New sports can be added by SPORTS_ADMIN as the department grows.
+New sports can be added by the TUTOR or SPORTS_REP as the department grows.
 
 ---
 
@@ -162,14 +162,15 @@ TrainingAttendance
 
 ## Team Management Actions
 
-| Action | SPORTS_ADMIN | COACH | TEAM_MANAGER |
-|---|:---:|:---:|:---:|
-| Create/edit sport | ✅ | ❌ | ❌ |
-| Create/edit team | ✅ | ❌ | ❌ |
-| Manage squad (add/remove) | ✅ | 🔶 own team | ❌ |
-| Assign coaching staff | ✅ | ❌ | ❌ |
-| Log training sessions | ✅ | ✅ | ❌ |
-| Record training attendance | ✅ | ✅ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create/edit sport | ✅ | ✅ |
+| Create/edit team | ✅ | ✅ |
+| Manage squad (add/remove) | ✅ | ✅ |
+| Assign coaching staff | ✅ | ✅ |
+| Log training sessions | ✅ | ✅ |
+| Record training attendance | ✅ | ✅ |
+| Delete sport/team | ✅ | ❌ |
 | View team roster | ✅ | ✅ | ✅ |
 | Export squad list | ✅ | ✅ | ✅ |
 

@@ -208,13 +208,14 @@ The athlete list should support filtering by:
 
 ## Actions Available per Role
 
-| Action | SPORTS_ADMIN | COACH | TEAM_MANAGER | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| Create athlete profile | ✅ | ❌ | ❌ | ❌ |
-| Edit athlete profile | ✅ | ❌ | ❌ | ❌ |
-| View full 360° profile | ✅ | 🔶 (own team) | 🔶 | 👁 (own only) |
-| Change athlete type | ✅ | ❌ | ❌ | ❌ |
-| Add sport affiliation | ✅ | 🔶 | ❌ | ❌ |
-| Update medical declaration | ✅ | ❌ | ❌ | ❌ |
-| Deactivate athlete | ✅ | ❌ | ❌ | ❌ |
-| Export athlete data | ✅ | ❌ | ❌ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create athlete profile | ✅ | ✅ |
+| Edit athlete profile | ✅ | ✅ |
+| View full 360° profile | ✅ | ✅ |
+| Change athlete type | ✅ | ✅ |
+| Add sport affiliation | ✅ | ✅ |
+| Update medical declaration | ✅ | ✅ |
+| Deactivate athlete | ✅ | ✅ |
+| Export athlete data | ✅ | ✅ |
+| Delete athlete (soft) | ✅ | ❌ |

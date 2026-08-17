@@ -2,167 +2,57 @@
 
 ## Overview
 
-The system uses **Role-Based Access Control (RBAC)**. Every user is assigned one or more roles, and each role has a defined set of permissions across each module.
+The system uses **Role-Based Access Control (RBAC)** with exactly **two roles**:
+`TUTOR` (Overall/Sports Tutor) and `SPORTS_REP` (Secretary of Sports on the
+University Union). There are no athlete-facing logins; the public website is
+available to all visitors without authentication.
 
 ---
 
 ## Roles
 
-### 1. SUPER_ADMIN
+### 1. TUTOR (Sports Tutor / Overall)
 
-System-level administrator. Has unrestricted access to everything.
+The primary operator and overall owner of the system (e.g. the UMU Sports Tutor).
 
 **Responsibilities:**
+- Everything SPORTS_REP can do
 - Create and manage user accounts
-- Configure system settings
-- Assign roles to users
-- View all audit logs
-- Manage academic year / season configuration
+- Permanently delete core records (sports, teams, events, matches, seasons, athletes, news)
+- Approve / publish sensitive state changes and verify match results
+- Full system configuration
 
----
+### 2. SPORTS_REP (Secretary of Sports, University Union)
 
-### 2. SPORTS_ADMIN (Sports Tutor)
-
-The primary operator of the system. This is the UMU Sports Tutor or department head.
+Handles day-to-day sports content and operations on behalf of the Union.
 
 **Responsibilities:**
-- Full management of all student-athletes
-- Manage all teams, sports, fixtures, and competitions
-- Manage scholarships
-- View academic performance data
-- Approve recruitment and trial outcomes
-- Generate all reports
-- Manage document records
-- Configure notification rules
+- Create and edit all content: sports, teams, athletes, fixtures, results, events, news
+- Manage squads and team staff assignments
+- Record match events, lineups, and reports
+- Manage recruitment prospects and trials
+- Manage academic records, scholarships, contracts, and documents
+- View and export all reports (JSON, CSV, and PDF)
+
+**Restrictions:**
+- Cannot create or manage user accounts
+- Cannot permanently delete core records (tutor-only)
+- Cannot approve/verify results or change core statuses that require tutor authority
 
 ---
 
-### 3. COACH
+## Role Permission Summary
 
-Manages one or more sports teams. Can manage training and match-day operations for their assigned teams.
-
-**Responsibilities:**
-- Manage team rosters (within assigned teams)
-- Create and edit training sessions
-- Set match lineups and substitutions
-- Record player performance (within assigned teams)
-- View athlete academic status (read-only)
-- Submit match reports
-- Conduct trial assessments
-
-**Restriction:** Can only access data for teams they are assigned to.
-
----
-
-### 4. TEAM_MANAGER
-
-Administrative support for a specific team.
-
-**Responsibilities:**
-- Manage team logistics (travel, venue, equipment)
-- View fixture schedule
-- Track player availability
-- Upload team documents
-- View athlete profiles (read-only)
-
-**Restriction:** Read-only on performance and academic data.
-
----
-
-### 5. SPORTS_OFFICIAL / REFEREE
-
-Match officials who record live match data.
-
-**Responsibilities:**
-- Record match scores, goals, cards, and events
-- Submit official match reports
-- View match fixture details
-
-**Restriction:** Can only edit matches they are assigned to.
-
----
-
-### 6. ACADEMIC_STAFF
-
-Representatives from faculties/academic registry who provide academic data.
-
-**Responsibilities:**
-- Enter/update student GPA and academic records
-- Flag academic warnings for athletes
-- View athlete academic profile
-
-**Restriction:** Cannot access sports performance, scholarships, or recruitment data.
-
----
-
-### 7. STUDENT_ATHLETE
-
-The student-athlete themselves.
-
-**Responsibilities:**
-- View own full profile (360° view)
-- View own match history and performance stats
-- View own academic record (as entered by academic staff)
-- View own scholarship status
-- View team fixtures and schedule
-- Upload own documents when requested
-- View recruitment/trial status
-
-**Restriction:** Read-only across all data. Can only see their own data.
-
----
-
-### 8. UNIVERSITY_ADMIN
-
-Senior university administration (e.g., Vice Chancellor's office, Finance).
-
-**Responsibilities:**
-- View institutional-level sports reports
-- View scholarship summaries
-- View enrollment and participation statistics
-
-**Restriction:** No write access. Reporting only.
-
----
-
-### 9. RECRUITER / SCOUT
-
-Manages the recruitment pipeline and trial process.
-
-**Responsibilities:**
-- Register prospects
-- Schedule and manage trials
-- Record trial assessments and scores
-- Recommend athletes for teams
-- View prospect profiles
-
-**Restriction:** Cannot access existing athlete academic records or scholarship data.
-
----
-
-## Role Permission Matrix
-
-| Permission | SUPER_ADMIN | SPORTS_ADMIN | COACH | TEAM_MANAGER | OFFICIAL | ACADEMIC | ATHLETE | UNI_ADMIN | RECRUITER |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Manage users | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Manage athletes | ✅ | ✅ | 🔶 | 🔶 | ❌ | ❌ | 👁 | ❌ | ❌ |
-| Manage teams | ✅ | ✅ | 🔶 | 🔶 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Manage fixtures | ✅ | ✅ | 🔶 | 🔶 | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Record match data | ✅ | ✅ | 🔶 | ❌ | 🔶 | ❌ | ❌ | ❌ | ❌ |
-| View match data | ✅ | ✅ | ✅ | ✅ | 🔶 | ❌ | 🔶 | ✅ | ❌ |
-| Manage academic data | ✅ | ✅ | 👁 | ❌ | ❌ | ✅ | 👁 | 👁 | ❌ |
-| Manage scholarships | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 👁 | 👁 | ❌ |
-| Manage recruitment | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | 👁 | ❌ | ✅ |
-| Manage documents | ✅ | ✅ | 🔶 | 🔶 | ❌ | ❌ | 🔶 | ❌ | 🔶 |
-| View reports | ✅ | ✅ | 🔶 | 🔶 | ❌ | 🔶 | 👁 | ✅ | 🔶 |
-| System config | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Audit logs | ✅ | 🔶 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-
-**Legend:**
-- ✅ Full access
-- 🔶 Partial / scoped access (own team/data only)
-- 👁 Read-only
-- ❌ No access
+| Operation | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create / edit content (athletes, teams, sports, fixtures, results, events, news) | ✅ | ✅ |
+| Manage squads / staff / lineups / match events | ✅ | ✅ |
+| Manage recruitment, academic, scholarships, contracts, documents | ✅ | ✅ |
+| View & export reports (JSON / CSV / PDF) | ✅ | ✅ |
+| Delete core records | ✅ | ❌ |
+| Manage user accounts | ✅ | ❌ |
+| Verify results / approve sensitive state changes | ✅ | ❌ |
+| Public website (no login) | — | — |
 
 ---
 
@@ -174,54 +64,40 @@ User
 ├── full_name
 ├── email (unique)
 ├── password_hash
-├── role (enum: SUPER_ADMIN | SPORTS_ADMIN | COACH | TEAM_MANAGER | OFFICIAL | ACADEMIC | ATHLETE | UNI_ADMIN | RECRUITER)
+├── role (enum: TUTOR | SPORTS_REP)
 ├── is_active (boolean)
 ├── profile_photo_url
 ├── phone_number
 ├── created_at
 ├── updated_at
 └── last_login_at
-
-UserScope (for scoped roles like COACH, OFFICIAL)
-├── user_id (FK → User)
-├── scope_type (enum: TEAM | SPORT | MATCH)
-└── scope_id (FK to relevant table)
 ```
 
 ---
 
 ## Authentication
 
-- JWT-based authentication
+- JWT-based authentication (staff only)
 - Access token: short-lived (15 minutes)
-- Refresh token: long-lived (7 days), stored in `httpOnly` cookie
+- Refresh token: long-lived (7 days)
 - Passwords hashed with `bcrypt` (minimum 12 rounds)
-- Failed login attempts: lock account after 5 consecutive failures
+- Account lockout after 5 consecutive failed login attempts
 - Password reset via email token (expires in 1 hour)
 
 ---
 
 ## Registration Flow
 
-### For Staff / Coaches / Officials
-1. SPORTS_ADMIN or SUPER_ADMIN creates the account
-2. System sends invite email with temporary password
+1. The TUTOR creates a staff account with role `TUTOR` or `SPORTS_REP`
+2. System sends an invite email with a temporary password
 3. User sets their own password on first login
 
-### For Student-Athletes
-1. Student completes the physical / digital UMU Sports Registration Form
-2. SPORTS_ADMIN creates their account and links to their student profile
-3. Student receives login credentials via email
-
-### For Academic Staff
-1. SUPER_ADMIN creates account and assigns `ACADEMIC` role
-2. Scoped to specific faculty/school
+No self-registration and no athlete/visitor accounts exist.
 
 ---
 
 ## Notes
 
-- A user can have only one primary role in v1.0
-- The `STUDENT_ATHLETE` role is always linked to exactly one `StudentAthlete` record
-- Role changes must be performed by `SUPER_ADMIN` only
-- All login events and role changes are recorded in the audit log
+- A user has exactly one role (`TUTOR` or `SPORTS_REP`)
+- Role changes are performed by the TUTOR only
+- The public site is open to everyone and never requires login

@@ -17,10 +17,10 @@ beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
 
   await prisma.user.create({
-    data: { email: TEST_ADMIN_EMAIL, fullName: 'Athletes Test Admin', passwordHash: hash, role: UserRole.SUPER_ADMIN },
+    data: { email: TEST_ADMIN_EMAIL, fullName: 'Athletes Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
   await prisma.user.create({
-    data: { email: TEST_COACH_EMAIL, fullName: 'Athletes Test Coach', passwordHash: hash, role: UserRole.COACH },
+    data: { email: TEST_COACH_EMAIL, fullName: 'Athletes Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
   });
 
   const sport = await prisma.sport.create({
@@ -179,12 +179,12 @@ describe('POST /api/athletes', () => {
     expect(res.body.error).toBe('VALIDATION_ERROR');
   });
 
-  it('forbids a coach from creating athletes', async () => {
+  it('allows a SPORTS_REP to create athletes', async () => {
     const res = await request(app)
       .post('/api/athletes')
       .set('Authorization', `Bearer ${coachToken}`)
       .send(athletePayload());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });
 
@@ -267,12 +267,16 @@ describe('PATCH /api/athletes/:id', () => {
     expect(res.body.data.affiliations[0]).toMatchObject({ position: 'Defender', teamId });
   });
 
-  it('forbids a coach from updating athletes', async () => {
+  it('allows a SPORTS_REP to update athletes', async () => {
+    const create = await request(app)
+      .post('/api/athletes')
+      .set('Authorization', `Bearer ${coachToken}`)
+      .send(athletePayload());
     const res = await request(app)
-      .patch('/api/athletes/00000000-0000-0000-0000-000000000000')
+      .patch(`/api/athletes/${create.body.data.id}`)
       .set('Authorization', `Bearer ${coachToken}`)
       .send({ yearOfStudy: 4 });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
   });
 });
 

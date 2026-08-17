@@ -65,7 +65,7 @@ CourseResult
 
 ## Academic Thresholds
 
-These thresholds determine when an alert is triggered. They are configurable by SPORTS_ADMIN.
+These thresholds determine when an alert is triggered. They are configurable by the TUTOR.
 
 ```
 AcademicThreshold (system config)
@@ -141,7 +141,7 @@ A trend chart shows GPA movement over time.
 Academic Staff assigned to a faculty log into the system and enter GPA, results, and standing per athlete.
 
 ### Option B — Bulk Import
-SPORTS_ADMIN or Academic Staff uploads a CSV/Excel file with columns:
+The TUTOR or SPORTS_REP uploads a CSV/Excel file with columns:
 ```
 registration_number, academic_year, semester, gpa, cgpa, failed_units, attendance, standing
 ```
@@ -163,13 +163,8 @@ Academic data is sensitive. Access is strictly controlled:
 
 | Role | Access |
 |---|---|
-| SPORTS_ADMIN | Full read + write (can enter/edit) |
-| ACADEMIC_STAFF | Full read + write (for own faculty athletes) |
-| COACH | Read-only (see standing, GPA — no course-level detail) |
-| TEAM_MANAGER | No access |
-| ATHLETE | Read-only own records |
-| UNIVERSITY_ADMIN | Aggregate reporting only (no individual records) |
-| RECRUITER | No access |
+| TUTOR | Full read + write (can enter/edit) |
+| SPORTS_REP | Full read + write (can enter/edit) |
 
 ---
 

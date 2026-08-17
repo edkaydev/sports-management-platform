@@ -25,7 +25,7 @@ beforeAll(async () => {
       email: TEST_ADMIN_EMAIL,
       fullName: "Teams Test Admin",
       passwordHash: hash,
-      role: UserRole.SUPER_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   const coach = await prisma.user.create({
@@ -33,7 +33,7 @@ beforeAll(async () => {
       email: TEST_COACH_EMAIL,
       fullName: "Teams Test Coach",
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
   coachUserId = coach.id;
@@ -198,9 +198,9 @@ describe("POST /api/teams", () => {
     expect(res.status).toBe(422);
   });
 
-  it("forbids a coach from creating teams", async () => {
+  it("allows a SPORTS_REP to create teams", async () => {
     const res = await createTeam(coachToken);
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });
 
@@ -247,12 +247,13 @@ describe("PATCH /api/teams/:id", () => {
     });
   });
 
-  it("forbids a coach from updating teams", async () => {
+  it("allows a SPORTS_REP to update teams", async () => {
+    const create = await createTeam(coachToken);
     const res = await request(app)
-      .patch("/api/teams/00000000-0000-0000-0000-000000000000")
+      .patch(`/api/teams/${create.body.data.id}`)
       .set("Authorization", `Bearer ${coachToken}`)
-      .send({ name: "nope" });
-    expect(res.status).toBe(403);
+      .send({ name: "Updated" });
+    expect(res.status).toBe(200);
   });
 });
 
@@ -455,7 +456,7 @@ describe("Team staff", () => {
     expect(staff.body.data).toHaveLength(0);
   });
 
-  it("forbids a coach from assigning staff", async () => {
+  it("allows a SPORTS_REP to assign staff", async () => {
     const create = await createTeam(adminToken, {
       name: `Staff Coach ${Date.now()}`,
     });
@@ -465,6 +466,6 @@ describe("Team staff", () => {
       .post(`/api/teams/${id}/staff`)
       .set("Authorization", `Bearer ${coachToken}`)
       .send({ userId: coachUserId, role: TeamStaffRole.HEAD_COACH });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });

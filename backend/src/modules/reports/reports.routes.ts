@@ -4,7 +4,7 @@ import * as controller from './reports.controller';
 
 const router = Router();
 
-router.use(verifyToken, requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'ACADEMIC', 'UNI_ADMIN'));
+router.use(verifyToken, requireRole('TUTOR', 'SPORTS_REP'));
 
 router.get('/overview', controller.departmentOverview);
 

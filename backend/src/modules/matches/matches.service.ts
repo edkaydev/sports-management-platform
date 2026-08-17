@@ -125,7 +125,7 @@ export async function updateMatchStatus(id: string, status: MatchStatus) {
 
   if (status === 'COMPLETED') {
     const admins = await prisma.user.findMany({
-      where: { role: { in: ['SPORTS_ADMIN', 'SUPER_ADMIN'] } },
+      where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
       select: { id: true },
     });
     if (admins.length > 0) {
@@ -204,7 +204,7 @@ export async function submitLineup(
 
   if (!existing) {
     const admins = await prisma.user.findMany({
-      where: { role: { in: ['SPORTS_ADMIN', 'SUPER_ADMIN'] } },
+      where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
       select: { id: true },
     });
     if (admins.length > 0) {

@@ -12,27 +12,27 @@ const router = Router();
 
 router.use(verifyToken);
 
-router.get('/', requireRole('SPORTS_ADMIN', 'ATHLETE'), controller.listContracts);
+router.get('/', requireRole('TUTOR', 'SPORTS_REP'), controller.listContracts);
 
-router.get('/:id', requireRole('SPORTS_ADMIN', 'ATHLETE'), controller.getContract);
+router.get('/:id', requireRole('TUTOR', 'SPORTS_REP'), controller.getContract);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createContractSchema),
   controller.createContract
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateContractSchema),
   controller.updateContract
 );
 
 router.post(
   '/:id/terminate',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(terminateContractSchema),
   controller.terminateContract
 );

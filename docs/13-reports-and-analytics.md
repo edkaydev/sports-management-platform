@@ -21,7 +21,7 @@ A high-level snapshot of the entire sports department.
 - Academic standing summary (good / warning / probation)
 - Document completion rate
 
-**Access:** SPORTS_ADMIN, UNIVERSITY_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -46,7 +46,7 @@ A list of all student-athletes with key data per athlete.
 - Year of study
 - Active / Inactive
 
-**Access:** SPORTS_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -63,7 +63,7 @@ All athletes with academic data, grouped by standing.
 
 **Filters:** Sport, Team, Semester, Faculty
 
-**Access:** SPORTS_ADMIN, ACADEMIC_STAFF
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -78,7 +78,7 @@ Complete overview of scholarship records.
 - Revoked this semester
 - Scholarship coverage summary (how many full vs partial)
 
-**Access:** SPORTS_ADMIN, UNIVERSITY_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -91,7 +91,7 @@ All current athlete contracts.
 - Contracts expiring within 30 days
 - Contracts with accompanying scholarships
 
-**Access:** SPORTS_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -107,7 +107,7 @@ Summary of all completed matches in a season.
 
 **Filters:** Sport, Team, Event, Date range
 
-**Access:** SPORTS_ADMIN, COACH, UNIVERSITY_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -122,7 +122,7 @@ Individual or team-level performance stats.
 
 **Filters:** Sport, Team, Season, Player
 
-**Access:** SPORTS_ADMIN, COACH
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -150,7 +150,7 @@ Summary of recruitment activity.
 - Selected / Rejected / Pending breakdown
 - Conversion rate (trials → enrolled athletes)
 
-**Access:** SPORTS_ADMIN, RECRUITER
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -164,7 +164,7 @@ Document completeness per athlete.
 - Athletes with expired documents
 - Document type breakdown
 
-**Access:** SPORTS_ADMIN
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
@@ -182,7 +182,7 @@ All reports support:
 
 ## Dashboard Widgets
 
-The SPORTS_ADMIN home dashboard shows live summary widgets:
+The TUTOR / SPORTS_REP home dashboard shows live summary widgets:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -218,15 +218,15 @@ In a future version, the system can automatically email periodic reports:
 
 ## Access by Role
 
-| Report | SPORTS_ADMIN | COACH | UNI_ADMIN | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| Department overview | ✅ | ❌ | ✅ | ❌ |
-| Student-athlete list | ✅ | 🔶 | ❌ | ❌ |
-| Academic standing | ✅ | 👁 | 👁 | 👁 own |
-| Scholarship report | ✅ | ❌ | ✅ | 👁 own |
-| Contract report | ✅ | ❌ | ❌ | 👁 own |
-| Match results | ✅ | ✅ | ✅ | ✅ |
-| Player performance | ✅ | 🔶 | ❌ | 👁 own |
-| Fixture schedule | ✅ | ✅ | ✅ | ✅ |
-| Recruitment report | ✅ | ❌ | ❌ | ❌ |
-| Document compliance | ✅ | ❌ | ❌ | ❌ |
+| Report | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Department overview | ✅ | ✅ |
+| Student-athlete list | ✅ | ✅ |
+| Academic standing | ✅ | ✅ |
+| Scholarship report | ✅ | ✅ |
+| Contract report | ✅ | ✅ |
+| Match results | ✅ | ✅ |
+| Player performance | ✅ | ✅ |
+| Fixture schedule | ✅ | ✅ |
+| Recruitment report | ✅ | ✅ |
+| Document compliance | ✅ | ✅ |

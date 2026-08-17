@@ -21,7 +21,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Documents Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
 
@@ -30,7 +30,7 @@ beforeAll(async () => {
       email: COACH_EMAIL,
       fullName: 'Documents Test Coach',
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 

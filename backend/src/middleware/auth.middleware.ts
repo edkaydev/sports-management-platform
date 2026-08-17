@@ -72,8 +72,8 @@ export function requireRole(...allowedRoles: UserRole[]) {
       return;
     }
 
-    const isAdmin = user.role === 'SUPER_ADMIN' || user.role === 'SPORTS_ADMIN';
-    if (isAdmin || allowedRoles.includes(user.role)) {
+    const isTutor = user.role === 'TUTOR';
+    if (isTutor || allowedRoles.includes(user.role)) {
       next();
       return;
     }

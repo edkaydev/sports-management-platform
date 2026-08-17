@@ -25,10 +25,10 @@ const SEASON_NAME = "2025/2026";
 
 async function main(): Promise<void> {
   const email = (
-    process.env.SEED_ADMIN_EMAIL ?? "admin@umu.ac.ug"
+    process.env.SEED_ADMIN_EMAIL ?? "tutor@umu.ac.ug"
   ).toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD ?? "Admin@2025";
-  const fullName = process.env.SEED_ADMIN_NAME ?? "Sports Department Admin";
+  const password = process.env.SEED_ADMIN_PASSWORD ?? "Tutor@2025";
+  const fullName = process.env.SEED_ADMIN_NAME ?? "Sports Tutor";
 
   const passwordHash = await bcrypt.hash(password, 12);
 
@@ -39,11 +39,26 @@ async function main(): Promise<void> {
       email,
       fullName,
       passwordHash,
-      role: UserRole.SUPER_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
 
-  console.log(`SUPER_ADMIN ready: ${admin.email} (role=${admin.role})`);
+  console.log(`TUTOR ready: ${admin.email} (role=${admin.role})`);
+
+  const repEmail = (process.env.SEED_REP_EMAIL ?? "sportrep@umu.ac.ug").toLowerCase();
+  const repPassword = process.env.SEED_REP_PASSWORD ?? "SportRep@2025";
+  const rep = await prisma.user.upsert({
+    where: { email: repEmail },
+    update: {},
+    create: {
+      email: repEmail,
+      fullName: "Sports Representative",
+      passwordHash: await bcrypt.hash(repPassword, 12),
+      role: UserRole.SPORTS_REP,
+    },
+  });
+
+  console.log(`SPORTS_REP ready: ${rep.email} (role=${rep.role})`);
 
   await seedSports();
   const season = await seedCurrentSeason(admin.id);
@@ -404,19 +419,19 @@ async function seedStaff(
   if (!teamId) return;
 
   const coachEmail = (
-    process.env.SEED_COACH_EMAIL ?? "coach@umu.ac.ug"
+    process.env.SEED_COACH_EMAIL ?? "sportrep@umu.ac.ug"
   ).toLowerCase();
   const coach = await prisma.user.upsert({
     where: { email: coachEmail },
     update: {},
     create: {
       email: coachEmail,
-      fullName: "Sample Team Coach",
+      fullName: "Sports Representative",
       passwordHash: await bcrypt.hash(
-        process.env.SEED_COACH_PASSWORD ?? "Coach@2025",
+        process.env.SEED_COACH_PASSWORD ?? "SportRep@2025",
         12,
       ),
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -438,8 +453,7 @@ async function seedStaff(
     },
   });
 
-  console.log(`STAFF ready: ${coach.fullName} (HEAD_COACH of UMU Saints)`);
-}
+  console.log(`STAFF ready: ${coach.fullName} (HEAD_COACH of UMU Saints)`);}
 
 async function seedAcademicRecords(enteredBy: string): Promise<void> {
   const semesters: Array<{

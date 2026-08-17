@@ -9,12 +9,13 @@ const TEST_PASSWORD = 'Admin@2025';
 
 let sportId: string;
 let teamId: string;
+let team2Id: string;
 let eventId: string;
 
 beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
   await prisma.user.create({
-    data: { email: ADMIN_EMAIL, fullName: 'Public Test Admin', passwordHash: hash, role: UserRole.SPORTS_ADMIN },
+    data: { email: ADMIN_EMAIL, fullName: 'Public Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
 
   const sport = await prisma.sport.create({
@@ -27,33 +28,60 @@ beforeAll(async () => {
   });
   teamId = team.id;
 
+  const team2 = await prisma.team.create({
+    data: { name: 'Public Rival FC', shortName: 'RFC', sportId, gender: Gender.MALE },
+  });
+  team2Id = team2.id;
+
   const event = await prisma.event.create({
     data: { name: 'Public Test Cup', type: 'TOURNAMENT', level: 'NATIONAL', sportId, status: 'ACTIVE' },
   });
   eventId = event.id;
 
-  await prisma.match.createMany({
+  await prisma.eventParticipant.createMany({
     data: [
-      {
+      { eventId, participantType: 'TEAM', teamId },
+      { eventId, participantType: 'TEAM', teamId: team2Id },
+    ],
+  });
+
+  const [upcoming, completed] = await prisma.$transaction([
+    prisma.match.create({
+      data: {
         eventId,
         sportId,
         matchNumber: 1,
         homeTeamId: teamId,
+        awayTeamId: team2Id,
         scheduledDate: new Date('2026-10-01T14:00:00.000Z'),
         status: MatchStatus.SCHEDULED,
       },
-      {
+    }),
+    prisma.match.create({
+      data: {
         eventId,
         sportId,
         matchNumber: 2,
         homeTeamId: teamId,
+        awayTeamId: team2Id,
         scheduledDate: new Date('2026-08-01T14:00:00.000Z'),
         status: MatchStatus.COMPLETED,
         homeScore: 2,
         awayScore: 1,
       },
-    ],
+    }),
+  ]);
+
+  await prisma.matchResult.create({
+    data: {
+      matchId: completed.id,
+      homeScore: 2,
+      awayScore: 1,
+      winnerTeamId: teamId,
+      resultType: 'HOME_WIN',
+    },
   });
+  void upcoming;
 
   await prisma.newsPost.create({
     data: {
@@ -67,10 +95,12 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await prisma.matchResult.deleteMany({ where: { match: { eventId } } });
   await prisma.match.deleteMany({ where: { eventId } });
+  await prisma.eventParticipant.deleteMany({ where: { eventId } });
   await prisma.newsPost.deleteMany({});
   await prisma.event.deleteMany({ where: { id: eventId } });
-  await prisma.team.deleteMany({ where: { id: teamId } });
+  await prisma.team.deleteMany({ where: { id: { in: [teamId, team2Id] } } });
   await prisma.sport.deleteMany({ where: { id: sportId } });
 
   const users = await prisma.user.findMany({
@@ -114,6 +144,40 @@ describe('Public endpoints (no auth)', () => {
     const res = await request(app).get('/api/public/events');
     expect(res.status).toBe(200);
     expect(res.body.data.some((e: { id: string }) => e.id === eventId)).toBe(true);
+  });
+
+  it('GET /api/public/teams/:id returns squad, fixtures, and results', async () => {
+    const res = await request(app).get(`/api/public/teams/${teamId}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.team.id).toBe(teamId);
+    expect(res.body.data.team._count.squadEntries).toBeDefined();
+    expect(Array.isArray(res.body.data.squad)).toBe(true);
+    expect(Array.isArray(res.body.data.fixtures)).toBe(true);
+    expect(Array.isArray(res.body.data.results)).toBe(true);
+    expect(res.body.data.results.some((m: { id: string }) => m.id)).toBe(true);
+  });
+
+  it('GET /api/public/teams/:id returns 404 for unknown team', async () => {
+    const res = await request(app).get('/api/public/teams/00000000-0000-0000-0000-000000000000');
+    expect(res.status).toBe(404);
+  });
+
+  it('GET /api/public/events/:id returns participants, fixtures, and standings', async () => {
+    const res = await request(app).get(`/api/public/events/${eventId}`);
+    expect(res.status).toBe(200);
+    expect(res.body.data.event.id).toBe(eventId);
+    expect(res.body.data.participants.length).toBe(2);
+    expect(res.body.data.standings).toHaveLength(2);
+    const leader = res.body.data.standings[0];
+    expect(leader.points).toBe(3);
+    expect(leader.won).toBe(1);
+    expect(leader.goalsFor).toBe(2);
+    expect(leader.goalsAgainst).toBe(1);
+  });
+
+  it('GET /api/public/events/:id returns 404 for unknown event', async () => {
+    const res = await request(app).get('/api/public/events/00000000-0000-0000-0000-000000000000');
+    expect(res.status).toBe(404);
   });
 
   it('GET /api/public/news lists published posts only', async () => {

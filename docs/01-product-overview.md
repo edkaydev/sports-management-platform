@@ -43,14 +43,9 @@ Sports Department, Nkozi Campus
 
 | Role | Primary Need |
 |---|---|
-| Sports Tutor / Sports Admin | Full department management |
-| Coach | Team management, lineups, performance |
-| Team Manager | Logistics and administration |
-| Sports Official | Match scoring and reports |
-| Academic Staff | Share academic data with sports department |
-| Student-Athlete | View own profile, fixtures, documents |
-| University Admin | Institutional reports |
-| Recruiter / Scout | Manage trials and recruitment |
+| TUTOR (Sports Tutor / Overall) | Full department management, user accounts, record deletion |
+| SPORTS_REP (Secretary of Sports, University Union) | All day-to-day content editing and operations |
+| Public visitors | Browse sports, teams, fixtures, results, and events on the open website (no login) |
 
 ---
 

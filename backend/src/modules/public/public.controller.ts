@@ -28,10 +28,37 @@ export async function sports(_req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export async function sportDetail(req: Request, res: Response, next: NextFunction) {
+  try {
+    const detail = await service.getPublicSport(req.params.id);
+    res.json({ success: true, data: detail });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function teams(_req: Request, res: Response, next: NextFunction) {
   try {
     const teams = await service.listTeams();
     res.json({ success: true, data: teams });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function teamDetail(req: Request, res: Response, next: NextFunction) {
+  try {
+    const detail = await service.getPublicTeam(req.params.id);
+    res.json({ success: true, data: detail });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function eventDetail(req: Request, res: Response, next: NextFunction) {
+  try {
+    const detail = await service.getPublicEvent(req.params.id);
+    res.json({ success: true, data: detail });
   } catch (err) {
     next(err);
   }

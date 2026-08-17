@@ -44,7 +44,7 @@ Scholarship
 ├── status (enum: ACTIVE | EXPIRED | SUSPENDED | REVOKED | RENEWED | PENDING)
 ├── academic_requirement_gpa (decimal — minimum GPA to maintain scholarship)
 ├── sports_requirement (text — e.g. "Must be in first team, attend all training")
-├── awarded_by (FK → User — SPORTS_ADMIN)
+├── awarded_by (FK → User — TUTOR / SPORTS_REP)
 ├── awarded_at (timestamp)
 ├── revoked_by (FK → User, nullable)
 ├── revoked_at (timestamp, nullable)
@@ -170,14 +170,14 @@ Revoked this semester         1
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | ATHLETE |
-|---|:---:|:---:|:---:|
-| Create scholarship | ✅ | ❌ | ❌ |
-| Edit scholarship | ✅ | ❌ | ❌ |
-| Renew scholarship | ✅ | ❌ | ❌ |
-| Revoke scholarship | ✅ | ❌ | ❌ |
-| View scholarship (own) | ✅ | ❌ | 👁 |
-| Create contract | ✅ | ❌ | ❌ |
-| View contract (own) | ✅ | ❌ | 👁 |
-| Upload scholarship docs | ✅ | ❌ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create scholarship | ✅ | ✅ |
+| Edit scholarship | ✅ | ✅ |
+| Renew scholarship | ✅ | ✅ |
+| Revoke scholarship | ✅ | ✅ |
+| View scholarships | ✅ | ✅ |
+| Create contract | ✅ | ✅ |
+| View contracts | ✅ | ✅ |
+| Upload scholarship docs | ✅ | ✅ |
 | View scholarship dashboard | ✅ | ❌ | ❌ |

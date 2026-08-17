@@ -28,7 +28,7 @@
 - [x] JWT middleware — verify access token on every protected route
 - [x] RBAC middleware — check role against allowed roles per route
 - [x] Account lockout after 5 failed attempts
-- [x] Seed script — create first SUPER_ADMIN user
+- [x] Seed script — create first TUTOR + SPORTS_REP users
 - [x] Test all auth endpoints
 
 ---
@@ -70,7 +70,7 @@
 - [ ] `PATCH /api/academic-records/:id` — update
 - [ ] `POST /api/academic-records/import` — CSV bulk import
 - [ ] Academic standing auto-computation logic
-- [ ] Academic threshold configuration (configurable by SPORTS_ADMIN)
+- [ ] Academic threshold configuration (configurable by TUTOR)
 - [ ] Test academic endpoints
 
 ---
@@ -187,9 +187,8 @@
 - [ ] Change password page
 
 ### Dashboard
-- [ ] SPORTS_ADMIN dashboard (stats, attention required, today's fixtures)
-- [ ] COACH dashboard (own teams, upcoming fixtures)
-- [ ] ATHLETE dashboard (own profile summary, next fixture)
+- [ ] TUTOR dashboard (stats, attention required, today's fixtures)
+- [ ] SPORTS_REP dashboard (own teams, upcoming fixtures)
 
 ### Athletes
 - [ ] Athlete list page (table, filters, search)

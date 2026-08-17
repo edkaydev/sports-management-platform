@@ -3,7 +3,6 @@ import * as sportsController from "./sports.controller";
 import { createSportSchema, updateSportSchema } from "./sports.schema";
 import { validate } from "../../middleware/validate.middleware";
 import { verifyToken, requireRole } from "../../middleware/auth.middleware";
-import { UserRole } from "@prisma/client";
 
 export const sportsRouter = Router();
 
@@ -14,18 +13,18 @@ sportsRouter.get("/:id", sportsController.getSport);
 
 sportsRouter.post(
   "/",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR", "SPORTS_REP"),
   validate(createSportSchema),
   sportsController.createSport,
 );
 sportsRouter.patch(
   "/:id",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR", "SPORTS_REP"),
   validate(updateSportSchema),
   sportsController.updateSport,
 );
 sportsRouter.delete(
   "/:id",
-  requireRole(UserRole.SPORTS_ADMIN),
+  requireRole("TUTOR"),
   sportsController.deleteSport,
 );

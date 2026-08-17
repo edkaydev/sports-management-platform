@@ -21,7 +21,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Academic Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
 
@@ -30,7 +30,7 @@ beforeAll(async () => {
       email: COACH_EMAIL,
       fullName: 'Academic Test Coach',
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -125,12 +125,21 @@ describe('POST /api/academic-records', () => {
     expect(res.status).toBe(409);
   });
 
-  it('returns 403 for COACH', async () => {
+  it('allows a SPORTS_REP to create records', async () => {
     const res = await request(app)
       .post('/api/academic-records')
       .set('Authorization', `Bearer ${coachToken}`)
-      .send({ athleteId, academicYear: '2024/2025', semester: 'SEM2' });
-    expect(res.status).toBe(403);
+      .send({
+        athleteId,
+        academicYear: '2023/2024',
+        semester: 'SEM1',
+        yearOfStudy: 1,
+        gpa: 3.0,
+        cgpa: 2.9,
+        totalCreditUnitsTaken: 15,
+        totalCreditUnitsPassed: 15,
+      });
+    expect(res.status).toBe(201);
   });
 });
 

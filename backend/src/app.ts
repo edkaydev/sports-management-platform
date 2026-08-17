@@ -24,6 +24,7 @@ import { performanceRouter } from './modules/performance/performance.routes';
 import { reportsRouter } from './modules/reports/reports.routes';
 import { newsRouter } from './modules/news/news.routes';
 import { publicRouter } from './modules/public/public.routes';
+import { equipmentRouter } from './modules/equipment/equipment.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -83,6 +84,7 @@ app.use('/api/matches', matchesRouter);
 app.use('/api', performanceRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/news', newsRouter);
+app.use('/api/equipment', equipmentRouter);
 
 // 404 handler
 app.use((_req, res) => {

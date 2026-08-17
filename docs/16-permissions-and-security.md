@@ -2,7 +2,7 @@
 
 ## Overview
 
-Security is enforced at three layers: authentication (who you are), authorisation (what role you have), and data scoping (which records you can access within your role).
+Security is enforced in layers: authentication (who you are) and authorisation (what role you have). Data scoping is simple because exactly two staff roles exist — no per-record scope restrictions apply.
 
 ---
 
@@ -11,16 +11,16 @@ Security is enforced at three layers: authentication (who you are), authorisatio
 ### JWT Implementation
 
 - Access token: signed HS256 JWT, 15 minute expiry
-- Refresh token: signed HS256 JWT, 7 day expiry, stored in `httpOnly; Secure; SameSite=Strict` cookie
+- Refresh token: signed HS256 JWT, 7 day expiry
 - Access token transmitted in `Authorization: Bearer <token>` header
-- Access token stored in memory only (never `localStorage` or `sessionStorage`)
+- Access token stored client-side in `localStorage`
 
 ### Token Payload
 
 ```json
 {
   "sub": "<user_uuid>",
-  "role": "SPORTS_ADMIN",
+  "role": "TUTOR",
   "iat": 1723300000,
   "exp": 1723300900
 }
@@ -36,13 +36,12 @@ Security is enforced at three layers: authentication (who you are), authorisatio
 ### Account Lockout
 
 - Account locked after 5 consecutive failed login attempts
-- Lockout duration: 30 minutes (auto-unlock) or manual unlock by SUPER_ADMIN
+- Lockout duration: 30 minutes (auto-unlock) or manual unlock by the TUTOR
 - Failed attempt count resets on successful login
 
 ### Session Management
 
-- On logout: refresh token cookie is cleared, access token discarded client-side
-- SUPER_ADMIN can invalidate all sessions for a user (force logout)
+- On logout: refresh token revoked, access token discarded client-side
 - Refresh tokens are stored in DB to support revocation:
 
 ```sql
@@ -69,43 +68,26 @@ Request
   → verifyToken()       — decodes and validates JWT
   → attachUser()        — loads user from DB, checks is_active
   → requireRole([...])  — checks role against allowed list
-  → scopeCheck()        — checks data-level scope (own team, own data)
   → Controller
 ```
 
-### Role Hierarchy (for inheritance checks)
+### Roles
 
 ```
-SUPER_ADMIN
-  └── SPORTS_ADMIN
-        ├── COACH
-        ├── TEAM_MANAGER
-        ├── OFFICIAL
-        ├── RECRUITER
-        └── ACADEMIC
-              └── ATHLETE
+TUTOR           (Sports Tutor / Overall — full access)
+  └── SPORTS_REP  (Secretary of Sports, University Union — content editing)
 ```
 
-`SUPER_ADMIN` and `SPORTS_ADMIN` implicitly pass all role checks.
+`TUTOR` always passes all role checks. Content routes allow both `TUTOR` and
+`SPORTS_REP`; delete, user-management, and verification routes allow `TUTOR` only.
 
 ---
 
 ## Data Scoping
 
-Beyond role-level checks, the system enforces **data scoping** — a COACH can only see/edit data for their assigned teams.
-
-### Scope Rules
-
-| Role | Scope Restriction |
-|---|---|
-| COACH | Can only access athletes and matches in their assigned teams |
-| TEAM_MANAGER | Can only access data for their assigned team |
-| OFFICIAL | Can only record match events for matches they are assigned to |
-| ACADEMIC | Can only enter academic data for athletes in their faculty |
-| ATHLETE | Can only read their own profile, performance, documents |
-| RECRUITER | Can only access prospects and trials they created or are assigned to |
-
-Scope is enforced in the **service layer**, not just middleware, so it cannot be bypassed by direct DB calls.
+No data scoping is required: both roles are department-level staff and see all
+department data. The public website exposes a curated read-only set of endpoints
+(`/api/public/*`) and requires no authentication.
 
 ---
 
@@ -150,11 +132,11 @@ Referrer-Policy: no-referrer
 |---|---|
 | Passwords | bcrypt hashed, never returned in API |
 | Refresh tokens | SHA-256 hashed before DB storage |
-| Medical declarations | Only accessible to SPORTS_ADMIN and the athlete |
-| Academic records | Role-restricted (see `08-academic-performance.md`) |
+| Medical declarations | Staff-only (TUTOR / SPORTS_REP) |
+| Academic records | Staff-only (see `08-academic-performance.md`) |
 | Document files | Served via pre-signed URLs, never public |
-| Scholarship details | Not visible to COACH or TEAM_MANAGER |
-| Contract terms | SPORTS_ADMIN only |
+| Scholarship details | Staff-only |
+| Contract terms | Staff-only |
 
 ---
 
@@ -165,7 +147,7 @@ Every write operation (create, update, delete) is logged to the `audit_logs` tab
 ```
 Action:       UPDATE_SCHOLARSHIP
 Entity:       scholarship / <uuid>
-User:         sports_admin@umu.ac.ug
+User:         tutor@umu.ac.ug
 Old value:    { status: 'ACTIVE', end_date: '2026-12-31' }
 New value:    { status: 'REVOKED', revoked_at: '2026-08-11' }
 IP:           197.x.x.x
@@ -173,15 +155,15 @@ Timestamp:    2026-08-11T16:00:00Z
 ```
 
 Audit logs are:
-- Write-only (cannot be edited or deleted, even by SUPER_ADMIN)
+- Write-only (cannot be edited or deleted)
 - Retained indefinitely
-- Accessible to SUPER_ADMIN only
+- Accessible to the TUTOR only
 
 ---
 
 ## Security Checklist (pre-launch)
 
-- [ ] All endpoints require authentication except `/api/auth/login` and `/api/auth/refresh`
+- [ ] All endpoints require authentication except `/api/auth/login`, `/api/auth/refresh`, and `/api/public/*`
 - [ ] No sensitive data in JWT payload beyond `sub` and `role`
 - [ ] HTTPS enforced in production (redirect HTTP → HTTPS)
 - [ ] Database not publicly accessible (firewall rules)

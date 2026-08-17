@@ -20,7 +20,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Notification Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   adminId = admin.id;
@@ -100,7 +100,7 @@ describe('PATCH /api/notifications/:id/read', () => {
         email: 'notif.other@umu.ac.ug',
         fullName: 'Other User',
         passwordHash: await hashPassword(TEST_PASSWORD),
-        role: UserRole.COACH,
+        role: UserRole.SPORTS_REP,
       },
     });
     const otherNotification = await prisma.notification.create({

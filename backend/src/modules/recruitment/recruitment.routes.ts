@@ -18,45 +18,45 @@ const router = Router();
 router.use(verifyToken);
 
 // Report must be registered before /:id to avoid conflicts
-router.get('/report', requireRole('SPORTS_ADMIN', 'RECRUITER'), controller.getReport);
+router.get('/report', requireRole('TUTOR', 'SPORTS_REP'), controller.getReport);
 
 // ─── Prospects ─────────────────────────────────────────────────────────────────
 
 router.get(
   '/prospects',
-  requireRole('SPORTS_ADMIN', 'RECRUITER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.listProspects
 );
 
 router.get(
   '/prospects/:id',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.getProspect
 );
 
 router.post(
   '/prospects',
-  requireRole('SPORTS_ADMIN', 'RECRUITER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createProspectSchema),
   controller.createProspect
 );
 
 router.patch(
   '/prospects/:id',
-  requireRole('SPORTS_ADMIN', 'RECRUITER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateProspectSchema),
   controller.updateProspect
 );
 
 router.delete(
   '/prospects/:id',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR'),
   controller.deleteProspect
 );
 
 router.post(
   '/prospects/:id/enroll',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR'),
   validate(enrollProspectSchema),
   controller.enrollProspect
 );
@@ -65,47 +65,47 @@ router.post(
 
 router.get(
   '/trials',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.listTrials
 );
 
 router.get(
   '/trials/:id',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.getTrial
 );
 
 router.post(
   '/trials',
-  requireRole('SPORTS_ADMIN', 'RECRUITER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createTrialSchema),
   controller.createTrial
 );
 
 router.patch(
   '/trials/:id',
-  requireRole('SPORTS_ADMIN', 'RECRUITER'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateTrialSchema),
   controller.updateTrial
 );
 
 router.post(
   '/trials/:id/participants',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(addTrialParticipantsSchema),
   controller.addParticipants
 );
 
 router.post(
   '/trials/:id/attendance',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateAttendanceSchema),
   controller.recordAttendance
 );
 
 router.post(
   '/trials/:id/assessments',
-  requireRole('SPORTS_ADMIN', 'RECRUITER', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(submitAssessmentSchema),
   controller.submitAssessment
 );

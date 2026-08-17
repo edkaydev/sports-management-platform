@@ -15,12 +15,12 @@ let coachUserId: string;
 beforeAll(async () => {
   const hash = await hashPassword(TEST_ADMIN_PASSWORD);
   const admin = await prisma.user.create({
-    data: { email: TEST_ADMIN_EMAIL, fullName: 'Auth Test Admin', passwordHash: hash, role: UserRole.SUPER_ADMIN },
+    data: { email: TEST_ADMIN_EMAIL, fullName: 'Auth Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
   adminUserId = admin.id;
 
   const coach = await prisma.user.create({
-    data: { email: TEST_COACH_EMAIL, fullName: 'Auth Test Coach', passwordHash: hash, role: UserRole.COACH },
+    data: { email: TEST_COACH_EMAIL, fullName: 'Auth Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
   });
   coachUserId = coach.id;
 });
@@ -55,7 +55,7 @@ describe('POST /api/auth/login', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.accessToken).toBeDefined();
-    expect(res.body.data.user).toMatchObject({ email: TEST_ADMIN_EMAIL, role: 'SUPER_ADMIN' });
+    expect(res.body.data.user).toMatchObject({ email: TEST_ADMIN_EMAIL, role: 'TUTOR' });
     expect(res.headers['set-cookie']).toBeDefined();
     expect(res.headers['set-cookie'][0]).toContain('refreshToken');
   });
@@ -174,7 +174,7 @@ describe('Account lockout', () => {
   it('locks the account after 5 consecutive failed attempts', async () => {
     const email = `lockout.${Date.now()}@umu.ac.ug`;
     const user = await prisma.user.create({
-      data: { email, fullName: 'Lockout User', passwordHash: await hashPassword('Admin@2025'), role: UserRole.ATHLETE },
+      data: { email, fullName: 'Lockout User', passwordHash: await hashPassword('Admin@2025'), role: UserRole.SPORTS_REP },
     });
 
     for (let i = 0; i < 5; i++) {

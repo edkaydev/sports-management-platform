@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client';
+import PDFDocument from 'pdfkit';
 import prisma from '../../config/database';
 import type { ReportsQuery } from './reports.schema';
 
@@ -291,4 +292,70 @@ export async function fixtureScheduleReport(query: ReportsQuery) {
 
 export function toCsvExport(rows: Record<string, unknown>[]): string {
   return toCsv(rows);
+}
+
+// ─── PDF export ───────────────────────────────────────────────────────────────
+
+export interface PdfColumn {
+  label: string;
+  key: string;
+}
+
+export function toPdfExport(
+  title: string,
+  subtitle: string,
+  columns: PdfColumn[],
+  rows: Record<string, unknown>[],
+): PDFKit.PDFDocument {
+  const doc = new PDFDocument({ size: 'A4', margin: 40 });
+  const pageWidth = doc.page.width - 80;
+  const colWidth = pageWidth / Math.max(columns.length, 1);
+  const headerH = 18;
+  const rowH = 16;
+
+  doc.font('Helvetica-Bold').fontSize(17).fillColor('#111827').text(title, { align: 'center' });
+  doc.moveDown(0.3);
+  doc.font('Helvetica').fontSize(9).fillColor('#6b7280').text(subtitle, { align: 'center' });
+  doc.moveDown(0.6);
+
+  const startY = doc.y;
+  columns.forEach((col, i) => {
+    doc.save().rect(40 + i * colWidth, startY, colWidth, headerH).fill('#1e3a8a').restore();
+    doc.font('Helvetica-Bold').fontSize(9).fillColor('#ffffff').text(
+      col.label,
+      40 + i * colWidth + 4,
+      startY + 5,
+      { width: colWidth - 8, height: headerH - 10, lineBreak: false },
+    );
+  });
+
+  doc.font('Helvetica').fontSize(8).fillColor('#111827');
+  let y = startY + headerH;
+
+  if (rows.length === 0) {
+    doc.text('No records found.', 40, y + 4);
+  }
+
+  rows.forEach((row) => {
+    if (y + rowH > doc.page.height - 40) {
+      doc.addPage();
+      y = 40;
+    }
+    const isAlt = (y - startY - headerH) / rowH % 2 === 1;
+    if (isAlt) {
+      doc.save().rect(40, y, pageWidth, rowH).fill('#f3f4f6').restore();
+    }
+    columns.forEach((col, i) => {
+      doc.text(
+        String(row[col.key] ?? ''),
+        40 + i * colWidth + 4,
+        y + 3,
+        { width: colWidth - 8, height: rowH - 6, lineBreak: false, ellipsis: true },
+      );
+    });
+    y += rowH;
+  });
+
+  doc.end();
+  return doc;
 }

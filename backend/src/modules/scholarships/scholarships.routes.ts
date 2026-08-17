@@ -15,38 +15,38 @@ router.use(verifyToken);
 
 router.get(
   '/',
-  requireRole('SPORTS_ADMIN', 'UNI_ADMIN', 'ATHLETE'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.listScholarships
 );
 
-router.get('/dashboard', requireRole('SPORTS_ADMIN', 'UNI_ADMIN'), controller.getDashboard);
+router.get('/dashboard', requireRole('TUTOR', 'SPORTS_REP'), controller.getDashboard);
 
-router.get('/:id', requireRole('SPORTS_ADMIN', 'UNI_ADMIN', 'ATHLETE'), controller.getScholarship);
+router.get('/:id', requireRole('TUTOR', 'SPORTS_REP'), controller.getScholarship);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createScholarshipSchema),
   controller.createScholarship
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateScholarshipSchema),
   controller.updateScholarship
 );
 
 router.post(
   '/:id/renew',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(renewScholarshipSchema),
   controller.renewScholarship
 );
 
 router.post(
   '/:id/revoke',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(revokeScholarshipSchema),
   controller.revokeScholarship
 );

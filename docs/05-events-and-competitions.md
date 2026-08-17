@@ -214,13 +214,14 @@ PLANNED → ACTIVE → COMPLETED
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | OFFICIAL | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| Create / edit event | ✅ | ❌ | ❌ | ❌ |
-| Register team to event | ✅ | 🔶 | ❌ | ❌ |
-| View events | ✅ | ✅ | ✅ | ✅ |
-| View calendar | ✅ | ✅ | ✅ | ✅ |
-| Upload event documents | ✅ | 🔶 | ❌ | ❌ |
-| Cancel / postpone event | ✅ | ❌ | ❌ | ❌ |
-| Manage competition structure | ✅ | ❌ | ❌ | ❌ |
-| View standings | ✅ | ✅ | ✅ | ✅ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create / edit event | ✅ | ✅ |
+| Register team to event | ✅ | ✅ |
+| View events | ✅ | ✅ |
+| View calendar | ✅ | ✅ |
+| Upload event documents | ✅ | ✅ |
+| Cancel / postpone event | ✅ | ✅ |
+| Manage competition structure | ✅ | ✅ |
+| View standings | ✅ | ✅ |
+| Delete event | ✅ | ❌ |

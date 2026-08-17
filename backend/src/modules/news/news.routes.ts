@@ -8,27 +8,27 @@ const router = Router();
 
 router.use(verifyToken);
 
-router.get('/', requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'UNI_ADMIN', 'ACADEMIC'), controller.listNews);
+router.get('/', requireRole('TUTOR', 'SPORTS_REP'), controller.listNews);
 
 router.get('/:id', controller.getNews);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'UNI_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createNewsSchema),
   controller.createNews
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'UNI_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateNewsSchema),
   controller.updateNews
 );
 
 router.delete(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR'),
   controller.deleteNews
 );
 

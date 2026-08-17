@@ -33,7 +33,8 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 | Events | `/api/events` | Competitions, participant registration |
 | Matches | `/api/matches` | Fixtures, lineups, match events, results, reports |
 | Performance | `/api/performances`, `/api/training-sessions` | Match performance, training attendance |
-| Reports | `/api/reports` | Department overview, athlete, academic, scholarship reports (JSON/CSV) |
+| Reports | `/api/reports` | Department overview, athlete, academic, scholarship reports (JSON/CSV/PDF) |
+| Public site | `/api/public` | Open catalogue, sports, teams, fixtures, events — no login required |
 
 ---
 
@@ -77,10 +78,14 @@ docker compose exec api npx prisma migrate dev
 docker compose exec api npx prisma db seed
 ```
 
-The seed creates an admin account and demo data (sports, teams, athletes, academic records, scholarships, contracts, events, fixtures, training, prospects).
+The seed creates two staff accounts and demo data (sports, teams, athletes, academic records, scholarships, contracts, events, fixtures, training, prospects).
 
-- **Admin login:** `admin@umu.ac.ug` / `Admin@2025`
-- **Coach login:** `coach@umu.ac.ug` / `Coach@2025`
+Two roles are used:
+- **TUTOR** (Sports Tutor / Overall) — full access including user management and record deletion
+- **SPORTS_REP** (Secretary of Sports, University Union) — all content editing, no user management and no record deletion
+
+- **Tutor login:** `tutor@umu.ac.ug` / `Tutor@2025`
+- **Sport Rep login:** `sportrep@umu.ac.ug` / `SportRep@2025`
 
 ### 5. Open the app
 
@@ -126,7 +131,7 @@ cd frontend
 npm run build
 ```
 
-The backend test suite runs against a real MySQL database and covers all 14 feature modules (153 tests).
+The backend test suite runs against a real MySQL database and covers all 16 feature modules.
 
 ---
 

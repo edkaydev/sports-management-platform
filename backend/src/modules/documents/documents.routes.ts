@@ -15,39 +15,39 @@ router.use(verifyToken);
 
 router.get(
   '/',
-  requireRole('SPORTS_ADMIN', 'COACH', 'ATHLETE'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.listDocuments
 );
 
 router.get(
   '/athletes/:athleteId/checklist',
-  requireRole('SPORTS_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.getChecklist
 );
 
-router.get('/:id', requireRole('SPORTS_ADMIN', 'COACH', 'ATHLETE'), controller.getDocument);
+router.get('/:id', requireRole('TUTOR', 'SPORTS_REP'), controller.getDocument);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN', 'COACH', 'ATHLETE'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   upload.single('file'),
   controller.uploadDocument
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateDocumentSchema),
   controller.updateDocument
 );
 
 router.patch(
   '/:id/verify',
-  requireRole('SPORTS_ADMIN'),
+  requireRole('TUTOR'),
   validate(verifyDocumentSchema),
   controller.verifyDocument
 );
 
-router.delete('/:id', requireRole('SPORTS_ADMIN'), controller.deleteDocument);
+router.delete('/:id', requireRole('TUTOR'), controller.deleteDocument);
 
 export { router as documentsRouter };

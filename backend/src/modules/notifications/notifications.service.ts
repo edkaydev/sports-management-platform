@@ -141,7 +141,7 @@ export async function runAcademicChecks() {
   });
 
   const admins = await prisma.user.findMany({
-    where: { role: { in: ['SUPER_ADMIN', 'SPORTS_ADMIN'] } },
+    where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
     select: { id: true },
   });
 
@@ -200,7 +200,7 @@ export async function runScholarshipExpiryChecks() {
   });
 
   const admins = await prisma.user.findMany({
-    where: { role: { in: ['SUPER_ADMIN', 'SPORTS_ADMIN'] } },
+    where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
     select: { id: true },
   });
 
@@ -259,7 +259,7 @@ export async function runDocumentExpiryChecks() {
   });
 
   const admins = await prisma.user.findMany({
-    where: { role: { in: ['SUPER_ADMIN', 'SPORTS_ADMIN'] } },
+    where: { role: { in: ['TUTOR', 'SPORTS_REP'] } },
     select: { id: true },
   });
 

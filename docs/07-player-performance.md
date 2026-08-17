@@ -174,11 +174,11 @@ IndividualEventResult
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | OFFICIAL | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| View athlete performance | ✅ | 🔶 own team | ❌ | 👁 own only |
-| Submit coach rating | ✅ | ✅ | ❌ | ❌ |
-| Edit performance record | ✅ | 🔶 | ❌ | ❌ |
-| View leaderboards | ✅ | ✅ | ❌ | ✅ |
-| View performance trends | ✅ | ✅ | ❌ | 👁 own only |
-| Export performance data | ✅ | 🔶 | ❌ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| View athlete performance | ✅ | ✅ |
+| Submit coach rating | ✅ | ✅ |
+| Edit performance record | ✅ | ✅ |
+| View leaderboards | ✅ | ✅ |
+| View performance trends | ✅ | ✅ |
+| Export performance data | ✅ | ✅ |

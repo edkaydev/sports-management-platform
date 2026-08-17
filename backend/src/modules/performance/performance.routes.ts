@@ -25,28 +25,28 @@ router.get('/training-sessions/:id', controller.getTrainingSession);
 
 router.post(
   '/performances',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH', 'OFFICIAL'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(recordPerformanceSchema),
   controller.recordPerformance
 );
 
 router.post(
   '/training-sessions',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createTrainingSessionSchema),
   controller.createTrainingSession
 );
 
 router.patch(
   '/training-sessions/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateTrainingSessionSchema),
   controller.updateTrainingSession
 );
 
 router.post(
   '/training-sessions/:id/attendance',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(recordAttendanceSchema),
   controller.recordAttendance
 );

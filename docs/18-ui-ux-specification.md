@@ -50,7 +50,8 @@ Clean, functional, and fast. The UI is built for people who use it every day —
 
 ## Sidebar Navigation
 
-Navigation items depend on role. For SPORTS_ADMIN:
+Navigation is identical for both staff roles (TUTOR and SPORTS_REP). User management
+and delete actions are shown only to TUTOR. For example:
 
 ```
 Dashboard
@@ -152,7 +153,7 @@ Status badges use colour + text label, never colour alone.
 
 ## Key Screens
 
-### Dashboard (SPORTS_ADMIN)
+### Dashboard (TUTOR / SPORTS_REP)
 
 ```
 UMU Sports Department                         2025/2026 Season

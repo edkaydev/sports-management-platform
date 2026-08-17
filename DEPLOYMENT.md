@@ -331,7 +331,7 @@ docker compose -f docker-compose.prod.yml up -d
 # Run database migrations
 docker compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
 
-# Seed the first SUPER_ADMIN user
+# Seed the first TUTOR and SPORTS_REP users
 docker compose -f docker-compose.prod.yml exec api npx prisma db seed
 
 # Check everything is running

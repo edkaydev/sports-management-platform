@@ -28,8 +28,7 @@ generator client {
 ```sql
 -- User roles
 CREATE TYPE user_role AS ENUM (
-  'SUPER_ADMIN', 'SPORTS_ADMIN', 'COACH', 'TEAM_MANAGER',
-  'OFFICIAL', 'ACADEMIC', 'ATHLETE', 'UNI_ADMIN', 'RECRUITER'
+  'TUTOR', 'SPORTS_REP'
 );
 
 -- Gender

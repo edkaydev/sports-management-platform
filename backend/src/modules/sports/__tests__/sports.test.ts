@@ -20,7 +20,7 @@ beforeAll(async () => {
       email: TEST_ADMIN_EMAIL,
       fullName: "Sports Test Admin",
       passwordHash: hash,
-      role: UserRole.SUPER_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
   await prisma.user.create({
@@ -28,7 +28,7 @@ beforeAll(async () => {
       email: TEST_COACH_EMAIL,
       fullName: "Sports Test Coach",
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -143,12 +143,12 @@ describe("POST /api/sports", () => {
     expect(res.body.error).toBe("VALIDATION_ERROR");
   });
 
-  it("forbids a coach from creating sports", async () => {
+  it("allows a SPORTS_REP to create sports", async () => {
     const res = await request(app)
       .post("/api/sports")
       .set("Authorization", `Bearer ${coachToken}`)
       .send(sportPayload());
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });
 
@@ -192,12 +192,16 @@ describe("PATCH /api/sports/:id", () => {
     expect(res.body.data.description).toBe("Updated description");
   });
 
-  it("forbids a coach from updating sports", async () => {
+  it("allows a SPORTS_REP to update sports", async () => {
+    const create = await request(app)
+      .post("/api/sports")
+      .set("Authorization", `Bearer ${coachToken}`)
+      .send(sportPayload());
     const res = await request(app)
-      .patch("/api/sports/00000000-0000-0000-0000-000000000000")
+      .patch(`/api/sports/${create.body.data.id}`)
       .set("Authorization", `Bearer ${coachToken}`)
       .send({ description: "nope" });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(200);
   });
 });
 

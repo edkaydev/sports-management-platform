@@ -13,7 +13,7 @@ router.use(verifyToken);
 // CSV Import — must be before /:id to avoid route conflict
 router.post(
   '/import',
-  requireRole('ACADEMIC'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   upload.single('file'),
   controller.importAcademicRecords
 );
@@ -21,21 +21,21 @@ router.post(
 // List
 router.get(
   '/',
-  requireRole('ACADEMIC', 'COACH', 'ATHLETE'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.listAcademicRecords
 );
 
 // Get single
 router.get(
   '/:id',
-  requireRole('ACADEMIC', 'COACH', 'ATHLETE'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.getAcademicRecord
 );
 
 // Create
 router.post(
   '/',
-  requireRole('ACADEMIC'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createAcademicRecordSchema),
   controller.createAcademicRecord
 );
@@ -43,7 +43,7 @@ router.post(
 // Update
 router.patch(
   '/:id',
-  requireRole('ACADEMIC'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateAcademicRecordSchema),
   controller.updateAcademicRecord
 );

@@ -42,7 +42,7 @@ Match
 
 ## Fixture Scheduling
 
-SPORTS_ADMIN can:
+TUTOR and SPORTS_REP can:
 - Create individual fixtures
 - Auto-generate fixtures for a round-robin / league (all teams play each other)
 - Bulk-generate knockout brackets
@@ -131,7 +131,7 @@ MatchEvent
 
 ## Score Tracking
 
-Scores are updated automatically as `GOAL`, `POINT`, or `TRY` events are recorded. The final score is also manually editable by SPORTS_ADMIN in case of corrections.
+Scores are updated automatically as `GOAL`, `POINT`, or `TRY` events are recorded. The final score is also manually editable by the TUTOR or SPORTS_REP in case of corrections.
 
 ---
 
@@ -210,14 +210,15 @@ All scheduled matches appear in the department calendar:
 
 ## Actions by Role
 
-| Action | SPORTS_ADMIN | COACH | OFFICIAL | ATHLETE |
-|---|:---:|:---:|:---:|:---:|
-| Create fixture | ✅ | ❌ | ❌ | ❌ |
-| Edit fixture details | ✅ | ❌ | ❌ | ❌ |
-| Submit lineup | ✅ | ✅ | ❌ | ❌ |
-| Record match events | ✅ | ✅ | ✅ | ❌ |
-| Edit final score | ✅ | ❌ | ✅ | ❌ |
-| Submit match report | ✅ | ✅ | ✅ | ❌ |
+| Action | TUTOR | SPORTS_REP |
+|---|:---:|:---:|
+| Create fixture | ✅ | ✅ |
+| Edit fixture details | ✅ | ✅ |
+| Submit lineup | ✅ | ✅ |
+| Record match events | ✅ | ✅ |
+| Edit final score | ✅ | ✅ |
+| Submit match report | ✅ | ✅ |
+| Delete match | ✅ | ❌ |
 | View fixtures | ✅ | ✅ | ✅ | ✅ |
 | View match events | ✅ | ✅ | ✅ | ✅ |
 | Verify/approve result | ✅ | ❌ | ✅ | ❌ |

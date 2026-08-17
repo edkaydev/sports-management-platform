@@ -10,15 +10,8 @@ datasource db {
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
 enum UserRole {
-  SUPER_ADMIN
-  SPORTS_ADMIN
-  COACH
-  TEAM_MANAGER
-  OFFICIAL
-  ACADEMIC
-  ATHLETE
-  UNI_ADMIN
-  RECRUITER
+  TUTOR
+  SPORTS_REP
 }
 
 enum Gender {
@@ -307,6 +300,39 @@ enum AttendanceStatus {
   LATE
 }
 
+enum EquipmentCategory {
+  BALL
+  UNIFORM
+  PROTECTIVE_GEAR
+  TRAINING_TOOL
+  MATCH_GEAR
+  MEDICAL
+  ELECTRONIC
+  OFFICE
+  OTHER
+}
+
+enum EquipmentCondition {
+  NEW
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  ISSUED
+  UNDER_MAINTENANCE
+  LOST
+  RETIRED
+}
+
+enum EquipmentAssignmentType {
+  ATHLETE
+  TEAM
+}
+
 // ─── Users ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -353,6 +379,8 @@ model User {
   trainingSessionsCreated TrainingSession[]
   trainingAttendanceRecorded TrainingAttendance[]
   newsPosts NewsPost[] @relation("newsPosts")
+  equipmentCreated EquipmentItem[] @relation("equipmentCreated")
+  equipmentAssigned EquipmentAssignment[] @relation("equipmentAssigned")
 
   @@map("users")
 }
@@ -433,6 +461,7 @@ model StudentAthlete {
   performances       PlayerMatchPerformance[]
   trainingAttendance TrainingAttendance[]
   Notification       Notification[]
+  equipmentAssignments EquipmentAssignment[]
 
   @@index([status])
   @@index([athleteType])
@@ -473,6 +502,7 @@ model Sport {
   events       Event[]
   matches      Match[]
   trainingSessions   TrainingSession[]
+  equipment    EquipmentItem[]
 
   @@map("sports")
 }
@@ -507,6 +537,7 @@ model Team {
   matchResultsWon MatchResult[]
   playerPerformances PlayerMatchPerformance[]
   trainingSessions   TrainingSession[]
+  equipmentAssignments EquipmentAssignment[]
 
   @@index([sportId])
   @@map("teams")
@@ -1223,4 +1254,59 @@ model NewsPost {
   @@index([status])
   @@index([publishedAt])
   @@map("news_posts")
+}
+
+// ─── Department Equipment & Inventory (TUTOR only) ───────────────────────────
+
+model EquipmentItem {
+  id              String             @id @default(uuid())
+  name            String
+  category        EquipmentCategory
+  assetNumber     String?            @unique @map("asset_number")
+  serialNumber    String?            @map("serial_number")
+  quantity        Int                @default(1)
+  condition       EquipmentCondition @default(NEW)
+  status          EquipmentStatus    @default(AVAILABLE)
+  sportId         String?            @map("sport_id")
+  storageLocation String?            @map("storage_location")
+  purchasedDate   DateTime?          @map("purchased_date")
+  purchaseCost    Decimal?           @map("purchase_cost") @db.Decimal(10, 2)
+  notes           String?            @db.Text
+  createdBy       String?            @map("created_by")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  sport        Sport?               @relation(fields: [sportId], references: [id])
+  createdByUser User?               @relation("equipmentCreated", fields: [createdBy], references: [id])
+  assignments  EquipmentAssignment[]
+
+  @@index([category])
+  @@index([status])
+  @@index([sportId])
+  @@map("equipment_items")
+}
+
+model EquipmentAssignment {
+  id               String                 @id @default(uuid())
+  equipmentId      String                 @map("equipment_id")
+  assignedToType   EquipmentAssignmentType @map("assigned_to_type")
+  athleteId        String?                @map("athlete_id")
+  teamId           String?                @map("team_id")
+  quantity         Int                    @default(1)
+  assignedBy       String                 @map("assigned_by")
+  assignedAt       DateTime               @default(now()) @map("assigned_at")
+  dueDate          DateTime?              @map("due_date")
+  returnedAt       DateTime?              @map("returned_at")
+  conditionOnReturn EquipmentCondition?   @map("condition_on_return")
+  notes            String?                @db.Text
+
+  equipment   EquipmentItem    @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  athlete     StudentAthlete?  @relation(fields: [athleteId], references: [id])
+  team        Team?            @relation(fields: [teamId], references: [id])
+  assignedByUser User?         @relation("equipmentAssigned", fields: [assignedBy], references: [id])
+
+  @@index([equipmentId])
+  @@index([athleteId])
+  @@index([teamId])
+  @@map("equipment_assignments")
 }

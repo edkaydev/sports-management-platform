@@ -9,7 +9,7 @@ export const reportsQuerySchema = z.object({
   semester: z.enum(['SEM1', 'SEM2', 'RESIT']).optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  format: z.enum(['json', 'csv']).optional().default('json'),
+  format: z.enum(['json', 'csv', 'pdf']).optional().default('json'),
 });
 
 export type ReportsQuery = z.infer<typeof reportsQuerySchema>;

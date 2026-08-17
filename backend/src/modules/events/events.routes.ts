@@ -16,33 +16,33 @@ router.get('/:id/participants', controller.listParticipants);
 
 router.post(
   '/',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(createEventSchema),
   controller.createEvent
 );
 
 router.patch(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(updateEventSchema),
   controller.updateEvent
 );
 
 router.patch(
   '/:id/status',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   controller.updateStatus
 );
 
 router.delete(
   '/:id',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN'),
+  requireRole('TUTOR'),
   controller.deleteEvent
 );
 
 router.post(
   '/:id/participants',
-  requireRole('SPORTS_ADMIN', 'SUPER_ADMIN', 'COACH'),
+  requireRole('TUTOR', 'SPORTS_REP'),
   validate(registerParticipantSchema),
   controller.registerParticipant
 );

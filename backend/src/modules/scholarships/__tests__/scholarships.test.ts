@@ -22,7 +22,7 @@ beforeAll(async () => {
       email: ADMIN_EMAIL,
       fullName: 'Scholarship Test Admin',
       passwordHash: hash,
-      role: UserRole.SPORTS_ADMIN,
+      role: UserRole.TUTOR,
     },
   });
 
@@ -31,7 +31,7 @@ beforeAll(async () => {
       email: COACH_EMAIL,
       fullName: 'Scholarship Test Coach',
       passwordHash: hash,
-      role: UserRole.COACH,
+      role: UserRole.SPORTS_REP,
     },
   });
 
@@ -98,17 +98,20 @@ describe('POST /api/scholarships', () => {
     scholarshipId = res.body.data.id;
   });
 
-  it('returns 403 for COACH', async () => {
+  it('allows a SPORTS_REP to create scholarships', async () => {
     const res = await request(app)
       .post('/api/scholarships')
       .set('Authorization', `Bearer ${coachToken}`)
       .send({
         athleteId,
         scholarshipType: 'PARTIAL',
+        sponsorName: 'UMU',
+        coverageDescription: 'Partial tuition',
+        coveragePercentage: 50,
         startDate: '2025-08-01',
         endDate: '2026-07-31',
       });
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(201);
   });
 });
 
