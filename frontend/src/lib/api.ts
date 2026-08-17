@@ -11,12 +11,42 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use(
-  (res) => res,
-  (error) => {
-    if (error.response?.status === 401) {
+// ─── Token refresh on 401 ────────────────────────────────────────────────────
+let _refreshing: Promise<string | null> | null = null;
+
+async function attemptRefresh(): Promise<string | null> {
+  if (_refreshing) return _refreshing;
+  _refreshing = api
+    .post<{ success: boolean; data: { accessToken: string } }>('/auth/refresh')
+    .then((res) => {
+      const newToken = res.data.data.accessToken;
+      localStorage.setItem('umu_token', newToken);
+      return newToken;
+    })
+    .catch(() => {
       localStorage.removeItem('umu_token');
       localStorage.removeItem('umu_user');
+      return null;
+    })
+    .finally(() => {
+      _refreshing = null;
+    });
+  return _refreshing;
+}
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const originalRequest = error.config as typeof error.config & { _retry?: boolean };
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const newToken = await attemptRefresh();
+      if (newToken) {
+        originalRequest.headers = originalRequest.headers ?? {};
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return api(originalRequest);
+      }
+      // Refresh failed — redirect to login
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
@@ -52,6 +82,11 @@ export interface User {
   email: string;
   role: string;
   isActive: boolean;
+}
+
+export enum UserRole {
+  TUTOR = 'TUTOR',
+  SPORTS_REP = 'SPORTS_REP',
 }
 
 export function roleLabel(role: string): string {
@@ -317,8 +352,12 @@ export interface EquipmentListResponse {
   pagination: Pagination;
 }
 
-export async function listEquipment(params?: Record<string, string | number>) {
-  const res = await api.get<{ success: boolean } & EquipmentListResponse>('/equipment', { params });
+export async function listEquipment(params?: Record<string, string | number | undefined>) {
+  // Strip undefined values before sending
+  const cleaned = params
+    ? Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined))
+    : undefined;
+  const res = await api.get<{ success: boolean } & EquipmentListResponse>('/equipment', { params: cleaned });
   return res.data;
 }
 

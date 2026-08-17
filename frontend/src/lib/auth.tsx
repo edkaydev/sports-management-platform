@@ -1,12 +1,14 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
-import { login as apiLogin, type User } from './api';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { login as apiLogin, api, type User } from './api';
 
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  hasRole: (role: string) => boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
+  updateToken: (token: string) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -36,13 +38,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function signOut() {
     localStorage.removeItem('umu_token');
     localStorage.removeItem('umu_user');
+    // Attempt server-side logout (fire and forget)
+    api.post('/auth/logout').catch(() => {});
     setToken(null);
     setUser(null);
   }
 
+  const updateToken = useCallback((newToken: string) => {
+    localStorage.setItem('umu_token', newToken);
+    setToken(newToken);
+  }, []);
+
+  const hasRole = useCallback(
+    (role: string): boolean => {
+      return user?.role === role;
+    },
+    [user]
+  );
+
   return (
     <AuthContext.Provider
-      value={{ user, token, isAuthenticated: !!token && !!user, signIn, signOut }}
+      value={{ user, token, isAuthenticated: !!token && !!user, hasRole, signIn, signOut, updateToken }}
     >
       {children}
     </AuthContext.Provider>

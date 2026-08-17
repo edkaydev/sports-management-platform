@@ -61,7 +61,7 @@ const navGroups: Array<{
 ];
 
 function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { user, hasRole } = useAuth();
+  const { hasRole } = useAuth();
   return (
     <>
       {open && (
