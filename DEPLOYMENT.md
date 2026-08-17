@@ -3,7 +3,7 @@
 ## Stack
 - Ubuntu 22.04 LTS
 - Docker + Docker Compose
-- Nginx (reverse proxy + SSL)
+- Nginx (Docker container — reverse proxy + SSL)
 - Let's Encrypt (free SSL certificate)
 - GitHub (source code)
 
@@ -86,228 +86,90 @@ docker compose version
 
 ---
 
-## 4. Install Nginx
-
-```bash
-sudo apt install -y nginx
-sudo systemctl enable nginx
-sudo systemctl start nginx
-```
-
----
-
-## 5. Install Certbot (Let's Encrypt SSL)
-
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-```
-
----
-
-## 6. Set Up the Project
+## 4. Set Up the Project
 
 Clone the repository:
 
 ```bash
 cd /home/edward
-git clone https://github.com/YOUR_USERNAME/sports-management-platform.git
+git clone https://github.com/edkaydev/sports-management-platform.git
 cd sports-management-platform
-```
-
-Create the production environment file:
-
-```bash
-cp backend/.env.example backend/.env.production
-nano backend/.env.production
-```
-
-Fill in your values:
-
-```env
-NODE_ENV=production
-PORT=3000
-
-DATABASE_URL=mysql://umu:YOUR_DB_PASSWORD@db:3306/umu_sports
-
-JWT_SECRET=CHANGE_THIS_TO_A_LONG_RANDOM_STRING
-JWT_ACCESS_EXPIRES_IN=15m
-JWT_REFRESH_EXPIRES_IN=7d
-
-STORAGE_PROVIDER=local
-UPLOAD_DIR=/app/uploads
-
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your-email@gmail.com
-SMTP_PASSWORD=your-app-password
-EMAIL_FROM=sports@umu.ac.ug
-
-FRONTEND_URL=https://umu-sports.umu.ac.ug
 ```
 
 ---
 
-## 7. Production Docker Compose
+## 5. Configure Environment Variables
 
-Create `docker-compose.prod.yml` at the project root:
+### 5.1 Docker Compose root `.env`
 
-```yaml
-services:
-
-  db:
-    image: mysql:8
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: umu_sports
-      MYSQL_USER: umu
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - internal
-
-  api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    restart: always
-    depends_on:
-      - db
-    env_file:
-      - ./backend/.env.production
-    volumes:
-      - uploads:/app/uploads
-    networks:
-      - internal
-      - web
-    expose:
-      - "3000"
-
-  client:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.prod
-    restart: always
-    networks:
-      - web
-    expose:
-      - "80"
-
-networks:
-  internal:
-  web:
-
-volumes:
-  mysql_data:
-  uploads:
-```
-
-Create a `.env` file at the root (for Docker Compose variable substitution):
+Create a `.env` file at the project root for Docker Compose variable substitution (used by `docker-compose.prod.yml`):
 
 ```bash
 nano .env
 ```
 
 ```env
-MYSQL_ROOT_PASSWORD=CHANGE_THIS
-MYSQL_PASSWORD=CHANGE_THIS
+MYSQL_ROOT_PASSWORD=CHANGE_THIS_TO_A_STRONG_ROOT_PASSWORD
+MYSQL_DATABASE=umu_sports
+MYSQL_USER=umu
+MYSQL_PASSWORD=CHANGE_THIS_TO_A_STRONG_DB_PASSWORD
 ```
+
+### 5.2 Backend `.env.prod`
+
+Copy the example and fill in your values:
+
+```bash
+cp backend/.env.example.prod backend/.env.prod
+nano backend/.env.prod
+```
+
+```env
+NODE_ENV=production
+PORT=3000
+
+# Database — must match the MYSQL_* values in root .env
+DATABASE_URL=mysql://umu:CHANGE_THIS@db:3306/umu_sports
+
+# JWT — generate with: openssl rand -hex 64
+JWT_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_STRING
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+
+# File Storage
+STORAGE_PROVIDER=local
+UPLOAD_DIR=./uploads
+
+# Email
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
+EMAIL_FROM=sports@umu.ac.ug
+
+# Frontend URL (for CORS)
+FRONTEND_URL=https://umu-sports.umu.ac.ug
+```
+
+> **Important:** The root `.env` and `backend/.env.prod` are gitignored. Never commit them.
 
 ---
 
-## 8. Frontend Production Dockerfile
+## 6. Get SSL Certificate
 
-Create `frontend/Dockerfile.prod`:
-
-```dockerfile
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.frontend.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-```
-
-Create `frontend/nginx.frontend.conf`:
-
-```nginx
-server {
-    listen 80;
-
-    location / {
-        root /usr/share/nginx/html;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-
----
-
-## 9. Configure Nginx as Reverse Proxy
-
-Create the site config:
+Point your domain DNS A record to the server's IP first, then install Certbot on the **host** (not in Docker):
 
 ```bash
-sudo nano /etc/nginx/sites-available/umu-sports
+sudo apt install -y certbot
 ```
 
-```nginx
-server {
-    listen 80;
-    server_name umu-sports.umu.ac.ug;
-
-    # API
-    location /api {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # Frontend
-    location / {
-        proxy_pass http://localhost:5173;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
-Enable the site:
+Get the certificate (standalone mode — temporarily stops nothing since Nginx isn't installed on host):
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/umu-sports /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+sudo certbot certonly --standalone -d umu-sports.umu.ac.ug
 ```
 
----
-
-## 10. Get SSL Certificate
-
-Point your domain to the server's IP first (DNS A record), then:
-
-```bash
-sudo certbot --nginx -d umu-sports.umu.ac.ug
-```
-
-Certbot will automatically:
-- Get the certificate
-- Update your Nginx config to redirect HTTP → HTTPS
-- Set up auto-renewal
+Certificates will be at `/etc/letsencrypt/live/umu-sports.umu.ac.ug/`.
 
 Test auto-renewal:
 
@@ -317,18 +179,18 @@ sudo certbot renew --dry-run
 
 ---
 
-## 11. Build and Start the Application
+## 7. Build and Start the Application
 
 ```bash
 cd /home/edward/sports-management-platform
 
-# Build images
+# Build all production images (db, api, client, nginx)
 docker compose -f docker-compose.prod.yml build
 
 # Start all services
 docker compose -f docker-compose.prod.yml up -d
 
-# Run database migrations
+# Wait for MySQL to be healthy, then run migrations
 docker compose -f docker-compose.prod.yml exec api npx prisma migrate deploy
 
 # Seed the first TUTOR and SPORTS_REP users
@@ -340,7 +202,7 @@ docker compose -f docker-compose.prod.yml ps
 
 ---
 
-## 12. Verify Deployment
+## 8. Verify Deployment
 
 ```bash
 # Check API health
@@ -348,56 +210,60 @@ curl https://umu-sports.umu.ac.ug/api/health
 
 # Check logs
 docker compose -f docker-compose.prod.yml logs -f api
+docker compose -f docker-compose.prod.yml logs -f nginx
 docker compose -f docker-compose.prod.yml logs -f db
 ```
 
 Open `https://umu-sports.umu.ac.ug` in a browser — login page should load.
 
+**Demo credentials:**
+- Tutor: `tutor@umu.ac.ug` / `Tutor@2025`
+- Sport Rep: `sportrep@umu.ac.ug` / `SportRep@2025`
+
 ---
 
-## 13. Database Backups
+## 9. Database Backups
 
-Create a backup script:
+The project includes a backup script at `scripts/backup-db.sh`.
+
+### 9.1 Set up environment variables for the backup script
+
+The script reads `MYSQL_HOST`, `MYSQL_USER`, `MYSQL_PASSWORD`, and `MYSQL_DATABASE` from environment variables. Create a wrapper or export them:
 
 ```bash
-nano /home/edward/backup.sh
+export MYSQL_HOST=127.0.0.1
+export MYSQL_USER=umu
+export MYSQL_PASSWORD=YOUR_DB_PASSWORD
+export MYSQL_DATABASE=umu_sports
 ```
 
+### 9.2 Test the backup
+
 ```bash
-#!/bin/bash
-DATE=$(date +%Y-%m-%d_%H-%M)
-BACKUP_DIR=/home/edward/backups
-mkdir -p $BACKUP_DIR
+# Dry run
+./scripts/backup-db.sh --dry-run
 
-docker compose -f /home/edward/sports-management-platform/docker-compose.prod.yml \
-  exec -T db \
-  mysqldump -u umu -p${MYSQL_PASSWORD} umu_sports \
-  > $BACKUP_DIR/umu_sports_$DATE.sql
-
-# Keep only last 30 days of backups
-find $BACKUP_DIR -name "*.sql" -mtime +30 -delete
-
-echo "Backup complete: umu_sports_$DATE.sql"
+# Actual backup
+./scripts/backup-db.sh
 ```
 
-Make it executable and schedule it:
+Backups are saved to `/var/backups/umu-sports/` as gzipped SQL files, with 30-day retention.
+
+### 9.3 Schedule daily backups via cron
 
 ```bash
-chmod +x /home/edward/backup.sh
-
-# Run daily at 2:00 AM
 crontab -e
 ```
 
-Add this line:
+Add:
 
 ```
-0 2 * * * /home/edward/backup.sh >> /home/edward/backup.log 2>&1
+0 2 * * * cd /home/edward/sports-management-platform && MYSQL_HOST=127.0.0.1 MYSQL_USER=umu MYSQL_PASSWORD=YOUR_DB_PASSWORD MYSQL_DATABASE=umu_sports ./scripts/backup-db.sh >> /var/backups/umu-sports/backup.log 2>&1
 ```
 
 ---
 
-## 14. Updating the Application
+## 10. Updating the Application
 
 When you push new code:
 
@@ -420,7 +286,7 @@ docker compose -f docker-compose.prod.yml logs -f api
 
 ---
 
-## 15. Useful Commands
+## 11. Useful Commands
 
 ```bash
 # View running containers
@@ -444,7 +310,7 @@ docker compose -f docker-compose.prod.yml down -v
 
 ---
 
-## 16. Firewall Setup
+## 12. Firewall Setup
 
 ```bash
 sudo ufw allow OpenSSH
@@ -459,3 +325,41 @@ This allows:
 - Port 443 (HTTPS)
 
 All other ports are blocked, including 3306 (MySQL) and 3000 (API) — only accessible internally via Docker network.
+
+---
+
+## Architecture Overview
+
+The production stack runs 4 Docker containers on an internal bridge network:
+
+```
+Internet
+   │
+   ▼
+┌─────────────────────────────────────┐
+│  Nginx (port 80, 443)              │
+│  - SSL termination                  │
+│  - Rate limiting                    │
+│  - Security headers                 │
+│  - Static file serving (uploads)    │
+└──────────┬──────────────────────────┘
+           │
+     ┌─────┴─────┐
+     │           │
+     ▼           ▼
+┌─────────┐ ┌─────────┐
+│  API    │ │ Client  │
+│  :3000  │ │ (static)│
+└────┬────┘ └─────────┘
+     │
+     ▼
+┌─────────┐
+│  MySQL  │
+│  :3306  │
+└─────────┘
+```
+
+- **Nginx** is the only entry point (ports 80/443)
+- **API** and **Client** are NOT exposed externally
+- **MySQL** is NOT exposed externally
+- All communication happens over the Docker `internal` bridge network
