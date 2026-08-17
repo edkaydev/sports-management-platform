@@ -73,22 +73,11 @@ Event
 
 For structured competitions (leagues, tournaments, group stages), the system supports:
 
-### Groups / Pools
-
-```
-CompetitionGroup
-├── id (UUID)
-├── event_id (FK → Event)
-├── name (e.g. "Group A")
-└── teams[] (FK → Team[])
-```
-
 ### Standings
 
 ```
 Standing
 ├── event_id
-├── group_id (nullable)
 ├── team_id
 ├── played
 ├── won
@@ -102,16 +91,6 @@ Standing
 ```
 
 Standings are recalculated automatically each time a match result is recorded.
-
-### Knockout Rounds
-
-```
-KnockoutRound
-├── event_id
-├── round_name (e.g. "Quarter Final", "Semi Final", "Final")
-├── round_number (integer)
-└── matches[] (FK → Match[])
-```
 
 ---
 

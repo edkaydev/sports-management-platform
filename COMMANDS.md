@@ -118,6 +118,12 @@ EXIT;
 ## Database — Backups
 
 ```bash
+# Automated backup (production — runs daily via cron)
+./scripts/backup-db.sh
+
+# Dry-run (print command without executing)
+./scripts/backup-db.sh --dry-run
+
 # Manual backup (development)
 docker compose exec db mysqldump -u umu -pumu_pass umu_sports > backup.sql
 

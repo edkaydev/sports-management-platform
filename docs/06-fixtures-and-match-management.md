@@ -31,7 +31,6 @@ Match
 ├── away_score (integer, nullable)
 ├── status (enum: SCHEDULED | IN_PROGRESS | COMPLETED | CANCELLED | POSTPONED | ABANDONED)
 ├── match_type (enum: LEAGUE | KNOCKOUT | FRIENDLY | GALA | TRIAL | OTHER)
-├── officials[] (FK → User[])
 ├── notes (text)
 ├── created_by (FK → User)
 ├── created_at
@@ -135,35 +134,9 @@ Scores are updated automatically as `GOAL`, `POINT`, or `TRY` events are recorde
 
 ---
 
-## Half-Time / Full-Time
-
-The system tracks:
-
-```
-MatchScore
-├── match_id
-├── period (enum: HALF_TIME | FULL_TIME | EXTRA_TIME | SHOOTOUT)
-├── home_score
-└── away_score
-```
-
----
-
 ## Match Result
 
-```
-MatchResult
-├── match_id (FK → Match, unique)
-├── home_score (final)
-├── away_score (final)
-├── winner_team_id (FK → Team, nullable — null for draw)
-├── result_type (enum: HOME_WIN | AWAY_WIN | DRAW | HOME_WIN_ON_PENALTIES | AWAY_WIN_ON_PENALTIES)
-├── home_penalties (integer, nullable)
-├── away_penalties (integer, nullable)
-├── walkover (boolean — one team didn't show)
-├── verified_by (FK → User)
-└── verified_at (timestamp)
-```
+Scores are stored directly on the `Match` model (`home_score`, `away_score`). The result is determined by comparing scores.
 
 ---
 
@@ -182,7 +155,7 @@ MatchReport
 ├── attendance_count (integer, nullable)
 ├── notable_incidents (text)
 ├── coaching_notes (text)
-└── attachments[] (FK → Document[])
+└── created_at
 ```
 
 ---

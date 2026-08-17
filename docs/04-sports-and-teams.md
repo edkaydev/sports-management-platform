@@ -141,21 +141,17 @@ Coaches can log training sessions for their teams.
 ```
 TrainingSession
 ├── id (UUID)
-├── team_id (FK → Team)
-├── coach_id (FK → User)
-├── session_date (date)
-├── start_time
-├── end_time
-├── venue
-├── type (enum: FITNESS | TACTICAL | TECHNICAL | SCRIMMAGE | RECOVERY | OTHER)
-├── notes (text)
+├── sport_id (FK → Sport)
+├── team_id (FK → Team, nullable)
+├── season_id (FK → Season)
+├── title (varchar)
+├── location (varchar, nullable)
+├── focusAreas (text, nullable — e.g. "Passing, Shooting")
+├── intensity (enum: LOW | MEDIUM | HIGH)
+├── status (enum: SCHEDULED | IN_PROGRESS | COMPLETED | CANCELLED)
+├── created_by (FK → User)
 ├── created_at
 └── updated_at
-
-TrainingAttendance
-├── session_id (FK → TrainingSession)
-├── athlete_id (FK → StudentAthlete)
-└── status (enum: PRESENT | ABSENT | EXCUSED | LATE)
 ```
 
 ---
@@ -179,22 +175,6 @@ TrainingAttendance
 ## Team History
 
 All past seasons' squads and coaching staff are preserved. A coach can view who was on the team in the 2023/2024 season, for example.
-
----
-
-## Player Transfer / Release
-
-When an athlete changes team (e.g., moves from Reserve to First Team):
-
-```
-TransferRecord
-├── athlete_id
-├── from_team_id
-├── to_team_id
-├── transfer_date
-├── reason (text)
-└── processed_by (FK → User)
-```
 
 ---
 

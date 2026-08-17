@@ -110,7 +110,7 @@ A contract athlete has a formal engagement agreement with the sports department.
 ```
 AthleteContract
 ├── id (UUID)
-├── athlete_id (FK → StudentAthlete, unique — one active contract at a time)
+├── athlete_id (FK → StudentAthlete)
 ├── contract_type (enum: PLAYING | COACHING_DEVELOPMENT | AMBASSADOR | OTHER)
 ├── start_date (date)
 ├── end_date (date)
@@ -180,4 +180,4 @@ Revoked this semester         1
 | Create contract | ✅ | ✅ |
 | View contracts | ✅ | ✅ |
 | Upload scholarship docs | ✅ | ✅ |
-| View scholarship dashboard | ✅ | ❌ | ❌ |
+| View scholarship dashboard | ✅ | ✅ |

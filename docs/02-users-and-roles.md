@@ -82,17 +82,13 @@ User
 - Refresh token: long-lived (7 days)
 - Passwords hashed with `bcrypt` (minimum 12 rounds)
 - Account lockout after 5 consecutive failed login attempts
-- Password reset via email token (expires in 1 hour)
+- Password change requires current password (no email-based reset in v1.0)
 
 ---
 
-## Registration Flow
+## Registration
 
-1. The TUTOR creates a staff account with role `TUTOR` or `SPORTS_REP`
-2. System sends an invite email with a temporary password
-3. User sets their own password on first login
-
-No self-registration and no athlete/visitor accounts exist.
+Users are created via the seed script or database directly. There is no user management API in v1.0.
 
 ---
 

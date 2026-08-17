@@ -64,6 +64,8 @@ Sports Department, Nkozi Campus
 | 9 | Documents & Records | All forms, certificates, clearances per athlete |
 | 10 | Notifications & Alerts | System-generated alerts for at-risk situations |
 | 11 | Reports & Analytics | Department-level and individual-level reports |
+| 12 | Equipment Inventory | Department equipment tracking, assignment, return (TUTOR-only) |
+| 13 | News & Announcements | News posts with draft/published workflow |
 
 ---
 
@@ -128,10 +130,10 @@ Based on the official UMU Sports Registration Form:
 |---|---|
 | Frontend | React + TypeScript |
 | Backend | Node.js + Express (REST API) |
-| Database | PostgreSQL |
+| Database | MySQL 8 |
 | Auth | JWT + Role-Based Access Control |
-| File Storage | AWS S3 or local storage |
-| Hosting | TBD |
+| File Storage | Local disk (configurable for S3 in future) |
+| Hosting | Docker + Ubuntu Server (Nginx reverse proxy) |
 
 > See `14-system-architecture.md` for full technical design.
 

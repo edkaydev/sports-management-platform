@@ -2,7 +2,7 @@
 
 ## Overview
 
-The system is a standard **three-tier web application**: a React frontend, a Node/Express REST API backend, and a PostgreSQL database. The architecture prioritises simplicity, maintainability, and clear separation of concerns.
+The system is a standard **three-tier web application**: a React frontend, a Node/Express REST API backend, and a MySQL 8 database. The architecture prioritises simplicity, maintainability, and clear separation of concerns.
 
 ---
 
@@ -29,8 +29,8 @@ The system is a standard **three-tier web application**: a React frontend, a Nod
           ┌────────────────┼─────────────────┐
           │                │                 │
 ┌─────────▼──────┐ ┌───────▼───────┐ ┌──────▼──────┐
-│  PostgreSQL    │ │  File Storage │ │  Email      │
-│  Database      │ │  (S3 / local) │ │  Service    │
+│  MySQL 8       │ │  File Storage │ │  Email      │
+│  Database      │ │  (local disk) │ │  Service    │
 └────────────────┘ └───────────────┘ └─────────────┘
 ```
 
@@ -56,23 +56,27 @@ The system is a standard **three-tier web application**: a React frontend, a Nod
 
 ```
 src/
-├── api/           # Axios instance + API call functions
-├── components/    # Shared UI components (Button, Table, Modal, etc.)
-├── features/      # Feature modules (athletes, teams, matches, etc.)
-│   ├── athletes/
-│   │   ├── components/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   └── types.ts
-│   ├── matches/
-│   ├── scholarships/
-│   └── ...
-├── hooks/         # Shared custom hooks
-├── layouts/       # Page layout wrappers (DashboardLayout, AuthLayout)
-├── pages/         # Top-level route pages
-├── store/         # Auth context, user context
-├── types/         # Shared TypeScript types
-└── utils/         # Helpers, formatters, validators
+├── main.tsx           # React entry point
+├── App.tsx            # Route definitions
+├── index.css          # Tailwind directives
+├── lib/
+│   ├── api.ts         # Axios instance + all API functions + TypeScript interfaces
+│   └── auth.tsx       # AuthContext provider (signIn, signOut, user state)
+├── components/
+│   ├── layout/        # AppLayout, PublicLayout
+│   └── ui/            # Button, PageHeader, Card, Badge, Table, Spinner, etc.
+└── pages/
+    ├── DashboardPage.tsx
+    ├── LoginPage.tsx
+    ├── AthletesPage.tsx, AthleteFormPage.tsx, AthleteDetailPage.tsx
+    ├── SportsPage.tsx, TeamsPage.tsx
+    ├── EventsPage.tsx, MatchesPage.tsx
+    ├── AcademicPage.tsx
+    ├── ScholarshipsPage.tsx, ContractsPage.tsx
+    ├── ProspectsPage.tsx, TrialsPage.tsx
+    ├── DocumentsPage.tsx, NotificationsPage.tsx
+    ├── ReportsPage.tsx, EquipmentPage.tsx, NewsManagePage.tsx
+    └── public/         # 11 public pages (no auth required)
 ```
 
 ---
@@ -109,13 +113,20 @@ src/
 │   │   └── auth.schema.ts      ← Zod validation schemas
 │   ├── athletes/
 │   ├── teams/
+│   ├── seasons/
 │   ├── matches/
 │   ├── scholarships/
-│   ├── academics/
+│   ├── academic/
 │   ├── recruitment/
 │   ├── documents/
 │   ├── notifications/
-│   └── reports/
+│   ├── events/
+│   ├── performance/
+│   ├── reports/
+│   ├── news/
+│   ├── equipment/
+│   ├── public/
+│   └── health/
 ├── prisma/          # Prisma schema + migrations (infrastructure layer)
 ├── types/           # Shared TypeScript types
 ├── utils/           # Helpers (pagination, response formatter, etc.)
@@ -179,9 +190,8 @@ When accessToken expires (401 response):
 
 ## File Storage
 
-- Document uploads stored in AWS S3 (or local disk in development)
-- Files accessed via pre-signed URLs (time-limited, no public access)
-- File paths in DB are S3 keys, not public URLs
+- Document uploads stored on local disk (`backend/uploads/`)
+- Files served via Nginx static file serving in production
 - Max file size: 10 MB
 - Accepted types: PDF, JPEG, PNG, DOCX, XLSX
 
@@ -230,11 +240,8 @@ JWT_ACCESS_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 
 # File Storage
-STORAGE_PROVIDER=local | s3
-AWS_BUCKET_NAME=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
+STORAGE_PROVIDER=local
+UPLOAD_DIR=./uploads
 
 # Email
 SMTP_HOST=
@@ -246,16 +253,17 @@ EMAIL_FROM=sports@umu.ac.ug
 
 ---
 
-## Deployment (Recommended)
+## Deployment
 
-| Component | Option |
+| Component | Choice |
 |---|---|
-| Frontend | Vercel / Netlify / Nginx static |
-| Backend API | Railway / Render / Ubuntu VPS + PM2 |
-| Database | PlanetScale (managed MySQL) / Railway / VPS |
-| File Storage | AWS S3 |
+| Frontend | Nginx (Docker container, serves built Vite output) |
+| Backend API | Node.js (Docker container, `dist/server.js`) |
+| Database | MySQL 8 (Docker container, persistent volume) |
+| Reverse Proxy | Nginx (Docker container, SSL via Let's Encrypt) |
+| File Storage | Local disk (Docker volume `uploads_data`) |
 | Domain | umu-sports.umu.ac.ug |
-| SSL | Let's Encrypt |
+| SSL | Let's Encrypt (Certbot) |
 
 ---
 
@@ -314,25 +322,59 @@ volumes:
 
 ### Dockerfiles
 
-**backend/Dockerfile**
+**backend/Dockerfile** (development)
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
-CMD ["node", "dist/app.js"]
+CMD ["npm", "run", "dev"]
 ```
 
-**frontend/Dockerfile**
+**backend/Dockerfile.prod** (production — multi-stage)
+```dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --ignore-scripts
+COPY . .
+RUN npx prisma generate && npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY prisma ./prisma
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["node", "dist/server.js"]
+```
+
+**frontend/Dockerfile** (development)
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "run", "dev"]
+```
+
+**frontend/Dockerfile.prod** (production — multi-stage with Nginx)
+```dockerfile
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --ignore-scripts
+COPY . .
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
+EXPOSE 80
 ```
 
 ### Commands
@@ -365,7 +407,7 @@ docker compose down
 | Uptime | 99% (excluding scheduled maintenance) |
 | Data backup | Daily automated backups |
 | Session timeout | 15 min access token, 7 day refresh |
-| Audit logging | All write operations logged |
+| Audit logging | Not implemented in v1.0 |
 
 ---
 

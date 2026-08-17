@@ -25,40 +25,32 @@ generator client {
 
 ## Enums
 
+> Note: Enums are enforced at the application layer via Prisma. MySQL ENUM syntax is used below for reference.
+
 ```sql
 -- User roles
-CREATE TYPE user_role AS ENUM (
-  'TUTOR', 'SPORTS_REP'
-);
+-- user_role ENUM: 'TUTOR', 'SPORTS_REP'
 
 -- Gender
-CREATE TYPE gender AS ENUM ('MALE', 'FEMALE');
+-- gender ENUM: 'MALE', 'FEMALE', 'MIXED'
 
 -- Athlete type
-CREATE TYPE athlete_type AS ENUM ('REGULAR', 'SCHOLARSHIP', 'CONTRACT');
+-- athlete_type ENUM: 'REGULAR', 'SCHOLARSHIP', 'CONTRACT'
 
 -- Athlete status
-CREATE TYPE athlete_status AS ENUM (
-  'ACTIVE', 'INJURED', 'SUSPENDED', 'GRADUATED', 'WITHDRAWN', 'INACTIVE'
-);
+-- athlete_status ENUM: 'ACTIVE', 'INJURED', 'SUSPENDED', 'GRADUATED', 'WITHDRAWN', 'INACTIVE'
 
 -- Academic standing
-CREATE TYPE academic_standing AS ENUM (
-  'GOOD_STANDING', 'WARNING', 'PROBATION', 'ACADEMIC_SUSPENSION', 'WITHDRAWN'
-);
+-- academic_standing ENUM: 'GOOD_STANDING', 'WARNING', 'PROBATION', 'ACADEMIC_SUSPENSION', 'WITHDRAWN'
 
 -- Sport category
-CREATE TYPE sport_category AS ENUM ('TEAM', 'INDIVIDUAL');
+-- sport_category ENUM: 'TEAM', 'INDIVIDUAL'
 
 -- Event type
-CREATE TYPE event_type AS ENUM (
-  'GALA', 'TOURNAMENT', 'LEAGUE', 'COMPETITION',
-  'FRIENDLY', 'TRIAL', 'TRAINING', 'FESTIVAL', 'SPECIAL'
-);
+-- event_type ENUM: 'GALA', 'TOURNAMENT', 'LEAGUE', 'COMPETITION', 'FRIENDLY', 'TRIAL', 'TRAINING', 'FESTIVAL', 'SPECIAL'
 
 -- Event level
-CREATE TYPE event_level AS ENUM (
-  'CAMPUS', 'FACULTY', 'UNIVERSITY', 'LOCAL', 'NATIONAL', 'REGIONAL', 'INTERNATIONAL'
+-- event_level ENUM: 'CAMPUS', 'FACULTY', 'UNIVERSITY', 'LOCAL', 'NATIONAL', 'REGIONAL', 'INTERNATIONAL'
 );
 
 -- Event format
@@ -117,11 +109,13 @@ CREATE TABLE users (
   full_name       VARCHAR(255) NOT NULL,
   email           VARCHAR(255) UNIQUE NOT NULL,
   password_hash   TEXT NOT NULL,
-  role            user_role NOT NULL,
+  role            VARCHAR(20) NOT NULL,  -- 'TUTOR' or 'SPORTS_REP'
   is_active       BOOLEAN DEFAULT true,
   phone_number    VARCHAR(20),
   profile_photo_url TEXT,
   last_login_at   TIMESTAMP,
+  failed_login_attempts INT DEFAULT 0,
+  locked_until    TIMESTAMP,
   created_at      TIMESTAMP DEFAULT NOW(),
   updated_at      TIMESTAMP DEFAULT NOW(),
   deleted_at      TIMESTAMP  -- soft delete
@@ -339,6 +333,8 @@ CREATE TABLE matches (
   round                 VARCHAR(100),
   home_team_id          UUID REFERENCES teams(id),
   away_team_id          UUID REFERENCES teams(id),
+  home_individual_id    UUID REFERENCES student_athletes(id),
+  away_individual_id    UUID REFERENCES student_athletes(id),
   venue                 VARCHAR(255),
   scheduled_date        DATE NOT NULL,
   scheduled_time        TIME,
@@ -346,7 +342,8 @@ CREATE TABLE matches (
   actual_end_time       TIMESTAMP,
   home_score            SMALLINT,
   away_score            SMALLINT,
-  status                match_status DEFAULT 'SCHEDULED',
+  status                VARCHAR(20) DEFAULT 'SCHEDULED',  -- match_status enum
+  match_type            VARCHAR(20) DEFAULT 'OTHER',      -- match_type enum
   notes                 TEXT,
   created_by            UUID REFERENCES users(id),
   created_at            TIMESTAMP DEFAULT NOW(),
@@ -410,27 +407,6 @@ CREATE TABLE notifications (
 CREATE INDEX idx_notifications_user_unread
   ON notifications(recipient_user_id, is_read)
   WHERE is_read = false;
-```
-
----
-
-## Audit Log
-
-```sql
-CREATE TABLE audit_logs (
-  id            UUID PRIMARY KEY DEFAULT (UUID()),
-  user_id       UUID REFERENCES users(id),
-  action        VARCHAR(100) NOT NULL,  -- e.g. 'CREATE_ATHLETE', 'UPDATE_SCHOLARSHIP'
-  entity_type   VARCHAR(50),
-  entity_id     UUID,
-  old_value     JSONB,
-  new_value     JSONB,
-  ip_address    VARCHAR(45),
-  created_at    TIMESTAMP DEFAULT NOW()
-);
-
-CREATE INDEX idx_audit_entity ON audit_logs(entity_type, entity_id);
-CREATE INDEX idx_audit_user   ON audit_logs(user_id);
 ```
 
 ---

@@ -56,23 +56,20 @@ and delete actions are shown only to TUTOR. For example:
 ```
 Dashboard
 Athletes
-  └── All Athletes
-  └── Add Athlete
-Teams & Sports
-  └── Teams
-  └── Sports
-Fixtures & Matches
-  └── Fixtures
-  └── Calendar
-Events & Competitions
-Scholarships & Contracts
-Recruitment
-  └── Prospects
-  └── Trials
-Academic Performance
+Sports
+Teams
+Events
+Matches
+Scholarships
+Contracts
+Prospects
+Trials
+Academic
 Documents
+Notifications
 Reports
-Settings
+Equipment    (TUTOR only)
+News
 ```
 
 Active item is highlighted with a left border accent, not background fill.
@@ -259,14 +256,6 @@ UMU FC vs UCU                            Faculty Gala · 11 Aug 2026
 
   [Record Event]   [Submit Match Report]   [Confirm Result]
 ```
-
----
-
-### Fixture Calendar
-
-- Month/week/list view toggle (text buttons, not icon-only)
-- Colour coding: Scheduled (grey), In Progress (blue), Completed (green), Cancelled (red)
-- Each event shows: time, sport, teams — no more
 
 ---
 

@@ -145,9 +145,8 @@ When a prospect is marked as `SELECTED`, the Sports Admin converts them to a ful
 1. System prompts: "Convert prospect to student-athlete?"
 2. Admin confirms
 3. A new `StudentAthlete` record is created, pre-populated from the `Prospect` record
-4. A `User` account is created (if they don't already have one)
-5. The `RecruitmentRecord` is linked to the new athlete profile
-6. Prospect status becomes `ENROLLED`
+4. The `RecruitmentRecord` is linked to the new athlete profile
+5. Prospect status becomes `ENROLLED`
 
 ```
 RecruitmentRecord

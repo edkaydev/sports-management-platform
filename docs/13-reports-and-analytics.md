@@ -95,38 +95,7 @@ All current athlete contracts.
 
 ---
 
-### 6. Match Results Report
-
-Summary of all completed matches in a season.
-
-**Contents:**
-- Match date, opponent, venue, score, result
-- Per-team win/draw/loss record
-- Top scorers, top assists
-- Cards summary
-
-**Filters:** Sport, Team, Event, Date range
-
-**Access:** TUTOR, SPORTS_REP
-
----
-
-### 7. Player Performance Report
-
-Individual or team-level performance stats.
-
-**Contents:**
-- Matches played, started, goals, assists, cards, average rating
-- Top performers per stat
-- Performance over time (trend)
-
-**Filters:** Sport, Team, Season, Player
-
-**Access:** TUTOR, SPORTS_REP
-
----
-
-### 8. Fixture Schedule Report
+### 6. Fixture Schedule Report
 
 All upcoming fixtures for a given period.
 
@@ -135,13 +104,13 @@ All upcoming fixtures for a given period.
 
 **Filters:** Sport, Team, Date range
 
-**Access:** All roles
+**Access:** TUTOR, SPORTS_REP
 
 ---
 
-### 9. Recruitment & Trials Report
+### 7. Recruitment & Trials Report
 
-Summary of recruitment activity.
+Summary of recruitment activity (available via `GET /api/recruitment/report`).
 
 **Contents:**
 - Prospects registered, by sport
@@ -149,20 +118,6 @@ Summary of recruitment activity.
 - Assessment scores summary
 - Selected / Rejected / Pending breakdown
 - Conversion rate (trials → enrolled athletes)
-
-**Access:** TUTOR, SPORTS_REP
-
----
-
-### 10. Document Compliance Report
-
-Document completeness per athlete.
-
-**Contents:**
-- Athletes with complete documents
-- Athletes with missing required documents
-- Athletes with expired documents
-- Document type breakdown
 
 **Access:** TUTOR, SPORTS_REP
 

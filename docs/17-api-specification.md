@@ -83,42 +83,6 @@ Access: Authenticated (TUTOR, SPORTS_REP)
 
 ---
 
-## Users
-
-### GET /api/users
-```
-Query: page, pageSize, role, isActive
-Returns: paginated user list
-Access: TUTOR
-```
-
-### POST /api/users
-```
-Body:   { fullName, email, role, phoneNumber }
-Returns: created user (system sends invite email)
-Access: TUTOR
-```
-
-### GET /api/users/:id
-```
-Returns: user record
-Access: TUTOR
-```
-
-### PATCH /api/users/:id
-```
-Body:   { fullName, phoneNumber, isActive }
-Access: TUTOR
-```
-
-### DELETE /api/users/:id
-```
-Soft deletes user
-Access: TUTOR
-```
-
----
-
 ## Athletes
 
 ### GET /api/athletes
@@ -159,36 +123,7 @@ Soft delete
 Access: TUTOR
 ```
 
-### GET /api/athletes/:id/academic-records
-```
-Returns: all academic records for athlete
-Access: TUTOR, SPORTS_REP
-```
-
-### GET /api/athletes/:id/scholarships
-```
-Returns: all scholarship records
-Access: TUTOR, SPORTS_REP
-```
-
-### GET /api/athletes/:id/contracts
-```
-Returns: all contract records
-Access: TUTOR, SPORTS_REP
-```
-
-### GET /api/athletes/:id/documents
-```
-Returns: all documents for athlete
-Access: TUTOR, SPORTS_REP
-```
-
-### GET /api/athletes/:id/performance
-```
-Query: season, sport
-Returns: aggregated season stats
-Access: TUTOR, SPORTS_REP
-```
+> Note: Related records (academic, scholarships, contracts, documents, performance) are queried via their own endpoints with `athleteId` filter.
 
 ---
 
@@ -239,6 +174,27 @@ Access: TUTOR, SPORTS_REP
 ```
 
 ### DELETE /api/teams/:id/squad/:athleteId
+```
+Access: TUTOR
+```
+
+---
+
+## Seasons
+
+### GET /api/seasons
+```
+Returns: all seasons
+Access: Authenticated (TUTOR, SPORTS_REP)
+```
+
+### POST /api/seasons
+```
+Body: { name, startDate, endDate, isCurrent }
+Access: TUTOR
+```
+
+### PATCH /api/seasons/:id
 ```
 Access: TUTOR
 ```
@@ -327,6 +283,34 @@ Access: TUTOR, SPORTS_REP
 ### POST /api/matches/:id/report
 ```
 Body: { summary, mvpAthleteId, attendanceCount, notableIncidents, coachingNotes }
+Access: TUTOR, SPORTS_REP
+```
+
+---
+
+## Performance
+
+### GET /api/performances
+```
+Query: athleteId, matchId, teamId, seasonId, sportId
+Access: TUTOR, SPORTS_REP
+```
+
+### POST /api/performances
+```
+Body: { athleteId, matchId, teamId, seasonId, sportId, ...stats }
+Access: TUTOR, SPORTS_REP
+```
+
+### GET /api/training-sessions
+```
+Query: sportId, teamId, seasonId, status
+Access: TUTOR, SPORTS_REP
+```
+
+### POST /api/training-sessions
+```
+Body: { sportId, teamId, seasonId, title, location, focusAreas, intensity }
 Access: TUTOR, SPORTS_REP
 ```
 
@@ -422,39 +406,52 @@ Access: TUTOR, SPORTS_REP
 
 ## Recruitment
 
-### GET /api/prospects
+### GET /api/recruitment/prospects
 ```
 Query: sport, status, source, search
 Access: TUTOR, SPORTS_REP
 ```
 
-### POST /api/prospects
+### POST /api/recruitment/prospects
 ```
 Body: prospect fields
 Access: TUTOR, SPORTS_REP
 ```
 
-### GET /api/trials
+### GET /api/recruitment/trials
 ```
 Query: sport, status, from, to
 Access: TUTOR, SPORTS_REP
 ```
 
-### POST /api/trials
+### POST /api/recruitment/trials
 ```
 Body: trial fields
 Access: TUTOR, SPORTS_REP
 ```
 
-### POST /api/trials/:id/assessments
+### POST /api/recruitment/trials/:id/assessments
 ```
 Body: assessment fields per prospect
 Access: TUTOR, SPORTS_REP
 ```
 
-### POST /api/prospects/:id/enroll
+### PATCH /api/recruitment/trials/:id/attendance
+```
+Body: { athleteId, attended }
+Access: TUTOR, SPORTS_REP
+```
+
+### POST /api/recruitment/prospects/:id/enroll
 ```
 Converts prospect to student-athlete
+Access: TUTOR, SPORTS_REP
+```
+
+### GET /api/recruitment/report
+```
+Query: sport, season, format
+Returns: recruitment summary report
 Access: TUTOR, SPORTS_REP
 ```
 
@@ -485,6 +482,18 @@ Access: TUTOR, SPORTS_REP
 Access: TUTOR
 ```
 
+### PATCH /api/documents/:id/verify
+```
+Body: { isVerified }
+Access: TUTOR
+```
+
+### GET /api/documents/athletes/:athleteId/checklist
+```
+Returns: document completeness checklist for athlete
+Access: TUTOR, SPORTS_REP
+```
+
 ---
 
 ## Notifications
@@ -512,7 +521,7 @@ Access: Authenticated (TUTOR, SPORTS_REP)
 
 ## Reports
 
-### GET /api/reports/department-overview
+### GET /api/reports/overview
 ```
 Access: TUTOR, SPORTS_REP
 ```
@@ -535,16 +544,82 @@ Query: status, format
 Access: TUTOR, SPORTS_REP
 ```
 
-### GET /api/reports/match-results
+### GET /api/reports/contracts
 ```
-Query: sport, team, event, from, to, format
+Query: status, format
 Access: TUTOR, SPORTS_REP
 ```
 
-### GET /api/reports/player-performance
+### GET /api/reports/fixtures
 ```
-Query: athleteId, team, season, format
+Query: sport, team, from, to, format
 Access: TUTOR, SPORTS_REP
+```
+
+---
+
+## Equipment (TUTOR only)
+
+### GET /api/equipment
+```
+Query: search, category, status
+Returns: paginated equipment list
+Access: TUTOR
+```
+
+### POST /api/equipment
+```
+Body: { name, category, description, quantity, condition, purchaseDate }
+Access: TUTOR
+```
+
+### PATCH /api/equipment/:id
+```
+Access: TUTOR
+```
+
+### DELETE /api/equipment/:id
+```
+Access: TUTOR
+```
+
+### POST /api/equipment/:id/assign
+```
+Body: { athleteId | teamId, notes }
+Access: TUTOR
+```
+
+### POST /api/equipment/:id/return
+```
+Body: { assignmentId, condition, notes }
+Access: TUTOR
+```
+
+---
+
+## News
+
+### GET /api/news
+```
+Query: status, search
+Returns: paginated news posts
+Access: Authenticated (TUTOR, SPORTS_REP)
+```
+
+### POST /api/news
+```
+Body: { title, content, status }
+Access: TUTOR, SPORTS_REP
+```
+
+### PATCH /api/news/:id
+```
+Access: TUTOR, SPORTS_REP
+```
+
+### DELETE /api/news/:id
+```
+Access: TUTOR
 ```
 
 ---

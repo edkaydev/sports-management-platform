@@ -62,21 +62,20 @@ Document
 
 ## Document Checklist per Athlete
 
-The Sports Admin can define a required document checklist per athlete type. The system tracks completion:
+The system provides a per-athlete document checklist endpoint that returns which required documents are present, missing, or expired.
 
 ```
-DocumentRequirement (system config)
-├── name (e.g. "Medical Clearance")
-├── category (enum)
-├── applies_to (enum: ALL | SCHOLARSHIP | CONTRACT | REGULAR)
-├── is_mandatory (boolean)
-└── requires_expiry_date (boolean)
+GET /api/documents/athletes/:athleteId/checklist
 
-AthleteDocumentStatus (computed view)
-├── athlete_id
-├── requirement_name
-├── status (PRESENT | MISSING | EXPIRED)
-└── document_id (nullable — if present)
+Response: {
+  athleteId: string,
+  documents: {
+    category: DocumentCategory,
+    required: boolean,
+    status: "PRESENT" | "MISSING" | "EXPIRED",
+    documentId: string | null
+  }[]
+}
 ```
 
 ### Example Checklist

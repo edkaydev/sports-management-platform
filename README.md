@@ -19,12 +19,12 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 
 | Module | Base path | Highlights |
 |---|---|---|
-| Auth & Users | `/api/auth` | Login, refresh, logout, password change, RBAC |
+| Auth | `/api/auth` | Login, refresh, logout, password change, RBAC |
 | Sports | `/api/sports` | Sport catalogue (team/individual) |
 | Seasons | `/api/seasons` | Academic/sporting season management |
 | Teams | `/api/teams` | Teams, squads, staff assignments |
 | Athletes | `/api/athletes` | CRUD, 360° profiles, affiliations |
-| Academic | `/api/academic` | Records, course results, CSV import |
+| Academic | `/api/academic-records` | Records, course results, CSV import |
 | Scholarships | `/api/scholarships` | Award, renew, revoke, at-risk dashboard |
 | Contracts | `/api/contracts` | Playing/coaching contracts, termination |
 | Recruitment | `/api/recruitment` | Prospects, trials, assessments, enrolment |
@@ -33,8 +33,10 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 | Events | `/api/events` | Competitions, participant registration |
 | Matches | `/api/matches` | Fixtures, lineups, match events, results, reports |
 | Performance | `/api/performances`, `/api/training-sessions` | Match performance, training attendance |
-| Reports | `/api/reports` | Department overview, athlete, academic, scholarship reports (JSON/CSV/PDF) |
-| Public site | `/api/public` | Open catalogue, sports, teams, fixtures, events — no login required |
+| Reports | `/api/reports` | Department overview, athlete, academic, scholarship, contract reports (JSON/CSV/PDF) |
+| Equipment | `/api/equipment` | Inventory management, assignment/return (TUTOR-only) |
+| News | `/api/news` | News/announcements with draft/published workflow |
+| Public site | `/api/public` | Open catalogue, sports, teams, fixtures, events, news — no login required |
 
 ---
 
@@ -108,10 +110,13 @@ sports-management-platform/
 ├── frontend/             # React client
 │   └── src/
 │       ├── components/   # Shared UI + layout components
-│       ├── lib/          # API client, auth context
-│       └── pages/        # Route pages
+│       ├── lib/          # API client (api.ts), auth context (auth.tsx)
+│       └── pages/        # Route pages (admin + public/)
+├── nginx/                # Nginx config (production reverse proxy)
+├── scripts/              # Utility scripts (backup-db.sh)
 ├── docs/                 # Specification documents (18 files)
 ├── docker-compose.yml
+├── docker-compose.prod.yml
 ├── TODO.md
 ├── COMMANDS.md
 └── DEPLOYMENT.md
@@ -131,7 +136,7 @@ cd frontend
 npm run build
 ```
 
-The backend test suite runs against a real MySQL database and covers all 16 feature modules.
+The backend test suite runs against a real MySQL database and covers all 17 feature modules.
 
 ---
 

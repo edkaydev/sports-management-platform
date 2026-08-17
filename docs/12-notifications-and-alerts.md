@@ -110,44 +110,6 @@ Notification
 
 ---
 
-## Notification Rules Configuration
-
-The TUTOR can adjust thresholds and toggle alerts:
-
-```
-NotificationRule
-├── alert_key (enum)
-├── is_enabled (boolean)
-├── threshold_value (decimal, nullable — for GPA/attendance rules)
-├── days_before_expiry (integer, nullable — for expiry alerts)
-├── send_email (boolean)
-└── updated_by (FK → User)
-```
-
----
-
-## Digest / Summary
-
-Instead of individual alerts, the TUTOR can opt for a **daily digest** email that groups all pending alerts into one message:
-
-```
-Daily Sports Department Summary — 11 Aug 2026
-
-CRITICAL (2)
-  · John Doe — Scholarship expired (Football)
-  · Jane Akello — Academic probation
-
-WARNING (5)
-  · 3 athletes have missing documents
-  · 2 match reports pending submission
-
-INFO (3)
-  · 4 upcoming fixtures this week
-  · 1 trial scheduled tomorrow
-```
-
----
-
 ## Notification Dashboard
 
 The Sports Admin homepage shows an "Attention Required" panel:

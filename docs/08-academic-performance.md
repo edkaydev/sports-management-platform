@@ -27,7 +27,7 @@ AcademicRecord
 ├── attendance_percentage (decimal 0–100, nullable)
 ├── academic_standing (enum: see below)
 ├── entered_by (FK → User — Academic Staff)
-├── entered_at (timestamp)
+├── created_at
 ├── notes (text, nullable)
 └── updated_at
 ```
@@ -65,16 +65,15 @@ CourseResult
 
 ## Academic Thresholds
 
-These thresholds determine when an alert is triggered. They are configurable by the TUTOR.
+These thresholds determine when an alert is triggered. They are hardcoded in the service layer (not configurable via DB in v1.0).
 
-```
-AcademicThreshold (system config)
-├── min_gpa_for_good_standing (default: 2.5)
-├── min_gpa_for_scholarship (default: 2.0 — see scholarships)
-├── max_failed_units_warning (default: 1)
-├── max_failed_units_probation (default: 3)
-├── min_attendance_warning (default: 75%)
-```
+| Threshold | Default |
+|---|---|
+| Min GPA for Good Standing | 2.5 |
+| Min GPA for Scholarship | 2.0 |
+| Max Failed Units (Warning) | 1 |
+| Max Failed Units (Probation) | 3 |
+| Min Attendance (Warning) | 75% |
 
 ---
 

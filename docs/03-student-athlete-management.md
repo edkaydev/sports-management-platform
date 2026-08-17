@@ -87,7 +87,7 @@ StudentAthlete
 ├── programme
 ├── faculty
 ├── athlete_type (enum: REGULAR | SCHOLARSHIP | CONTRACT)
-├── is_active (boolean)
+├── status (enum: ACTIVE | INJURED | SUSPENDED | INACTIVE | GRADUATED | WITHDRAWN)
 ├── profile_photo_url
 ├── created_at
 ├── updated_at
@@ -99,7 +99,7 @@ StudentAthlete
 ├── → RecruitmentRecord (0 or 1)
 ├── → Document[]
 ├── → MedicalDeclaration
-└── → PerformanceRecord[]
+└── → PlayerMatchPerformance[]
 ```
 
 ---
@@ -178,17 +178,7 @@ When a Sports Admin or Coach opens an athlete's profile, they see a unified view
 
 ## Academic Year & Season Tracking
 
-Athletes are tracked per **academic year**. Historical records are preserved when an athlete moves from Year 1 to Year 2, etc.
-
-```
-AcademicYearEnrollment
-├── athlete_id
-├── academic_year (e.g. "2025/2026")
-├── semester (enum: SEM1 | SEM2)
-├── year_of_study
-├── programme
-└── is_active
-```
+Athletes are tracked per **academic year**. The `year_of_study`, `programme`, and `semester` are tracked as fields on the `StudentAthlete` record and updated as the athlete progresses.
 
 ---
 

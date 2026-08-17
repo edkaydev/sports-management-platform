@@ -156,12 +156,12 @@
 
 ## Phase 12 — Reports
 
-- [x] `GET /api/reports/department-overview`
+- [x] `GET /api/reports/overview`
 - [x] `GET /api/reports/athletes`
 - [x] `GET /api/reports/academic-standing`
 - [x] `GET /api/reports/scholarships`
 - [x] `GET /api/reports/contracts`
-- [x] `GET /api/reports/recruitment`
+- [x] `GET /api/reports/fixtures`
 - [x] CSV export
 - [x] PDF export (pdfkit)
 
@@ -290,10 +290,10 @@
 
 ## Phase 15 — Deployment
 
-- [ ] Production `docker-compose.prod.yml`
-- [ ] Nginx config (reverse proxy + SSL)
-- [ ] Environment variables secured (secrets manager or .env.prod)
-- [ ] Database backup script (daily cron)
+- [x] Production `docker-compose.prod.yml`
+- [x] Nginx config (reverse proxy + SSL) — `nginx/nginx.conf` + `nginx/conf.d/default.conf`
+- [x] Environment variables secured — `backend/.env.example.prod` template
+- [x] Database backup script (daily cron) — `scripts/backup-db.sh`
 - [ ] Domain configured (`umu-sports.umu.ac.ug`)
 - [ ] SSL certificate (Let's Encrypt)
 - [ ] Smoke test on production
@@ -304,5 +304,4 @@
 ## Known Issues / Outstanding Work
 
 - File uploads are stored locally in `backend/uploads/`. For production with multiple replicas or cloud hosting, migrate to S3 or equivalent object storage.
-- The 26 test `.txt` files in `backend/uploads/` from development should be cleaned up before any demo or production deployment.
-- Deployment phase (Phase 15) is not yet complete — no production Nginx config or SSL setup.
+- Domain DNS and SSL certificate (Let's Encrypt) need to be configured on the production server.

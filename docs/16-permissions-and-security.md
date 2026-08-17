@@ -13,7 +13,7 @@ Security is enforced in layers: authentication (who you are) and authorisation (
 - Access token: signed HS256 JWT, 15 minute expiry
 - Refresh token: signed HS256 JWT, 7 day expiry
 - Access token transmitted in `Authorization: Bearer <token>` header
-- Access token stored client-side in `localStorage`
+- Access token stored client-side in memory (React state)
 
 ### Token Payload
 
@@ -46,9 +46,9 @@ Security is enforced in layers: authentication (who you are) and authorisation (
 
 ```sql
 CREATE TABLE refresh_tokens (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID PRIMARY KEY,
   user_id     UUID NOT NULL REFERENCES users(id),
-  token_hash  TEXT NOT NULL UNIQUE,  -- SHA-256 of the token
+  token_hash  TEXT NOT NULL UNIQUE,
   expires_at  TIMESTAMP NOT NULL,
   revoked     BOOLEAN DEFAULT false,
   created_at  TIMESTAMP DEFAULT NOW()
@@ -142,22 +142,7 @@ Referrer-Policy: no-referrer
 
 ## Audit Logging
 
-Every write operation (create, update, delete) is logged to the `audit_logs` table:
-
-```
-Action:       UPDATE_SCHOLARSHIP
-Entity:       scholarship / <uuid>
-User:         tutor@umu.ac.ug
-Old value:    { status: 'ACTIVE', end_date: '2026-12-31' }
-New value:    { status: 'REVOKED', revoked_at: '2026-08-11' }
-IP:           197.x.x.x
-Timestamp:    2026-08-11T16:00:00Z
-```
-
-Audit logs are:
-- Write-only (cannot be edited or deleted)
-- Retained indefinitely
-- Accessible to the TUTOR only
+Audit logging is not implemented in v1.0. A future version will log write operations to an `audit_logs` table.
 
 ---
 
