@@ -41,15 +41,30 @@ export default function PublicLayout() {
                 {link.label}
               </NavLink>
             ))}
+
+            <Link
+              to="/login"
+              className="ml-2 rounded-md bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-700"
+            >
+              Login
+            </Link>
           </nav>
 
-          <button
-            className="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 md:hidden"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            Menu
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              to="/login"
+              className="rounded-md bg-red-600 px-3 py-2 text-sm font-bold text-white"
+            >
+              Login
+            </Link>
+            <button
+              className="rounded-md border border-red-200 px-3 py-2 text-sm font-semibold text-red-700"
+              onClick={() => setOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              Menu
+            </button>
+          </div>
         </div>
 
         {open && (
@@ -67,6 +82,13 @@ export default function PublicLayout() {
                 {link.label}
               </NavLink>
             ))}
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="mt-2 block rounded-md bg-red-600 px-3 py-2 text-center text-sm font-bold text-white"
+            >
+              Login
+            </Link>
           </nav>
         )}
       </header>
