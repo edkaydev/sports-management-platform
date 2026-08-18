@@ -7,6 +7,7 @@ import {
   getPublicNews,
 } from '@/lib/api';
 import { Spinner } from '@/components/ui';
+import HomeSlider from '@/components/public/HomeSlider';
 
 function formatDate(value: string | null): string {
   if (!value) return 'TBD';
@@ -28,65 +29,9 @@ export default function HomePage() {
   const loading = fixtures.isLoading || results.isLoading || events.isLoading || news.isLoading;
   const featured = news.data?.news.find((n) => n.featured) ?? news.data?.news[0];
 
-  const heroStats = [
-    { label: 'Fixtures', value: '12', icon: '📅' },
-    { label: 'Results', value: '08', icon: '🏆' },
-    { label: 'Teams', value: '14', icon: '👥' },
-    { label: 'Events', value: '05', icon: '🎯' },
-  ];
-
   return (
     <div className="bg-[#f5f3f2] text-zinc-900">
-      <section className="bg-gradient-to-r from-[#111111] via-[#2d0707] to-[#b91c1c] text-white">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <div className="grid items-end gap-10 lg:grid-cols-[1.4fr_0.6fr]">
-            <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.28em] text-red-200">
-                Uganda Martyrs University
-              </p>
-              <h1 className="text-3xl font-black leading-tight tracking-tight sm:text-5xl">
-                Home of the UMU Saints
-              </h1>
-              <p className="mt-4 max-w-2xl text-base text-red-50 sm:text-lg">
-                Follow fixtures, results, teams, and events from the UMU Sports Department —
-                and support our student-athletes across football, netball, basketball, rugby, and more.
-              </p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/fixtures"
-                  className="rounded-md bg-white px-6 py-3 text-sm font-bold text-red-700 shadow-sm transition hover:bg-red-50"
-                >
-                  View Fixtures
-                </Link>
-                <Link
-                  to="/results"
-                  className="rounded-md border border-white/50 bg-white/5 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10"
-                >
-                  Latest Results
-                </Link>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              {heroStats.map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
-                >
-                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg">
-                    {item.icon}
-                  </div>
-                  <div className="text-2xl font-black text-white">{item.value}</div>
-                  <div className="text-xs font-semibold uppercase tracking-[0.2em] text-red-100">
-                    {item.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <HomeSlider />
 
       {loading ? (
         <div className="flex justify-center py-16">

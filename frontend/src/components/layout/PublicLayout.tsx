@@ -97,35 +97,57 @@ export default function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-red-100 bg-zinc-950 text-zinc-300">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-3">
+      <footer className="border-t border-red-100 bg-white text-zinc-700">
+        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr]">
           <div>
-            <div className="mb-2 text-lg font-black text-white">UMU Sports</div>
-            <p className="text-sm text-zinc-400">
+            <div className="mb-3 flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-600 text-sm font-black text-white shadow-sm">
+                UMU
+              </span>
+              <div className="text-lg font-black text-zinc-900">UMU Sports</div>
+            </div>
+            <p className="max-w-sm text-sm leading-6 text-zinc-600">
               Uganda Martyrs University Sports Department — supporting student-athletes on and off the field.
             </p>
           </div>
 
           <div>
-            <div className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-red-400">Quick Links</div>
+            <div className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-red-700">Quick Links</div>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/fixtures" className="hover:text-white">Fixtures</Link></li>
-              <li><Link to="/results" className="hover:text-white">Results</Link></li>
-              <li><Link to="/events" className="hover:text-white">Events</Link></li>
-              <li><Link to="/news" className="hover:text-white">News</Link></li>
+              <li><Link to="/fixtures" className="text-zinc-600 hover:text-red-700">Fixtures</Link></li>
+              <li><Link to="/results" className="text-zinc-600 hover:text-red-700">Results</Link></li>
+              <li><Link to="/events" className="text-zinc-600 hover:text-red-700">Events</Link></li>
+              <li><Link to="/news" className="text-zinc-600 hover:text-red-700">News</Link></li>
             </ul>
           </div>
 
           <div>
-            <div className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-red-400">Contact</div>
-            <ul className="space-y-2 text-sm text-zinc-400">
+            <div className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-red-700">Athletics</div>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/teams" className="text-zinc-600 hover:text-red-700">Teams</Link></li>
+              <li><Link to="/sports" className="text-zinc-600 hover:text-red-700">Sports</Link></li>
+              <li><Link to="/login" className="text-zinc-600 hover:text-red-700">Student login</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-red-700">Contact</div>
+            <ul className="space-y-2 text-sm text-zinc-600">
               <li>Nkozi Main Campus, Mpigi, Uganda</li>
               <li>sports@umu.ac.ug</li>
+              <li>
+                <Link
+                  to="/login"
+                  className="mt-2 inline-flex rounded-md bg-red-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-red-700"
+                >
+                  Login
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">
+        <div className="border-t border-red-100 bg-red-50/60 py-4 text-center text-xs text-zinc-600">
           © 2026 Uganda Martyrs University Sports Department
         </div>
       </footer>
