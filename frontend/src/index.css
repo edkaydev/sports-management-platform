@@ -3,7 +3,19 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
   body {
-    @apply bg-gray-50 text-gray-900 text-sm;
+    @apply bg-[#f5f3f2] text-zinc-900 text-sm antialiased;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  ::selection {
+    background: rgba(185, 28, 28, 0.18);
   }
 }

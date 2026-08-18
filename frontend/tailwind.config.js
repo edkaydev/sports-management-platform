@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#1d4ed8',
-        'text-base': '#111827',
+        primary: '#b91c1c',
+        'text-base': '#111111',
         muted: '#6b7280',
-        border: '#e5e7eb',
-        'bg-page': '#f9fafb',
+        border: '#e7e5e4',
+        'bg-page': '#f5f3f2',
         'bg-surface': '#ffffff',
         success: '#16a34a',
         warning: '#d97706',
         danger: '#dc2626',
-        info: '#2563eb',
+        info: '#7f1d1d',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
