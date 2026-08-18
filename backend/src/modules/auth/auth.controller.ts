@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from './auth.service';
-import { LoginInput, ChangePasswordInput } from './auth.schema';
+import { LoginInput, ChangePasswordInput, ForceChangePasswordInput } from './auth.schema';
 import {
   AuthRequest,
   getRefreshCookie,
@@ -59,4 +59,15 @@ async function changePassword(req: AuthRequest, res: Response, next: NextFunctio
   }
 }
 
-export { login, refresh, logout, changePassword };
+async function forceChangePassword(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const input = req.body as ForceChangePasswordInput;
+    await authService.forceChangePassword(req.user!.id, input);
+
+    res.status(200).json({ success: true, message: 'Password changed successfully. Please log in again.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export { login, refresh, logout, changePassword, forceChangePassword };

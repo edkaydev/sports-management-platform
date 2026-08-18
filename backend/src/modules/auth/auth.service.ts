@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import prisma from '../../config/database';
 import { signAccessToken, generateRefreshToken, sha256 } from '../../config/jwt';
 import { AppError } from '../../middleware/error.middleware';
-import { LoginInput, ChangePasswordInput } from './auth.schema';
+import { LoginInput, ChangePasswordInput, ForceChangePasswordInput } from './auth.schema';
 import { UserRole } from '@prisma/client';
 
 const BCRYPT_COST = 12;
@@ -18,6 +18,7 @@ export interface AuthUser {
   fullName: string;
   email: string;
   role: UserRole;
+  mustChangePassword: boolean;
 }
 
 export async function login(input: LoginInput) {
@@ -144,16 +145,41 @@ export async function changePassword(userId: string, input: ChangePasswordInput)
   ]);
 }
 
+export async function forceChangePassword(userId: string, input: ForceChangePasswordInput): Promise<void> {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new AppError(404, 'NOT_FOUND', 'User not found');
+  }
+
+  if (!user.mustChangePassword) {
+    throw new AppError(400, 'INVALID_REQUEST', 'Password change is not required for this account');
+  }
+
+  if (input.newPassword === input.currentPassword) {
+    throw new AppError(422, 'VALIDATION_ERROR', 'New password must be different from current password');
+  }
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await hashPassword(input.newPassword), mustChangePassword: false },
+    }),
+    prisma.refreshToken.updateMany({ where: { userId }, data: { revoked: true } }),
+  ]);
+}
+
 export function publicUser(user: {
   id: string;
   fullName: string;
   email: string;
   role: UserRole;
+  mustChangePassword: boolean;
 }): AuthUser {
   return {
     id: user.id,
     fullName: user.fullName,
     email: user.email,
     role: user.role,
+    mustChangePassword: user.mustChangePassword,
   };
 }

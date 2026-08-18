@@ -21,7 +21,8 @@ logs/
 npm-debug.log*
 
 # Prisma
-backend/prisma/migrations/
+backend/prisma/migrations/**/migration_lock.toml
+backend/prisma/migrations/**/_prisma_migrations
 
 # OS
 .DS_Store

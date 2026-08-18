@@ -27,7 +27,7 @@ async function main(): Promise<void> {
   const email = (
     process.env.SEED_ADMIN_EMAIL ?? "tutor@umu.ac.ug"
   ).toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD ?? "Tutor@2025";
+  const password = process.env.SEED_ADMIN_PASSWORD ?? "tutor123";
   const fullName = process.env.SEED_ADMIN_NAME ?? "Sports Tutor";
 
   const passwordHash = await bcrypt.hash(password, 12);
@@ -40,13 +40,14 @@ async function main(): Promise<void> {
       fullName,
       passwordHash,
       role: UserRole.TUTOR,
+      mustChangePassword: true,
     },
   });
 
   console.log(`TUTOR ready: ${admin.email} (role=${admin.role})`);
 
-  const repEmail = (process.env.SEED_REP_EMAIL ?? "sportrep@umu.ac.ug").toLowerCase();
-  const repPassword = process.env.SEED_REP_PASSWORD ?? "SportRep@2025";
+  const repEmail = (process.env.SEED_REP_EMAIL ?? "sports@umu.ac.ug").toLowerCase();
+  const repPassword = process.env.SEED_REP_PASSWORD ?? "sports123";
   const rep = await prisma.user.upsert({
     where: { email: repEmail },
     update: {},
@@ -55,6 +56,7 @@ async function main(): Promise<void> {
       fullName: "Sports Representative",
       passwordHash: await bcrypt.hash(repPassword, 12),
       role: UserRole.SPORTS_REP,
+      mustChangePassword: true,
     },
   });
 
@@ -419,7 +421,7 @@ async function seedStaff(
   if (!teamId) return;
 
   const coachEmail = (
-    process.env.SEED_COACH_EMAIL ?? "sportrep@umu.ac.ug"
+    process.env.SEED_COACH_EMAIL ?? "sports@umu.ac.ug"
   ).toLowerCase();
   const coach = await prisma.user.upsert({
     where: { email: coachEmail },
@@ -428,10 +430,11 @@ async function seedStaff(
       email: coachEmail,
       fullName: "Sports Representative",
       passwordHash: await bcrypt.hash(
-        process.env.SEED_COACH_PASSWORD ?? "SportRep@2025",
+        process.env.SEED_COACH_PASSWORD ?? "sports123",
         12,
       ),
       role: UserRole.SPORTS_REP,
+      mustChangePassword: true,
     },
   });
 

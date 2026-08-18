@@ -20,3 +20,4 @@ authRouter.post('/login', loginLimiter, validate(loginSchema), authController.lo
 authRouter.post('/refresh', authController.refresh);
 authRouter.post('/logout', verifyToken, authController.logout);
 authRouter.post('/change-password', verifyToken, validate(changePasswordSchema), authController.changePassword);
+authRouter.post('/force-change-password', verifyToken, validate(changePasswordSchema), authController.forceChangePassword);
