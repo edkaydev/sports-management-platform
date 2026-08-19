@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: '/api',
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 });
 
 api.interceptors.request.use((config) => {
@@ -11,7 +12,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ─── Token refresh on 401 ────────────────────────────────────────────────────
 let _refreshing: Promise<string | null> | null = null;
 
 async function attemptRefresh(): Promise<string | null> {
@@ -28,14 +28,17 @@ async function attemptRefresh(): Promise<string | null> {
       localStorage.removeItem('umu_user');
       return null;
     })
-    .finally(() => {
-      _refreshing = null;
-    });
+    .finally(() => { _refreshing = null; });
   return _refreshing;
 }
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    if (res.data?.data !== undefined) {
+      res.data = res.data.data;
+    }
+    return res;
+  },
   async (error) => {
     const originalRequest = error.config as typeof error.config & { _retry?: boolean };
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -46,14 +49,23 @@ api.interceptors.response.use(
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
         return api(originalRequest);
       }
-      // Refresh failed — redirect to login
       if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+        // Dynamically import toast to avoid circular dep issues
+        import('sonner').then(({ toast }) => {
+          toast.error('Your session has expired. Please sign in again.', { id: 'session-expired' });
+        });
+        setTimeout(() => { window.location.href = '/login'; }, 1200);
       }
     }
     return Promise.reject(error);
   }
 );
+
+const TUTOR_ROLES = ['OWNER', 'ADMIN', 'DIRECTOR', 'DEPUTY_DIRECTOR', 'TUTOR', 'HEAD_OF_DEPARTMENT', 'ACADEMIC'];
+
+export function isTutorRole(user: { role?: string } | null | undefined): boolean {
+  return !!user?.role && TUTOR_ROLES.includes(user.role);
+}
 
 export function getErrorMessage(error: unknown): string {
   if (axios.isAxiosError(error)) {
@@ -78,239 +90,80 @@ export async function downloadFile(url: string, filename: string) {
 
 export interface User {
   id: string;
-  fullName: string;
   email: string;
+  firstName: string;
+  lastName: string;
   role: string;
-  isActive: boolean;
+  mustChangePassword: boolean;
 }
 
-export enum UserRole {
-  TUTOR = 'TUTOR',
-  SPORTS_REP = 'SPORTS_REP',
+export async function login(email: string, password: string): Promise<{ accessToken: string; user: User }> {
+  const res = await api.post('/auth/login', { email, password });
+  return res.data.data ?? res.data;
 }
 
-export function roleLabel(role: string): string {
-  switch (role) {
-    case 'TUTOR':
-      return 'Sports Tutor';
-    case 'SPORTS_REP':
-      return 'Sports Representative';
-    default:
-      return role;
-  }
-}
-
-export function isTutorRole(user: User | null): boolean {
-  return user?.role === 'TUTOR';
-}
-
-export async function login(email: string, password: string) {
-  const res = await api.post<{ success: boolean; data: { accessToken: string; user: User } }>(
-    '/auth/login',
-    { email, password }
-  );
-  return res.data.data;
-}
-
-export interface PublicMatch {
-  id: string;
-  matchNumber: number | null;
-  round: string | null;
-  venue: string | null;
-  scheduledDate: string;
-  scheduledTime: string | null;
-  homeScore: number | null;
-  awayScore: number | null;
-  status: string;
-  sport: { id: string; name: string };
-  event: { id: string; name: string } | null;
-  homeTeam: { id: string; name: string; shortName: string | null } | null;
-  awayTeam: { id: string; name: string; shortName: string | null } | null;
-  homeIndividual: { id: string; fullName: string } | null;
-  awayIndividual: { id: string; fullName: string } | null;
-  results: {
-    homeScore: number;
-    awayScore: number;
-    resultType: string;
-    winnerTeamId: string | null;
-    homePenalties: number | null;
-    awayPenalties: number | null;
-    walkover: boolean;
-  } | null;
-}
-
-export interface PublicTeam {
-  id: string;
-  name: string;
-  shortName: string | null;
-  gender: string;
-  logoUrl: string | null;
-  homeVenue: string | null;
-  foundingYear: number | null;
-  sport: { id: string; name: string; gender: string };
-  _count: { squadEntries: number };
-}
-
-export interface PublicSport {
-  id: string;
-  name: string;
-  gender: string;
-  category: string;
-  description: string | null;
-  _count: { teams: number; matches: number };
-}
-
-export interface PublicEvent {
-  id: string;
-  name: string;
-  type: string;
-  level: string;
-  venue: string | null;
-  startDate: string | null;
-  endDate: string | null;
-  description: string | null;
-  status: string;
-  format: string;
-  sport: { id: string; name: string } | null;
-  _count: { participants: number; matches: number };
-}
-
-export interface PublicNewsPost {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  content: string;
-  coverImage: string | null;
-  tags: string | null;
-  featured: boolean;
-  publishedAt: string | null;
-  author: { id: string; fullName: string } | null;
-}
-
-export interface Pagination {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
-
-export async function getPublicFixtures() {
-  const res = await api.get<{ success: boolean; data: PublicMatch[] }>('/public/fixtures', {
-    params: { limit: 50 },
-  });
-  return res.data.data;
-}
-
-export async function getPublicResults() {
-  const res = await api.get<{ success: boolean; data: PublicMatch[] }>('/public/results', {
-    params: { limit: 50 },
-  });
-  return res.data.data;
-}
-
-export async function getPublicSports() {
-  const res = await api.get<{ success: boolean; data: PublicSport[] }>('/public/sports');
-  return res.data.data;
-}
-
-export interface PublicSportDetail {
-  sport: PublicSport;
-  teams: PublicTeam[];
-  fixtures: PublicMatch[];
-  results: PublicMatch[];
-  events: PublicEvent[];
-}
-
-export async function getPublicSport(identifier: string) {
-  const res = await api.get<{ success: boolean; data: PublicSportDetail }>(`/public/sports/${encodeURIComponent(identifier)}`);
-  return res.data.data;
-}
-
-export async function getPublicTeams() {
-  const res = await api.get<{ success: boolean; data: PublicTeam[] }>('/public/teams');
-  return res.data.data;
-}
-
-export interface PublicSquadEntry {
-  id: string;
-  jerseyNumber: number | null;
-  position: string | null;
-  isCaptain: boolean;
-  isViceCaptain: boolean;
-  status: string;
-  joinedDate: string | null;
-  athlete: {
-    id: string;
-    fullName: string;
-    profilePhotoUrl: string | null;
-    athleteType: string;
-  };
-}
-
-export interface PublicTeamDetail {
-  team: PublicTeam & { _count: { squadEntries: number; homeMatches: number; awayMatches: number } };
-  squad: PublicSquadEntry[];
-  fixtures: PublicMatch[];
-  results: PublicMatch[];
-}
-
-export async function getPublicTeam(identifier: string) {
-  const res = await api.get<{ success: boolean; data: PublicTeamDetail }>(`/public/teams/${encodeURIComponent(identifier)}`);
-  return res.data.data;
+export async function getPublicSlides() {
+  const res = await api.get('/slides/public');
+  return (res.data.data ?? res.data) as any[];
 }
 
 export async function getPublicEvents() {
-  const res = await api.get<{ success: boolean; data: PublicEvent[] }>('/public/events', {
-    params: { limit: 50 },
-  });
-  return res.data.data;
+  const res = await api.get('/events/public');
+  return (res.data.data ?? res.data) as any[];
 }
 
-export interface StandingRow {
-  teamId: string;
-  played: number;
-  won: number;
-  drawn: number;
-  lost: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  points: number;
-}
-
-export interface EventParticipant {
-  id: string;
-  team: { id: string; name: string; shortName: string | null; gender: string; logoUrl: string | null } | null;
-  athlete: { id: string; fullName: string; gender: string } | null;
+export async function getPublicEvent(id: string) {
+  const res = await api.get(`/events/public/${id}`);
+  return (res.data.data ?? res.data) as any;
 }
 
 export interface PublicEventDetail {
-  event: PublicEvent;
-  participants: EventParticipant[];
-  fixtures: PublicMatch[];
-  results: PublicMatch[];
-  standings: StandingRow[];
+  event: any;
+  participants: any[];
+  standings: any[];
+  fixtures: any[];
+  results: any[];
 }
 
-export async function getPublicEvent(identifier: string) {
-  const res = await api.get<{ success: boolean; data: PublicEventDetail }>(`/public/events/${encodeURIComponent(identifier)}`);
-  return res.data.data;
+export async function getPublicFixtures() {
+  const res = await api.get('/matches/public');
+  return (res.data.data ?? res.data) as any[];
+}
+
+export async function getPublicResults() {
+  const res = await api.get('/matches/public/results');
+  return (res.data.data ?? res.data) as any[];
 }
 
 export async function getPublicNews() {
-  const res = await api.get<{ success: boolean; data: { news: PublicNewsPost[]; pagination: Pagination } }>(
-    '/public/news',
-    { params: { page: 1, limit: 50 } }
-  );
-  return res.data.data;
+  const res = await api.get('/news/public');
+  return (res.data.data ?? res.data) as any;
 }
 
 export async function getPublicNewsBySlug(slug: string) {
-  const res = await api.get<{ success: boolean; data: PublicNewsPost }>(`/public/news/${slug}`);
-  return res.data.data;
+  const res = await api.get(`/news/public/${slug}`);
+  return (res.data.data ?? res.data) as any;
 }
 
-// ─── Public Slider Slides ─────────────────────────────────────────────────────
+export async function getPublicSports() {
+  const res = await api.get('/sports/public');
+  return (res.data.data ?? res.data) as any[];
+}
+
+export async function getPublicSport(id: string) {
+  const res = await api.get(`/sports/public/${id}`);
+  return (res.data.data ?? res.data) as any;
+}
+
+export async function getPublicTeams() {
+  const res = await api.get('/teams/public');
+  return (res.data.data ?? res.data) as any[];
+}
+
+export async function getPublicTeam(id: string) {
+  const res = await api.get(`/teams/public/${id}`);
+  return (res.data.data ?? res.data) as any;
+}
 
 export interface SliderSlide {
   id: string;
@@ -321,125 +174,74 @@ export interface SliderSlide {
   linkLabel: string | null;
   sortOrder: number;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
-
-export async function getPublicSlides() {
-  const res = await api.get<{ success: boolean; data: Array<Pick<SliderSlide, 'id' | 'title' | 'subtitle' | 'imageUrl' | 'linkUrl' | 'linkLabel'>> }>('/public/slides');
-  return res.data.data;
-}
-
-export async function listSlides() {
-  const res = await api.get<{ success: boolean; data: SliderSlide[] }>('/slides');
-  return res.data.data;
-}
-
-export async function createSlide(payload: Partial<SliderSlide>) {
-  const res = await api.post<{ success: boolean; data: SliderSlide }>('/slides', payload);
-  return res.data.data;
-}
-
-export async function updateSlide(id: string, payload: Partial<SliderSlide>) {
-  const res = await api.patch<{ success: boolean; data: SliderSlide }>(`/slides/${id}`, payload);
-  return res.data.data;
-}
-
-export async function deleteSlide(id: string) {
-  const res = await api.delete<{ success: boolean }>(`/slides/${id}`);
-  return res.data;
-}
-
-// ─── Department Equipment (TUTOR only) ───────────────────────────────────────
 
 export interface EquipmentItem {
   id: string;
   name: string;
   category: string;
+  description: string | null;
+  totalQuantity: number;
+  availableQuantity: number;
+  condition: string;
+  location: string | null;
+  storageLocation: string | null;
+  notes: string | null;
+  imageUrl: string | null;
   assetNumber: string | null;
   serialNumber: string | null;
   quantity: number;
-  condition: string;
   status: string;
   sportId: string | null;
-  storageLocation: string | null;
   purchasedDate: string | null;
-  purchaseCost: string | null;
-  notes: string | null;
-  sport: { id: string; name: string } | null;
-  assignments: EquipmentAssignment[];
+  purchaseCost: number | null;
+  sport?: { id: string; name: string };
 }
 
 export interface EquipmentAssignment {
   id: string;
-  equipmentId: string;
-  assignedToType: 'ATHLETE' | 'TEAM';
-  athleteId: string | null;
-  teamId: string | null;
   quantity: number;
+  assignedDate: string;
   assignedAt: string;
   dueDate: string | null;
+  returnedDate: string | null;
   returnedAt: string | null;
-  conditionOnReturn: string | null;
+  status: string;
   notes: string | null;
-  athlete: { id: string; fullName: string } | null;
-  team: { id: string; name: string } | null;
-  assignedByUser?: { id: string; fullName: string } | null;
+  assignedToType: string | null;
+  equipment: EquipmentItem;
+  athlete: { id: string; fullName: string; registrationNumber: string };
+  team?: { id: string; name: string };
 }
 
-export interface EquipmentListResponse {
-  items: EquipmentItem[];
-  pagination: Pagination;
+export async function listEquipment(params?: Record<string, string> | string) {
+  const resolvedParams = typeof params === 'string' ? { category: params } : params;
+  const res = await api.get('/equipment', { params: resolvedParams });
+  const data = res.data.data ?? res.data;
+  return Array.isArray(data) ? data : data?.items ?? data?.equipment ?? [];
 }
 
-export async function listEquipment(params?: Record<string, string | number | undefined>) {
-  // Strip undefined values before sending
-  const cleaned = params
-    ? Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined))
-    : undefined;
-  const res = await api.get<{ success: boolean } & EquipmentListResponse>('/equipment', { params: cleaned });
-  return res.data;
+export async function getEquipmentAssignments(params?: Record<string, string> | string) {
+  const resolvedParams = typeof params === 'string' ? { status: params } : params;
+  const res = await api.get('/equipment/assignments', { params: resolvedParams });
+  const data = res.data.data ?? res.data;
+  return Array.isArray(data) ? data : data?.assignments ?? data?.items ?? [];
 }
 
-export async function getEquipment(id: string) {
-  const res = await api.get<{ success: boolean; data: EquipmentItem }>(`/equipment/${id}`);
-  return res.data.data;
+export async function assignEquipment(data: Record<string, unknown> | string, extra?: Record<string, unknown>) {
+  const payload = typeof data === 'string' ? { equipmentId: data, ...extra } : data;
+  const res = await api.post('/equipment/assign', payload);
+  return res.data.data ?? res.data;
 }
 
-export async function createEquipment(payload: Record<string, unknown>) {
-  const res = await api.post<{ success: boolean; data: EquipmentItem }>('/equipment', payload);
-  return res.data.data;
+export async function returnEquipment(id: string, data?: Record<string, unknown>) {
+  const res = await api.post(`/equipment/return/${id}`, data);
+  return res.data.data ?? res.data;
 }
 
-export async function updateEquipment(id: string, payload: Record<string, unknown>) {
-  const res = await api.patch<{ success: boolean; data: EquipmentItem }>(`/equipment/${id}`, payload);
-  return res.data.data;
+export async function deleteEquipmentAssignment(id: string) {
+  const res = await api.delete(`/equipment/assignments/${id}`);
+  return res.data.data ?? res.data;
 }
 
-export async function deleteEquipment(id: string) {
-  const res = await api.delete<{ success: boolean }>(`/equipment/${id}`);
-  return res.data;
-}
-
-export async function assignEquipment(id: string, payload: Record<string, unknown>) {
-  const res = await api.post<{ success: boolean; data: EquipmentAssignment }>(`/equipment/${id}/assign`, payload);
-  return res.data.data;
-}
-
-export async function returnEquipment(assignmentId: string, payload: Record<string, unknown>) {
-  const res = await api.post<{ success: boolean; data: EquipmentAssignment }>(
-    `/equipment/assignments/${assignmentId}/return`,
-    payload
-  );
-  return res.data.data;
-}
-
-export async function deleteEquipmentAssignment(assignmentId: string) {
-  const res = await api.delete<{ success: boolean }>(`/equipment/assignments/${assignmentId}`);
-  return res.data;
-}
-
-export async function getEquipmentAssignments(id: string) {
-  const res = await api.get<{ success: boolean; data: EquipmentAssignment[] }>(`/equipment/${id}/assignments`);
-  return res.data.data;
-}
+export default api;

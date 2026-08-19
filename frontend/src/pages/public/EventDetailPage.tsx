@@ -117,7 +117,7 @@ export default function EventDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Upcoming Fixtures</h2>
               <ul className="space-y-3">
-                {data.fixtures.map((m) => (
+                {data.fixtures.map((m: any) => (
                   <li key={m.id} className="bg-surface border border-border rounded-lg p-4 sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
                       <div className="text-xs font-semibold text-muted uppercase tracking-wide">
@@ -146,7 +146,7 @@ export default function EventDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Results</h2>
               <ul className="space-y-3">
-                {data.results.map((m) => {
+                {data.results.map((m: any) => {
                   const r = m.results;
                   return (
                     <li key={m.id} className="bg-surface border border-border rounded-lg p-4">
@@ -177,7 +177,7 @@ export default function EventDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Participants</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {data.participants.map((p) => (
+                {data.participants.map((p: any) => (
                   <div key={p.id} className="bg-surface border border-border rounded-lg p-4 font-medium text-gray-900">
                     {p.team?.name ?? p.athlete?.fullName ?? 'TBD'}
                   </div>

@@ -1,6 +1,7 @@
 import { NewsStatus } from '@prisma/client';
 import prisma from '../../config/database';
 import { AppError } from '../../middleware/error.middleware';
+import { emitDomainUpdate } from '../../config/socket';
 import type { CreateNewsInput, UpdateNewsInput } from './news.schema';
 
 function slugify(title: string): string {
@@ -33,7 +34,7 @@ export async function createNews(data: CreateNewsInput, authorId: string) {
   const existing = await prisma.newsPost.findUnique({ where: { slug } });
   if (existing) throw new AppError(409, 'CONFLICT', 'A news post with this slug already exists');
 
-  return prisma.newsPost.create({
+  const post = await prisma.newsPost.create({
     data: {
       title: data.title,
       slug,
@@ -55,6 +56,9 @@ export async function createNews(data: CreateNewsInput, authorId: string) {
     },
     include: { author: { select: { id: true, fullName: true } } },
   });
+
+  emitDomainUpdate('news', { action: 'create', id: post.id });
+  return post;
 }
 
 export async function updateNews(id: string, data: UpdateNewsInput) {
@@ -66,7 +70,7 @@ export async function updateNews(id: string, data: UpdateNewsInput) {
     if (taken) throw new AppError(409, 'CONFLICT', 'A news post with this slug already exists');
   }
 
-  return prisma.newsPost.update({
+  const updated = await prisma.newsPost.update({
     where: { id },
     data: {
       title: data.title,
@@ -86,11 +90,15 @@ export async function updateNews(id: string, data: UpdateNewsInput) {
     },
     include: { author: { select: { id: true, fullName: true } } },
   });
+
+  emitDomainUpdate('news', { action: 'update', id: updated.id });
+  return updated;
 }
 
 export async function deleteNews(id: string) {
   const existing = await prisma.newsPost.findUnique({ where: { id } });
   if (!existing) throw new AppError(404, 'NOT_FOUND', 'News post not found');
   await prisma.newsPost.delete({ where: { id } });
+  emitDomainUpdate('news', { action: 'delete', id });
   return { message: 'News post deleted' };
 }

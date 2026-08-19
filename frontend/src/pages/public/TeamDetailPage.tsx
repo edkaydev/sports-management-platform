@@ -65,7 +65,7 @@ export default function TeamDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Squad</h2>
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {data.squad.map((s) => (
+                {data.squad.map((s: any) => (
                   <li key={s.id} className="bg-surface border border-border rounded-lg p-4 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-50 text-primary flex items-center justify-center font-bold text-sm shrink-0">
                       {s.jerseyNumber ?? (s.isCaptain ? 'C' : '•')}
@@ -91,7 +91,7 @@ export default function TeamDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Upcoming Fixtures</h2>
               <ul className="space-y-3">
-                {data.fixtures.map((m) => (
+                {data.fixtures.map((m: any) => (
                   <li key={m.id} className="bg-surface border border-border rounded-lg p-4 sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
                       <div className="text-xs font-semibold text-muted uppercase tracking-wide">
@@ -121,7 +121,7 @@ export default function TeamDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Recent Results</h2>
               <ul className="space-y-3">
-                {data.results.map((m) => {
+                {data.results.map((m: any) => {
                   const r = m.results;
                   return (
                     <li key={m.id} className="bg-surface border border-border rounded-lg p-4">

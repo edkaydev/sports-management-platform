@@ -1,0 +1,15 @@
+export { authService } from './auth.service';
+export { athleteService } from './athlete.service';
+export { sportService } from './sport.service';
+export { teamService } from './team.service';
+export { eventService } from './event.service';
+export { matchService } from './match.service';
+export { academicService } from './academic.service';
+export { scholarshipService } from './scholarship.service';
+export { contractService } from './contract.service';
+export { recruitmentService } from './recruitment.service';
+export { documentService } from './document.service';
+export { notificationService } from './notification.service';
+export { reportService } from './report.service';
+export { equipmentService } from './equipment.service';
+export { newsService, slideService } from './news.service';

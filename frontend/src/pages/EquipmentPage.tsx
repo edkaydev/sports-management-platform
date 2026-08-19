@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import {
-  api,
+import api, {
   getErrorMessage,
   listEquipment,
   getEquipmentAssignments,
   assignEquipment,
   returnEquipment,
   deleteEquipmentAssignment,
-  EquipmentItem,
-  EquipmentAssignment,
+  type EquipmentItem,
+  type EquipmentAssignment,
 } from '@/lib/api';
 import {
   PageHeader,
@@ -77,10 +76,10 @@ export default function EquipmentPage() {
     queryKey: ['equipment', search, categoryFilter, statusFilter],
     queryFn: () =>
       listEquipment({
-        search: search || undefined,
-        category: categoryFilter || undefined,
-        status: statusFilter || undefined,
-        pageSize: 100,
+        ...(search ? { search } : {}),
+        ...(categoryFilter ? { category: categoryFilter } : {}),
+        ...(statusFilter ? { status: statusFilter } : {}),
+        pageSize: '100',
       }),
   });
 
@@ -211,7 +210,7 @@ export default function EquipmentPage() {
   }
 
   const items = data?.items ?? [];
-  const activeAssignments = assignments?.filter((a) => !a.returnedAt) ?? [];
+  const activeAssignments = assignments?.filter((a: any) => !a.returnedDate) ?? [];
 
   return (
     <div>
@@ -421,20 +420,20 @@ export default function EquipmentPage() {
             <EmptyState message="No assignments recorded for this item." />
           ) : (
             <Table headers={['Assigned To', 'Quantity', 'Assigned', 'Due', 'Status', 'Actions']}>
-              {(assignments ?? []).map((a) => (
+              {(assignments ?? []).map((a: any) => (
                 <tr key={a.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2.5 font-medium text-gray-900">
                     {a.assignedToType === 'ATHLETE' ? a.athlete?.fullName ?? 'Athlete' : a.team?.name ?? 'Team'}
                   </td>
                   <td className="px-4 py-2.5 text-gray-600">{a.quantity}</td>
-                  <td className="px-4 py-2.5 text-gray-600">{new Date(a.assignedAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-2.5 text-gray-600">{new Date(a.assignedDate).toLocaleDateString()}</td>
                   <td className="px-4 py-2.5 text-gray-600">{a.dueDate ? new Date(a.dueDate).toLocaleDateString() : '—'}</td>
                   <td className="px-4 py-2.5">
-                    <Badge color={a.returnedAt ? 'gray' : 'green'}>{a.returnedAt ? 'Returned' : 'Issued'}</Badge>
+                    <Badge color={a.returnedDate ? 'gray' : 'green'}>{a.returnedDate ? 'Returned' : 'Issued'}</Badge>
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex gap-2">
-                      {!a.returnedAt && (
+                      {!a.returnedDate && (
                         <button
                           className="text-sm text-primary font-medium hover:underline"
                           onClick={() => {
@@ -493,7 +492,7 @@ export default function EquipmentPage() {
       ) : (
         <div className="bg-surface border border-border rounded-lg overflow-x-auto">
           <Table headers={['Asset #', 'Name', 'Category', 'Qty', 'Condition', 'Status', 'Sport', 'Location', 'Actions']}>
-            {items.map((item) => (
+            {items.map((item: any) => (
               <tr key={item.id} className="hover:bg-gray-50">
                 <td className="px-4 py-2.5 font-mono text-sm text-gray-900">{item.assetNumber ?? '—'}</td>
                 <td className="px-4 py-2.5 font-medium text-gray-900">{item.name}</td>

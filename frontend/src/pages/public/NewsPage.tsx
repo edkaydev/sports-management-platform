@@ -20,7 +20,7 @@ export default function NewsPage() {
         <div className="py-16"><EmptyState message="No news yet" /></div>
       ) : (
         <div className="space-y-6">
-          {data.news.map((post) => (
+          {data.news.map((post: any) => (
             <article key={post.id} className="bg-surface border border-border rounded-lg overflow-hidden sm:flex">
               {post.coverImage && (
                 <div

@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, getErrorMessage } from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import {
   PageHeader, Table, Badge, Spinner, EmptyState, statusColor,
   Button, Field, inputClass, InlineAlert,

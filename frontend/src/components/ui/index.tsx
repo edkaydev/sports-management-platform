@@ -1,91 +1,75 @@
 import type { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
+import {
+  Table as TableBase,
+  TableHeader as TableHeaderBase,
+  TableBody as TableBodyBase,
+  TableRow as TableRowBase,
+  TableHead as TableHeadBase,
+  TableCell as TableCellBase,
+} from './table';
 
-export function Button({
+export { Button, buttonVariants } from './button';
+export type { ButtonProps } from './button';
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent } from './card';
+export { Badge, badgeVariants } from './badge';
+export { Input } from './input';
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from './dialog';
+export { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from './select';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { Progress } from './progress';
+export { Skeleton } from './skeleton';
+export { Checkbox } from './checkbox';
+
+function TableCompat({
+  headers,
   children,
-  variant = 'primary',
-  size = 'md',
-  type = 'button',
-  disabled,
-  className = '',
-  onClick,
+  className,
 }: {
+  headers?: string[];
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger';
-  size?: 'sm' | 'md';
-  type?: 'button' | 'submit';
-  disabled?: boolean;
   className?: string;
-  onClick?: () => void;
 }) {
-  const base =
-    'inline-flex items-center justify-center rounded font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
-  const variants = {
-    primary: 'bg-primary text-white hover:bg-blue-700',
-    secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
-    danger: 'bg-danger text-white hover:bg-red-700',
-  };
-  const sizes = {
-    sm: 'px-2.5 py-1.5 text-xs',
-    md: 'px-4 py-2',
-  };
   return (
-    <button
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-    >
-      {children}
-    </button>
+    <TableBase className={cn('w-full text-sm', className)}>
+      {headers && (
+        <TableHeaderBase>
+          <TableRowBase className="bg-gray-50 border-y border-border">
+            {headers.map((h) => (
+              <TableHeadBase key={h} className="px-4 py-2.5 text-left font-medium text-gray-600 whitespace-nowrap">
+                {h}
+              </TableHeadBase>
+            ))}
+          </TableRowBase>
+        </TableHeaderBase>
+      )}
+      <TableBodyBase className="divide-y divide-border">{children}</TableBodyBase>
+    </TableBase>
   );
 }
+
+export { TableCompat as Table, TableHeaderBase as TableHeader, TableBodyBase as TableBody, TableRowBase as TableRow, TableHeadBase as TableHead, TableCellBase as TableCell };
 
 export function PageHeader({
   title,
   subtitle,
   actions,
+  action,
 }: {
   title: string;
   subtitle?: string;
   actions?: ReactNode;
+  action?: ReactNode;
 }) {
   return (
     <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
       <div>
         <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-        {subtitle && <p className="text-sm text-muted mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
       </div>
-      {actions && <div className="flex gap-2">{actions}</div>}
+      {(actions || action) && <div className="flex gap-2">{actions ?? action}</div>}
     </div>
   );
-}
-
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`bg-surface border border-border rounded-lg p-5 ${className}`}>{children}</div>;
-}
-
-export function Badge({ color = 'gray', children }: { color?: 'green' | 'red' | 'amber' | 'blue' | 'gray'; children: ReactNode }) {
-  const colors = {
-    green: 'bg-green-50 text-green-700',
-    red: 'bg-red-50 text-red-700',
-    amber: 'bg-amber-50 text-amber-700',
-    blue: 'bg-blue-50 text-blue-700',
-    gray: 'bg-gray-100 text-gray-700',
-  };
-  return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${colors[color]}`}>
-      {children}
-    </span>
-  );
-}
-
-export function statusColor(status?: string): 'green' | 'red' | 'amber' | 'blue' | 'gray' {
-  const s = (status ?? '').toUpperCase();
-  if (['ACTIVE', 'GOOD_STANDING', 'COMPLETED', 'PRESENT', 'PASS'].some((k) => s.includes(k))) return 'green';
-  if (['EXPIRED', 'REVOKED', 'SUSPENDED', 'CANCELLED', 'FAIL', 'ABSENT', 'REJECTED'].some((k) => s.includes(k))) return 'red';
-  if (['WARNING', 'PROBATION', 'PENDING', 'IN_PROGRESS', 'EXPIRING'].some((k) => s.includes(k))) return 'amber';
-  if (['PLANNED', 'SCHEDULED', 'INFO'].some((k) => s.includes(k))) return 'blue';
-  return 'gray';
 }
 
 export function Spinner() {
@@ -98,7 +82,7 @@ export function Spinner() {
 
 export function EmptyState({ message, action }: { message: string; action?: ReactNode }) {
   return (
-    <div className="py-10 text-center text-sm text-muted">
+    <div className="py-10 text-center text-sm text-muted-foreground">
       <p>{message}</p>
       {action && <div className="mt-3 flex justify-center">{action}</div>}
     </div>
@@ -113,13 +97,13 @@ export function InlineAlert({
   message: string;
 }) {
   const colors = {
-    info: 'border-blue-400 text-blue-800',
-    warning: 'border-amber-400 text-amber-800',
-    error: 'border-red-400 text-red-800',
-    success: 'border-green-400 text-green-800',
+    info: 'border-blue-400 text-blue-800 bg-blue-50',
+    warning: 'border-amber-400 text-amber-800 bg-amber-50',
+    error: 'border-red-400 text-red-800 bg-red-50',
+    success: 'border-green-400 text-green-800 bg-green-50',
   };
   return (
-    <div className={`border-l-4 bg-surface px-4 py-3 text-sm ${colors[type]}`}>{message}</div>
+    <div className={`border-l-4 px-4 py-3 text-sm rounded-r-lg ${colors[type]}`}>{message}</div>
   );
 }
 
@@ -137,38 +121,22 @@ export function Field({
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-danger">*</span>}
+        {label} {required && <span className="text-destructive">*</span>}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
+      {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
     </div>
   );
 }
 
 export const inputClass =
-  'w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary';
+  'w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
-export function Table({
-  headers,
-  children,
-}: {
-  headers: string[];
-  children: ReactNode;
-}) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-gray-50 border-y border-border">
-            {headers.map((h) => (
-              <th key={h} className="px-4 py-2.5 text-left font-medium text-gray-600 whitespace-nowrap">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-border">{children}</tbody>
-      </table>
-    </div>
-  );
+export function statusColor(status?: string): 'green' | 'red' | 'amber' | 'blue' | 'gray' {
+  const s = (status ?? '').toUpperCase();
+  if (['ACTIVE', 'GOOD_STANDING', 'COMPLETED', 'PRESENT', 'PASS'].some((k) => s.includes(k))) return 'green';
+  if (['EXPIRED', 'REVOKED', 'SUSPENDED', 'CANCELLED', 'FAIL', 'ABSENT', 'REJECTED'].some((k) => s.includes(k))) return 'red';
+  if (['WARNING', 'PROBATION', 'PENDING', 'IN_PROGRESS', 'EXPIRING'].some((k) => s.includes(k))) return 'amber';
+  if (['PLANNED', 'SCHEDULED', 'INFO'].some((k) => s.includes(k))) return 'blue';
+  return 'gray';
 }

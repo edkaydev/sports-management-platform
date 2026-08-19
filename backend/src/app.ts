@@ -26,6 +26,7 @@ import { newsRouter } from './modules/news/news.routes';
 import { publicRouter } from './modules/public/public.routes';
 import { slidesRouter } from './modules/slides/slides.routes';
 import { equipmentRouter } from './modules/equipment/equipment.routes';
+import { uploadsRouter } from './modules/uploads/uploads.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 
@@ -87,6 +88,7 @@ app.use('/api/reports', reportsRouter);
 app.use('/api/news', newsRouter);
 app.use('/api/slides', slidesRouter);
 app.use('/api/equipment', equipmentRouter);
+app.use('/api/uploads', uploadsRouter);
 
 // 404 handler
 app.use((_req, res) => {

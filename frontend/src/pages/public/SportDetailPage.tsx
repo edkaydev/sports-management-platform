@@ -63,7 +63,7 @@ export default function SportDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Teams</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {data.teams.map((t) => (
+                {data.teams.map((t: any) => (
                   <Link
                     key={t.id}
                     to={`/teams/${t.id}`}
@@ -88,7 +88,7 @@ export default function SportDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Upcoming Fixtures</h2>
               <ul className="space-y-3">
-                {data.fixtures.map((m) => (
+                {data.fixtures.map((m: any) => (
                   <li key={m.id} className="bg-surface border border-border rounded-lg p-4 sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
                       <div className="text-xs font-semibold text-muted uppercase tracking-wide">
@@ -118,7 +118,7 @@ export default function SportDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Recent Results</h2>
               <ul className="space-y-3">
-                {data.results.map((m) => {
+                {data.results.map((m: any) => {
                   const r = m.results;
                   return (
                     <li key={m.id} className="bg-surface border border-border rounded-lg p-4">
@@ -147,7 +147,7 @@ export default function SportDetailPage() {
             <section className="mt-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Events</h2>
               <ul className="space-y-3">
-                {data.events.map((e) => (
+                {data.events.map((e: any) => (
                   <li key={e.id} className="bg-surface border border-border rounded-lg p-4">
                     <div className="font-medium text-gray-900">{e.name}</div>
                     <div className="text-xs text-muted mt-0.5">

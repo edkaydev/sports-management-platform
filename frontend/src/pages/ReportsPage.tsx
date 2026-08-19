@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api, downloadFile } from '@/lib/api';
+import api, { downloadFile } from '@/lib/api';
 import { PageHeader, Card, Table, Spinner, EmptyState, Button, Field, inputClass, statusColor, Badge } from '@/components/ui';
 
 export default function ReportsPage() {

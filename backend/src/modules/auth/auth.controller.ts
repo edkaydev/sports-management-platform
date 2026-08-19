@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import prisma from '../../config/database';
 import * as authService from './auth.service';
 import { LoginInput, ChangePasswordInput, ForceChangePasswordInput } from './auth.schema';
 import {
@@ -70,4 +71,16 @@ async function forceChangePassword(req: AuthRequest, res: Response, next: NextFu
   }
 }
 
-export { login, refresh, logout, changePassword, forceChangePassword };
+async function getMe(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!user || !user.isActive || user.deletedAt) {
+      throw new AppError(401, 'UNAUTHORIZED', 'User not found');
+    }
+    res.status(200).json({ success: true, data: authService.publicUser(user) });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export { login, refresh, logout, changePassword, forceChangePassword, getMe };

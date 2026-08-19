@@ -20,4 +20,16 @@ router.post(
   controller.runChecks
 );
 
+router.post(
+  '/broadcast',
+  requireRole('TUTOR', 'SPORTS_REP'),
+  controller.broadcastNotification
+);
+
+router.post(
+  '/email',
+  requireRole('TUTOR', 'SPORTS_REP'),
+  controller.sendEmailNotification
+);
+
 export { router as notificationsRouter };

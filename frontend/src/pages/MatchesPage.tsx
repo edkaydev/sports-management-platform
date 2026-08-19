@@ -1,263 +1,190 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, getErrorMessage, isTutorRole } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
-import { PageHeader, Button, Table, Badge, Spinner, EmptyState, statusColor, Field, inputClass, Card, InlineAlert } from '@/components/ui';
-
-interface Match {
-  id: string;
-  eventId: string;
-  sportId: string;
-  matchNumber: number | null;
-  round: string | null;
-  homeTeamId: string | null;
-  awayTeamId: string | null;
-  venue: string | null;
-  scheduledDate: string;
-  scheduledTime: string | null;
-  homeScore: number | null;
-  awayScore: number | null;
-  status: string;
-  matchType: string;
-  event?: { id: string; name: string };
-  homeTeam?: { id: string; name: string };
-  awayTeam?: { id: string; name: string };
-}
+import { useMatches } from '@/hooks/useMatches';
+import { useEvents } from '@/hooks/useEvents';
+import { useSports } from '@/hooks/useSports';
+import { useTeams } from '@/hooks/useTeams';
+import { useAuth } from '@/contexts/AuthContext';
+import { PageHeader, EmptyState } from '@/components/shared';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
+import { FormDialog } from '@/components/shared/FormDialog';
+import { PageLoader } from '@/components/PageLoader';
+import { isTutorRole } from '@/lib/api';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 
 const EMPTY_FORM = {
-  eventId: '',
-  sportId: '',
-  homeTeamId: '',
-  awayTeamId: '',
-  matchNumber: '',
-  round: '',
-  venue: '',
-  scheduledDate: '',
-  scheduledTime: '',
-  status: 'SCHEDULED',
-  matchType: 'OTHER',
+  eventId: '', sportId: '', homeTeamId: '', awayTeamId: '', matchNumber: '',
+  round: '', venue: '', scheduledDate: '', scheduledTime: '',
+  status: 'SCHEDULED', matchType: 'OTHER',
 };
 
+function SelectField({ label, value, onChange, options, required }: {
+  label: string; value: string; onChange: (v: string) => void;
+  options: { value: string; label: string }[]; required?: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label} {required && '*'}
+      </label>
+      <select className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={value} onChange={(e) => onChange(e.target.value)} required={required}>
+        <option value="">Select...</option>
+        {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+    </div>
+  );
+}
+
 export default function MatchesPage() {
-  const qc = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-  const [editing, setEditing] = useState<Match | null>(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [error, setError] = useState('');
   const { user } = useAuth();
   const canDelete = isTutorRole(user);
+  const { matches, isLoading, createMatch, updateMatch, deleteMatch } = useMatches();
+  const { events } = useEvents();
+  const { sports } = useSports();
+  const { teams } = useTeams();
+  const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<any>(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [error, setError] = useState('');
 
-  const { data: events } = useQuery({
-    queryKey: ['events'],
-    queryFn: async () => (await api.get('/events')).data.data,
-  });
-  const { data: sports } = useQuery({
-    queryKey: ['sports'],
-    queryFn: async () => (await api.get('/sports')).data.data,
-  });
-  const { data: teams } = useQuery({
-    queryKey: ['teams'],
-    queryFn: async () => (await api.get('/teams')).data.data,
-  });
+  const fixtures = [...matches].sort(
+    (a: any, b: any) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime()
+  );
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['matches'],
-    queryFn: async () => (await api.get('/matches')).data.data,
-  });
-
-  const fixtures = data
-    ? [...data].sort(
-        (a: Match, b: Match) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime()
-      )
-    : [];
-
-  const save = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        eventId: form.eventId,
-        sportId: form.sportId,
-        homeTeamId: form.homeTeamId || undefined,
-        awayTeamId: form.awayTeamId || undefined,
-        matchNumber: form.matchNumber ? parseInt(form.matchNumber, 10) : undefined,
-        round: form.round || undefined,
-        venue: form.venue || undefined,
-        scheduledDate: new Date(`${form.scheduledDate}T${form.scheduledTime || '00:00'}`).toISOString(),
-        scheduledTime: form.scheduledTime || undefined,
-        status: form.status,
-        matchType: form.matchType,
-      };
-      if (editing) {
-        await api.patch(`/matches/${editing.id}`, payload);
-      } else {
-        await api.post('/matches', payload);
-      }
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['matches'] });
-      setShowForm(false);
-      setEditing(null);
-      setForm(EMPTY_FORM);
-      setError('');
-    },
-    onError: (err) => setError(getErrorMessage(err)),
-  });
-
-  const remove = useMutation({
-    mutationFn: async (id: string) => {
-      await api.delete(`/matches/${id}`);
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['matches'] }),
-    onError: (err) => setError(getErrorMessage(err)),
-  });
-
-  function startEdit(m: Match) {
+  function startEdit(m: any) {
     setEditing(m);
     setForm({
-      eventId: m.eventId,
-      sportId: m.sportId,
-      homeTeamId: m.homeTeamId ?? '',
-      awayTeamId: m.awayTeamId ?? '',
-      matchNumber: m.matchNumber?.toString() ?? '',
-      round: m.round ?? '',
-      venue: m.venue ?? '',
-      scheduledDate: m.scheduledDate.slice(0, 10),
+      eventId: m.eventId, sportId: m.sportId, homeTeamId: m.homeTeamId ?? '',
+      awayTeamId: m.awayTeamId ?? '', matchNumber: m.matchNumber?.toString() ?? '',
+      round: m.round ?? '', venue: m.venue ?? '', scheduledDate: m.scheduledDate.slice(0, 10),
       scheduledTime: m.scheduledTime ?? m.scheduledDate.slice(11, 16),
-      status: m.status,
-      matchType: m.matchType,
+      status: m.status, matchType: m.matchType,
     });
     setShowForm(true);
     setError('');
   }
 
-  function set<K extends keyof typeof form>(key: K, value: string) {
-    setForm((f) => ({ ...f, [key]: value }));
+  function resetForm() { setEditing(null); setForm(EMPTY_FORM); setShowForm(false); setError(''); }
+
+  function handleSubmit() {
+    const payload = {
+      eventId: form.eventId, sportId: form.sportId,
+      homeTeamId: form.homeTeamId || undefined, awayTeamId: form.awayTeamId || undefined,
+      matchNumber: form.matchNumber ? parseInt(form.matchNumber, 10) : undefined,
+      round: form.round || undefined, venue: form.venue || undefined,
+      scheduledDate: new Date(`${form.scheduledDate}T${form.scheduledTime || '00:00'}`).toISOString(),
+      scheduledTime: form.scheduledTime || undefined, status: form.status, matchType: form.matchType,
+    };
+    if (editing) {
+      updateMatch.mutate({ id: editing.id, data: payload }, { onSuccess: resetForm, onError: (e) => setError(e.message) });
+    } else {
+      createMatch.mutate(payload, { onSuccess: resetForm, onError: (e) => setError(e.message) });
+    }
   }
+
+  if (isLoading) return <PageLoader />;
 
   return (
     <div>
       <PageHeader
         title="Fixtures & Matches"
         subtitle={`${fixtures.length} matches`}
-        actions={<Button onClick={() => { setEditing(null); setForm(EMPTY_FORM); setShowForm((v) => !v); }}>{showForm ? 'Close' : 'Add Match'}</Button>}
+        actions={
+          <Button onClick={() => { setEditing(null); setForm(EMPTY_FORM); setShowForm(true); }}>
+            <Plus className="w-4 h-4 mr-2" /> Add Match
+          </Button>
+        }
       />
-      {showForm && (
-        <Card className="mb-6 max-w-lg">
-          <form
-            className="space-y-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              save.mutate();
-            }}
-          >
-            <h3 className="font-semibold text-gray-900">{editing ? 'Edit Match' : 'Add Match'}</h3>
-            {error && <InlineAlert type="error" message={error} />}
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Event" required>
-                <select className={inputClass} value={form.eventId} onChange={(e) => set('eventId', e.target.value)} required>
-                  <option value="">Select event…</option>
-                  {events?.map((e: any) => (
-                    <option key={e.id} value={e.id}>{e.name}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Sport" required>
-                <select className={inputClass} value={form.sportId} onChange={(e) => set('sportId', e.target.value)} required>
-                  <option value="">Select sport…</option>
-                  {sports?.map((s: any) => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Home Team">
-                <select className={inputClass} value={form.homeTeamId} onChange={(e) => set('homeTeamId', e.target.value)}>
-                  <option value="">None</option>
-                  {teams?.map((t: any) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Away Team">
-                <select className={inputClass} value={form.awayTeamId} onChange={(e) => set('awayTeamId', e.target.value)}>
-                  <option value="">None</option>
-                  {teams?.map((t: any) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Match Number">
-                <input type="number" min={1} className={inputClass} value={form.matchNumber} onChange={(e) => set('matchNumber', e.target.value)} />
-              </Field>
-              <Field label="Round">
-                <input className={inputClass} value={form.round} onChange={(e) => set('round', e.target.value)} />
-              </Field>
-              <Field label="Date" required>
-                <input type="date" className={inputClass} value={form.scheduledDate} onChange={(e) => set('scheduledDate', e.target.value)} required />
-              </Field>
-              <Field label="Time">
-                <input type="time" className={inputClass} value={form.scheduledTime} onChange={(e) => set('scheduledTime', e.target.value)} />
-              </Field>
-              <Field label="Venue">
-                <input className={inputClass} value={form.venue} onChange={(e) => set('venue', e.target.value)} />
-              </Field>
-              <Field label="Status">
-                <select className={inputClass} value={form.status} onChange={(e) => set('status', e.target.value)}>
-                  {['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'POSTPONED', 'ABANDONED'].map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
-              </Field>
-            </div>
-            <div className="flex justify-end">
-              <Button type="submit">{editing ? 'Save Changes' : 'Save Match'}</Button>
-            </div>
-          </form>
+
+      {fixtures.length === 0 ? (
+        <EmptyState message="No fixtures scheduled." action={<Button onClick={() => setShowForm(true)}>Add Match</Button>} />
+      ) : (
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Match</TableHead>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Venue</TableHead>
+                  <TableHead>Date & Time</TableHead>
+                  <TableHead>Score</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="w-24">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {fixtures.map((m: any) => (
+                  <TableRow key={m.id}>
+                    <TableCell className="font-medium">{m.homeTeam?.name ?? 'TBD'} vs {m.awayTeam?.name ?? 'TBD'}</TableCell>
+                    <TableCell>{m.event?.name ?? '—'}</TableCell>
+                    <TableCell>{m.venue ?? '—'}</TableCell>
+                    <TableCell className="text-xs">{new Date(m.scheduledDate).toLocaleString()}</TableCell>
+                    <TableCell>{m.homeScore != null ? `${m.homeScore} – ${m.awayScore}` : '—'}</TableCell>
+                    <TableCell><Badge variant="outline">{m.status}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => startEdit(m)}><Pencil className="w-4 h-4" /></Button>
+                        {canDelete && (
+                          <Button variant="ghost" size="icon" onClick={() => {
+                            if (window.confirm('Delete this match?')) deleteMatch.mutate(m.id);
+                          }}><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
         </Card>
       )}
-      {isLoading ? (
-        <Spinner />
-      ) : !fixtures.length ? (
-        <EmptyState message="No fixtures scheduled." />
-      ) : (
-        <div className="bg-surface border border-border rounded-lg">
-          <Table headers={['Match', 'Event', 'Venue', 'Date & Time', 'Score', 'Status', 'Actions']}>
-            {fixtures.map((m: Match) => (
-              <tr key={m.id} className="hover:bg-gray-50">
-                <td className="px-4 py-2.5 font-medium text-gray-900">
-                  {m.homeTeam?.name ?? 'TBD'} vs {m.awayTeam?.name ?? 'TBD'}
-                </td>
-                <td className="px-4 py-2.5 text-gray-600">{m.event?.name ?? '—'}</td>
-                <td className="px-4 py-2.5 text-gray-600">{m.venue ?? '—'}</td>
-                <td className="px-4 py-2.5 text-gray-600">
-                  {new Date(m.scheduledDate).toLocaleString()}
-                </td>
-                <td className="px-4 py-2.5 text-gray-600">
-                  {m.homeScore != null ? `${m.homeScore} – ${m.awayScore}` : '—'}
-                </td>
-                <td className="px-4 py-2.5">
-                  <Badge color={statusColor(m.status)}>{m.status}</Badge>
-                </td>
-                <td className="px-4 py-2.5">
-                  <div className="flex gap-2">
-                    <button className="text-sm text-primary font-medium hover:underline" onClick={() => startEdit(m)}>
-                      Edit
-                    </button>
-                    {canDelete && (
-                      <button
-                        className="text-sm text-danger font-medium hover:underline"
-                        onClick={() => {
-                          if (window.confirm('Delete this match?')) remove.mutate(m.id);
-                        }}
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </Table>
+
+      <FormDialog
+        open={showForm} onOpenChange={setShowForm}
+        title={editing ? 'Edit Match' : 'Add Match'}
+        onSubmit={handleSubmit}
+        submitLabel={editing ? 'Save Changes' : 'Save Match'}
+        isSubmitting={createMatch.isPending || updateMatch.isPending}
+        maxWidth="max-w-lg"
+      >
+        {error && <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">{error}</div>}
+        <div className="grid grid-cols-2 gap-4">
+          <SelectField label="Event" value={form.eventId} onChange={(v) => setForm(f => ({ ...f, eventId: v }))}
+            options={events.map((e: any) => ({ value: e.id, label: e.name }))} required />
+          <SelectField label="Sport" value={form.sportId} onChange={(v) => setForm(f => ({ ...f, sportId: v }))}
+            options={sports.map((s: any) => ({ value: s.id, label: s.name }))} required />
+          <SelectField label="Home Team" value={form.homeTeamId} onChange={(v) => setForm(f => ({ ...f, homeTeamId: v }))}
+            options={teams.map((t: any) => ({ value: t.id, label: t.name }))} />
+          <SelectField label="Away Team" value={form.awayTeamId} onChange={(v) => setForm(f => ({ ...f, awayTeamId: v }))}
+            options={teams.map((t: any) => ({ value: t.id, label: t.name }))} />
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Match Number</label>
+            <Input type="number" min={1} value={form.matchNumber} onChange={(e) => setForm(f => ({ ...f, matchNumber: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Round</label>
+            <Input value={form.round} onChange={(e) => setForm(f => ({ ...f, round: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+            <Input type="date" value={form.scheduledDate} onChange={(e) => setForm(f => ({ ...f, scheduledDate: e.target.value }))} required />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
+            <Input type="time" value={form.scheduledTime} onChange={(e) => setForm(f => ({ ...f, scheduledTime: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+            <Input value={form.venue} onChange={(e) => setForm(f => ({ ...f, venue: e.target.value }))} />
+          </div>
+          <SelectField label="Status" value={form.status} onChange={(v) => setForm(f => ({ ...f, status: v }))}
+            options={['SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'POSTPONED', 'ABANDONED'].map(s => ({ value: s, label: s }))} />
         </div>
-      )}
+      </FormDialog>
     </div>
   );
 }

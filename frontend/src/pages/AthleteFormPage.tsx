@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { api, getErrorMessage } from '@/lib/api';
+import api, { getErrorMessage } from '@/lib/api';
 import { PageHeader, Button, Field, inputClass, InlineAlert, Card } from '@/components/ui';
 
 export default function AthleteFormPage() {

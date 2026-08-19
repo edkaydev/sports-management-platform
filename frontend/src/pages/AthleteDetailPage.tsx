@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import { PageHeader, Card, Badge, Spinner, EmptyState, statusColor } from '@/components/ui';
 
 export default function AthleteDetailPage() {

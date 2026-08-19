@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api';
+import api from '@/lib/api';
 import { PageHeader, Button, Table, Badge, Spinner, EmptyState, statusColor, inputClass } from '@/components/ui';
 
 export default function AthletesPage() {

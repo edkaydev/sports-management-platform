@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api, getErrorMessage, isTutorRole, SliderSlide } from '@/lib/api';
-import { useAuth } from '@/lib/auth';
+import api, { getErrorMessage, isTutorRole, type SliderSlide } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { PageHeader, Button, Table, Spinner, EmptyState, Field, inputClass, Card, InlineAlert } from '@/components/ui';
 
 interface SlideForm {

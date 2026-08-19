@@ -1,0 +1,188 @@
+export type UserRole = 'TUTOR' | 'SPORTS_REP';
+
+export interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  phoneNumber: string | null;
+  profilePhotoUrl: string | null;
+  mustChangePassword: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  MIXED = 'MIXED',
+}
+
+export enum AthleteType {
+  REGULAR = 'REGULAR',
+  SCHOLARSHIP = 'SCHOLARSHIP',
+  CONTRACT = 'CONTRACT',
+}
+
+export enum AthleteStatus {
+  ACTIVE = 'ACTIVE',
+  INJURED = 'INJURED',
+  SUSPENDED = 'SUSPENDED',
+  GRADUATED = 'GRADUATED',
+  WITHDRAWN = 'WITHDRAWN',
+  INACTIVE = 'INACTIVE',
+}
+
+export enum SportCategory {
+  TEAM = 'TEAM',
+  INDIVIDUAL = 'INDIVIDUAL',
+}
+
+export enum AcademicStanding {
+  GOOD_STANDING = 'GOOD_STANDING',
+  WARNING = 'WARNING',
+  PROBATION = 'PROBATION',
+  ACADEMIC_SUSPENSION = 'ACADEMIC_SUSPENSION',
+  WITHDRAWN = 'WITHDRAWN',
+}
+
+export enum Semester {
+  SEM1 = 'SEM1',
+  SEM2 = 'SEM2',
+  RESIT = 'RESIT',
+}
+
+export enum ScholarshipType {
+  FULL = 'FULL',
+  PARTIAL = 'PARTIAL',
+  SPONSORSHIP = 'SPONSORSHIP',
+  BURSARY = 'BURSARY',
+}
+
+export enum ScholarshipStatus {
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  SUSPENDED = 'SUSPENDED',
+  REVOKED = 'REVOKED',
+  RENEWED = 'RENEWED',
+  PENDING = 'PENDING',
+}
+
+export enum ContractType {
+  PLAYING = 'PLAYING',
+  COACHING_DEVELOPMENT = 'COACHING_DEVELOPMENT',
+  AMBASSADOR = 'AMBASSADOR',
+  OTHER = 'OTHER',
+}
+
+export enum ContractStatus {
+  ACTIVE = 'ACTIVE',
+  EXPIRED = 'EXPIRED',
+  TERMINATED = 'TERMINATED',
+  SUSPENDED = 'SUSPENDED',
+}
+
+export enum ProspectStatus {
+  PROSPECT = 'PROSPECT',
+  REGISTERED = 'REGISTERED',
+  TRIAL_SCHEDULED = 'TRIAL_SCHEDULED',
+  TRIAL_COMPLETED = 'TRIAL_COMPLETED',
+  SELECTED = 'SELECTED',
+  REJECTED = 'REJECTED',
+  ENROLLED = 'ENROLLED',
+  WITHDRAWN = 'WITHDRAWN',
+}
+
+export enum TrialStatus {
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum EventStatus {
+  PLANNED = 'PLANNED',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  POSTPONED = 'POSTPONED',
+}
+
+export enum MatchStatus {
+  SCHEDULED = 'SCHEDULED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  POSTPONED = 'POSTPONED',
+  ABANDONED = 'ABANDONED',
+}
+
+export enum DocumentCategory {
+  REGISTRATION = 'REGISTRATION',
+  MEDICAL = 'MEDICAL',
+  ACADEMIC = 'ACADEMIC',
+  SCHOLARSHIP = 'SCHOLARSHIP',
+  CONTRACT = 'CONTRACT',
+  COMPETITION = 'COMPETITION',
+  MATCH = 'MATCH',
+  RECRUITMENT = 'RECRUITMENT',
+  IDENTIFICATION = 'IDENTIFICATION',
+  CORRESPONDENCE = 'CORRESPONDENCE',
+  OTHER = 'OTHER',
+}
+
+export enum NotificationType {
+  ACADEMIC_WARNING = 'ACADEMIC_WARNING',
+  ACADEMIC_PROBATION = 'ACADEMIC_PROBATION',
+  FAILED_UNIT = 'FAILED_UNIT',
+  LOW_ATTENDANCE = 'LOW_ATTENDANCE',
+  SCHOLARSHIP_EXPIRING = 'SCHOLARSHIP_EXPIRING',
+  SCHOLARSHIP_EXPIRED = 'SCHOLARSHIP_EXPIRED',
+  CONTRACT_EXPIRING = 'CONTRACT_EXPIRING',
+  DOCUMENT_EXPIRING = 'DOCUMENT_EXPIRING',
+  FIXTURE_REMINDER = 'FIXTURE_REMINDER',
+  TRIAL_REMINDER = 'TRIAL_REMINDER',
+  SYSTEM = 'SYSTEM',
+}
+
+export enum NotificationSeverity {
+  INFO = 'INFO',
+  WARNING = 'WARNING',
+  CRITICAL = 'CRITICAL',
+}
+
+export enum EquipmentCategory {
+  BALL = 'BALL',
+  UNIFORM = 'UNIFORM',
+  PROTECTIVE_GEAR = 'PROTECTIVE_GEAR',
+  TRAINING_TOOL = 'TRAINING_TOOL',
+  MATCH_GEAR = 'MATCH_GEAR',
+  MEDICAL = 'MEDICAL',
+  ELECTRONIC = 'ELECTRONIC',
+  OFFICE = 'OFFICE',
+  OTHER = 'OTHER',
+}
+
+export enum EquipmentCondition {
+  NEW = 'NEW',
+  GOOD = 'GOOD',
+  FAIR = 'FAIR',
+  POOR = 'POOR',
+  DAMAGED = 'DAMAGED',
+}
+
+export enum EquipmentStatus {
+  AVAILABLE = 'AVAILABLE',
+  ISSUED = 'ISSUED',
+  UNDER_MAINTENANCE = 'UNDER_MAINTENANCE',
+  LOST = 'LOST',
+  RETIRED = 'RETIRED',
+}
+
+export enum NewsStatus {
+  DRAFT = 'DRAFT',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+}

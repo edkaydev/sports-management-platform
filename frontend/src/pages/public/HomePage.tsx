@@ -27,7 +27,7 @@ export default function HomePage() {
   const news = useQuery({ queryKey: ['public', 'news'], queryFn: getPublicNews });
 
   const loading = fixtures.isLoading || results.isLoading || events.isLoading || news.isLoading;
-  const featured = news.data?.news.find((n) => n.featured) ?? news.data?.news[0];
+  const featured = news.data?.news.find((n: any) => n.featured) ?? news.data?.news[0];
 
   return (
     <div className="bg-[#f5f3f2] text-zinc-900">

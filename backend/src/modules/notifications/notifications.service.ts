@@ -1,6 +1,8 @@
 import { Prisma, NotificationType, NotificationSeverity } from '@prisma/client';
+import nodemailer from 'nodemailer';
 import prisma from '../../config/database';
 import { AppError } from '../../middleware/error.middleware';
+import { emitNotificationNew, emitToAll, emitToRole } from '../../config/socket';
 import type { ListNotificationsQuery } from './notifications.schema';
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -81,7 +83,7 @@ export async function createNotification(input: {
   relatedEntityId?: string;
   expiresAt?: Date;
 }) {
-  return prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: {
       type: input.type,
       severity: input.severity ?? NotificationSeverity.INFO,
@@ -94,6 +96,17 @@ export async function createNotification(input: {
       expiresAt: input.expiresAt,
     },
   });
+
+  // Push real-time update to recipient
+  emitNotificationNew(input.recipientUserId, {
+    id: notification.id,
+    type: notification.type,
+    severity: notification.severity,
+    title: notification.title,
+    message: notification.message,
+  });
+
+  return notification;
 }
 
 export async function createNotificationsBulk(
@@ -300,4 +313,87 @@ export async function runDocumentExpiryChecks() {
   }
 
   return createNotificationsBulk(notifications);
+}
+
+// ─── Broadcast (staff-initiated) ──────────────────────────────────────────────
+
+export async function broadcastNotification(input: {
+  title: string;
+  message: string;
+  type?: NotificationType;
+  targetRole?: string;
+}) {
+  const where = input.targetRole
+    ? { role: input.targetRole as any, isActive: true }
+    : { isActive: true };
+
+  const users = await prisma.user.findMany({ where, select: { id: true } });
+
+  const notifications = await createNotificationsBulk(
+    users.map((u) => ({
+      type: input.type ?? NotificationType.SYSTEM,
+      severity: NotificationSeverity.INFO,
+      title: input.title,
+      message: input.message,
+      recipientUserId: u.id,
+    }))
+  );
+
+  // Push real-time event to all (or role room)
+  if (input.targetRole) {
+    emitToRole(input.targetRole, 'notification:new', { title: input.title, message: input.message });
+  } else {
+    emitToAll('notification:new', { title: input.title, message: input.message });
+  }
+
+  return { ...notifications, recipientCount: users.length };
+}
+
+// ─── Email (nodemailer) ───────────────────────────────────────────────────────
+
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT ?? '587', 10),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
+
+export async function sendEmailNotification(input: {
+  subject: string;
+  body: string;
+  recipientRole?: string;
+  recipientEmails?: string[];
+  html?: boolean;
+}) {
+  const from = process.env.SMTP_FROM ?? process.env.SMTP_USER ?? 'noreply@umu.ac.ug';
+
+  let emails: string[] = input.recipientEmails ?? [];
+
+  if (input.recipientRole) {
+    const users = await prisma.user.findMany({
+      where: { role: input.recipientRole as any, isActive: true },
+      select: { email: true },
+    });
+    emails = [...emails, ...users.map((u) => u.email)];
+  }
+
+  if (emails.length === 0) {
+    throw new AppError(400, 'BAD_REQUEST', 'No recipient emails resolved');
+  }
+
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: `UMU Sports <${from}>`,
+    to: emails.join(','),
+    subject: input.subject,
+    ...(input.html ? { html: input.body } : { text: input.body }),
+  });
+
+  return { sent: emails.length, to: emails };
 }

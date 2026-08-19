@@ -1,116 +1,166 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from '@/lib/auth';
-import AppLayout from '@/components/layout/AppLayout';
-import PublicLayout from '@/components/layout/PublicLayout';
-import LoginPage from '@/pages/LoginPage';
-import NotFoundPage from '@/pages/NotFoundPage';
-import DashboardPage from '@/pages/DashboardPage';
-import AthletesPage from '@/pages/AthletesPage';
-import AthleteFormPage from '@/pages/AthleteFormPage';
-import AthleteDetailPage from '@/pages/AthleteDetailPage';
-import SportsPage from '@/pages/SportsPage';
-import TeamsPage from '@/pages/TeamsPage';
-import EventsPage from '@/pages/EventsPage';
-import MatchesPage from '@/pages/MatchesPage';
-import AcademicPage from '@/pages/AcademicPage';
-import ScholarshipsPage from '@/pages/ScholarshipsPage';
-import ContractsPage from '@/pages/ContractsPage';
-import ProspectsPage from '@/pages/ProspectsPage';
-import TrialsPage from '@/pages/TrialsPage';
-import DocumentsPage from '@/pages/DocumentsPage';
-import NotificationsPage from '@/pages/NotificationsPage';
-import ReportsPage from '@/pages/ReportsPage';
-import NewsManagePage from '@/pages/NewsManagePage';
-import SlidesManagePage from '@/pages/SlidesManagePage';
-import EquipmentPage from '@/pages/EquipmentPage';
-import HomePage from '@/pages/public/HomePage';
-import PublicFixturesPage from '@/pages/public/FixturesPage';
-import PublicResultsPage from '@/pages/public/ResultsPage';
-import PublicSportsPage from '@/pages/public/SportsPage';
-import PublicSportDetailPage from '@/pages/public/SportDetailPage';
-import PublicTeamsPage from '@/pages/public/TeamsPage';
-import PublicTeamDetailPage from '@/pages/public/TeamDetailPage';
-import PublicEventsPage from '@/pages/public/EventsPage';
-import PublicEventDetailPage from '@/pages/public/EventDetailPage';
-import PublicNewsPage from '@/pages/public/NewsPage';
-import PublicNewsDetailPage from '@/pages/public/NewsDetailPage';
+import { lazy, Suspense } from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { PageLoader } from '@/components/PageLoader';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AppLayout } from './components/layout/AppLayout';
 
-function Protected({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-}
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
 
-function TutorOnly({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, user } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (user?.role !== 'TUTOR') return <Navigate to="/dashboard" replace />;
-  return <>{children}</>;
-}
+const ForbiddenPage = lazy(() => import('./pages/errors/ForbiddenPage').then(m => ({ default: m.ForbiddenPage })));
+const UnauthorizedPage = lazy(() => import('./pages/errors/UnauthorizedPage').then(m => ({ default: m.UnauthorizedPage })));
+const NotFoundErrorPage = lazy(() => import('./pages/errors/NotFoundErrorPage').then(m => ({ default: m.NotFoundErrorPage })));
+const ServerErrorPage = lazy(() => import('./pages/errors/ServerErrorPage').then(m => ({ default: m.ServerErrorPage })));
 
-function AppRoutes() {
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const AthletesPage = lazy(() => import('./pages/AthletesPage'));
+const AthleteFormPage = lazy(() => import('./pages/AthleteFormPage'));
+const AthleteDetailPage = lazy(() => import('./pages/AthleteDetailPage'));
+const SportsAdminPage = lazy(() => import('./pages/SportsPage'));
+const TeamsPage = lazy(() => import('./pages/TeamsPage'));
+const EventsPage = lazy(() => import('./pages/EventsPage'));
+const MatchesPage = lazy(() => import('./pages/MatchesPage'));
+const AcademicPage = lazy(() => import('./pages/AcademicPage'));
+const ScholarshipsPage = lazy(() => import('./pages/ScholarshipsPage'));
+const ContractsPage = lazy(() => import('./pages/ContractsPage'));
+const ProspectsPage = lazy(() => import('./pages/ProspectsPage'));
+const TrialsPage = lazy(() => import('./pages/TrialsPage'));
+const DocumentsPage = lazy(() => import('./pages/DocumentsPage'));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const NewsManagePage = lazy(() => import('./pages/NewsManagePage'));
+const SlidesManagePage = lazy(() => import('./pages/SlidesManagePage'));
+const EquipmentPage = lazy(() => import('./pages/EquipmentPage'));
+const TournamentCreatePage = lazy(() => import('./pages/TournamentCreatePage'));
+
+const HomePage = lazy(() => import('./pages/public/HomePage'));
+const PublicFixturesPage = lazy(() => import('./pages/public/FixturesPage'));
+const PublicResultsPage = lazy(() => import('./pages/public/ResultsPage'));
+const PublicSportsPage = lazy(() => import('./pages/public/SportsPage'));
+const PublicSportDetailPage = lazy(() => import('./pages/public/SportDetailPage'));
+const PublicTeamsPage = lazy(() => import('./pages/public/TeamsPage'));
+const PublicTeamDetailPage = lazy(() => import('./pages/public/TeamDetailPage'));
+const PublicEventsPage = lazy(() => import('./pages/public/EventsPage'));
+const PublicEventDetailPage = lazy(() => import('./pages/public/EventDetailPage'));
+const PublicNewsPage = lazy(() => import('./pages/public/NewsPage'));
+const PublicNewsDetailPage = lazy(() => import('./pages/public/NewsDetailPage'));
+
+const ProtectedLayout = (
+  <ErrorBoundary>
+    <ProtectedRoute>
+      <AppLayout />
+    </ProtectedRoute>
+  </ErrorBoundary>
+);
+
+function App() {
   return (
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/fixtures" element={<PublicFixturesPage />} />
-        <Route path="/results" element={<PublicResultsPage />} />
-        <Route path="/sports" element={<PublicSportsPage />} />
-        <Route path="/sports/:id" element={<PublicSportDetailPage />} />
-        <Route path="/teams" element={<PublicTeamsPage />} />
-        <Route path="/teams/:id" element={<PublicTeamDetailPage />} />
-        <Route path="/events" element={<PublicEventsPage />} />
-        <Route path="/events/:id" element={<PublicEventDetailPage />} />
-        <Route path="/news" element={<PublicNewsPage />} />
-        <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
-      </Route>
+    <ErrorBoundary>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/change-password" element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="/forbidden" element={<ForbiddenPage />} />
+          <Route path="/not-found" element={<NotFoundErrorPage />} />
+          <Route path="/server-error" element={<ServerErrorPage />} />
 
-      <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/fixtures" element={<PublicFixturesPage />} />
+          <Route path="/results" element={<PublicResultsPage />} />
+          <Route path="/sports" element={<PublicSportsPage />} />
+          <Route path="/sports/:id" element={<PublicSportDetailPage />} />
+          <Route path="/teams" element={<PublicTeamsPage />} />
+          <Route path="/teams/:id" element={<PublicTeamDetailPage />} />
+          <Route path="/events" element={<PublicEventsPage />} />
+          <Route path="/events/:id" element={<PublicEventDetailPage />} />
+          <Route path="/news" element={<PublicNewsPage />} />
+          <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
 
-      <Route
-        element={
-          <Protected>
-            <AppLayout />
-          </Protected>
-        }
-      >
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/athletes" element={<AthletesPage />} />
-        <Route path="/athletes/new" element={<AthleteFormPage />} />
-        <Route path="/athletes/:id" element={<AthleteDetailPage />} />
-        <Route path="/sports" element={<SportsPage />} />
-        <Route path="/teams" element={<TeamsPage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/matches" element={<MatchesPage />} />
-        <Route path="/academic" element={<AcademicPage />} />
-        <Route path="/scholarships" element={<ScholarshipsPage />} />
-        <Route path="/contracts" element={<ContractsPage />} />
-        <Route path="/prospects" element={<ProspectsPage />} />
-        <Route path="/trials" element={<TrialsPage />} />
-        <Route path="/documents" element={<DocumentsPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/news/manage" element={<NewsManagePage />} />
-        <Route path="/slides/manage" element={<SlidesManagePage />} />
-        <Route
-          path="/equipment"
-          element={
-            <TutorOnly>
-              <EquipmentPage />
-            </TutorOnly>
-          }
-        />
-      </Route>
+          <Route path="/dashboard" element={ProtectedLayout}>
+            <Route index element={<DashboardPage />} />
+          </Route>
 
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+          <Route path="/athletes" element={ProtectedLayout}>
+            <Route index element={<AthletesPage />} />
+            <Route path="new" element={<AthleteFormPage />} />
+            <Route path=":id" element={<AthleteDetailPage />} />
+          </Route>
+
+          <Route path="/sports-admin" element={ProtectedLayout}>
+            <Route index element={<SportsAdminPage />} />
+          </Route>
+
+          <Route path="/teams-admin" element={ProtectedLayout}>
+            <Route index element={<TeamsPage />} />
+          </Route>
+
+          <Route path="/events-admin" element={ProtectedLayout}>
+            <Route index element={<EventsPage />} />
+          </Route>
+
+          <Route path="/tournaments/new" element={ProtectedLayout}>
+            <Route index element={<TournamentCreatePage />} />
+          </Route>
+
+          <Route path="/matches" element={ProtectedLayout}>
+            <Route index element={<MatchesPage />} />
+          </Route>
+
+          <Route path="/academic" element={ProtectedLayout}>
+            <Route index element={<AcademicPage />} />
+          </Route>
+
+          <Route path="/scholarships" element={ProtectedLayout}>
+            <Route index element={<ScholarshipsPage />} />
+          </Route>
+
+          <Route path="/contracts" element={ProtectedLayout}>
+            <Route index element={<ContractsPage />} />
+          </Route>
+
+          <Route path="/prospects" element={ProtectedLayout}>
+            <Route index element={<ProspectsPage />} />
+          </Route>
+
+          <Route path="/trials" element={ProtectedLayout}>
+            <Route index element={<TrialsPage />} />
+          </Route>
+
+          <Route path="/documents" element={ProtectedLayout}>
+            <Route index element={<DocumentsPage />} />
+          </Route>
+
+          <Route path="/notifications" element={ProtectedLayout}>
+            <Route index element={<NotificationsPage />} />
+          </Route>
+
+          <Route path="/reports" element={ProtectedLayout}>
+            <Route index element={<ReportsPage />} />
+          </Route>
+
+          <Route path="/news/manage" element={ProtectedLayout}>
+            <Route index element={<NewsManagePage />} />
+          </Route>
+
+          <Route path="/slides/manage" element={ProtectedLayout}>
+            <Route index element={<SlidesManagePage />} />
+          </Route>
+
+          <Route path="/equipment" element={ProtectedLayout}>
+            <Route index element={<EquipmentPage />} />
+          </Route>
+
+          <Route path="*" element={<NotFoundErrorPage />} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
-export default function App() {
-  return (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
-  );
-}
+export default App;

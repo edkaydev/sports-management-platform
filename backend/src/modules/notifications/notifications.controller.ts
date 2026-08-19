@@ -62,3 +62,25 @@ export async function runChecks(req: AuthRequest, res: Response, next: NextFunct
     next(err);
   }
 }
+
+export async function broadcastNotification(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { title, message, type, targetRole } = req.body;
+    if (!title || !message) throw new Error('title and message are required');
+    const result = await service.broadcastNotification({ title, message, type, targetRole });
+    res.json({ success: true, data: result, message: 'Broadcast sent' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function sendEmailNotification(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const { subject, body, recipientRole, recipientEmails, html } = req.body;
+    if (!subject || !body) throw new Error('subject and body are required');
+    const result = await service.sendEmailNotification({ subject, body, recipientRole, recipientEmails, html });
+    res.json({ success: true, data: result, message: 'Email sent' });
+  } catch (err) {
+    next(err);
+  }
+}
