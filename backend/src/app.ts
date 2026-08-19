@@ -32,6 +32,9 @@ import { requestLogger } from './middleware/logger.middleware';
 
 const app = express();
 
+// Trust proxy (required behind Nginx/Docker reverse proxy)
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
