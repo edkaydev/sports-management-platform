@@ -1312,3 +1312,19 @@ model EquipmentAssignment {
   @@index([teamId])
   @@map("equipment_assignments")
 }
+
+model SliderSlide {
+  id          String   @id @default(uuid())
+  title       String   @db.VarChar(255)
+  subtitle    String?  @db.VarChar(500)
+  imageUrl    String   @map("image_url") @db.VarChar(1024)
+  linkUrl     String?  @map("link_url") @db.VarChar(1024)
+  linkLabel   String?  @map("link_label") @db.VarChar(100)
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, sortOrder])
+  @@map("slider_slides")
+}

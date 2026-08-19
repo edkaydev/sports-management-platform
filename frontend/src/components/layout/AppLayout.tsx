@@ -55,6 +55,7 @@ const navGroups: Array<{
       { to: '/notifications', label: 'Notifications' },
       { to: '/reports', label: 'Reports' },
       { to: '/news/manage', label: 'News & Announcements' },
+      { to: '/slides/manage', label: 'Home Slider' },
       { to: '/equipment', label: 'Department Equipment', tutorOnly: true },
     ],
   },

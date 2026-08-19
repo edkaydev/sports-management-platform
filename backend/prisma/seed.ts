@@ -179,6 +179,14 @@ const TEAMS: Array<{
     foundingYear: 1998,
   },
   {
+    name: "UMU Lady Flames",
+    shortName: "UMU",
+    sportName: "Basketball",
+    gender: Gender.FEMALE,
+    venue: "Nkozi Indoor Court",
+    foundingYear: 2003,
+  },
+  {
     name: "UMU Martyrs",
     shortName: "UMU",
     sportName: "Rugby",
@@ -203,6 +211,14 @@ const TEAMS: Array<{
     foundingYear: 1996,
   },
   {
+    name: "UMU Lady Volley",
+    shortName: "UMU",
+    sportName: "Volleyball",
+    gender: Gender.FEMALE,
+    venue: "Nkozi Volleyball Court",
+    foundingYear: 2005,
+  },
+  {
     name: "UMU Handball",
     shortName: "UMU",
     sportName: "Handball",
@@ -217,6 +233,14 @@ const TEAMS: Array<{
     gender: Gender.MIXED,
     venue: "Nkozi Tennis Courts",
     foundingYear: 2003,
+  },
+  {
+    name: "UMU Ladies Tennis",
+    shortName: "UMU",
+    sportName: "Tennis",
+    gender: Gender.FEMALE,
+    venue: "Nkozi Tennis Courts",
+    foundingYear: 2007,
   },
   {
     name: "UMU Athletics Squad",

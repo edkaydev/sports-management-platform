@@ -4,6 +4,11 @@ import { getPublicTeam } from '@/lib/api';
 import { Spinner, EmptyState } from '@/components/ui';
 import { formatMatchDate } from './FixturesPage';
 
+function formatGenderLabel(gender?: string | null) {
+  if (!gender) return 'Mixed';
+  return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+}
+
 export default function TeamDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, isError } = useQuery({
@@ -35,7 +40,7 @@ export default function TeamDetailPage() {
               <div>
                 <h1 className="text-3xl font-bold">{data.team.name}</h1>
                 <p className="mt-1 text-blue-100 capitalize">
-                  {data.team.sport.name} · {data.team.gender.toLowerCase()}
+                  {data.team.sport.name} · {formatGenderLabel(data.team.gender)}
                 </p>
               </div>
               <div className="flex gap-6 text-center">

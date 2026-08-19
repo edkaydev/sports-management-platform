@@ -310,6 +310,46 @@ export async function getPublicNewsBySlug(slug: string) {
   return res.data.data;
 }
 
+// ─── Public Slider Slides ─────────────────────────────────────────────────────
+
+export interface SliderSlide {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  imageUrl: string;
+  linkUrl: string | null;
+  linkLabel: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export async function getPublicSlides() {
+  const res = await api.get<{ success: boolean; data: Array<Pick<SliderSlide, 'id' | 'title' | 'subtitle' | 'imageUrl' | 'linkUrl' | 'linkLabel'>> }>('/public/slides');
+  return res.data.data;
+}
+
+export async function listSlides() {
+  const res = await api.get<{ success: boolean; data: SliderSlide[] }>('/slides');
+  return res.data.data;
+}
+
+export async function createSlide(payload: Partial<SliderSlide>) {
+  const res = await api.post<{ success: boolean; data: SliderSlide }>('/slides', payload);
+  return res.data.data;
+}
+
+export async function updateSlide(id: string, payload: Partial<SliderSlide>) {
+  const res = await api.patch<{ success: boolean; data: SliderSlide }>(`/slides/${id}`, payload);
+  return res.data.data;
+}
+
+export async function deleteSlide(id: string) {
+  const res = await api.delete<{ success: boolean }>(`/slides/${id}`);
+  return res.data;
+}
+
 // ─── Department Equipment (TUTOR only) ───────────────────────────────────────
 
 export interface EquipmentItem {

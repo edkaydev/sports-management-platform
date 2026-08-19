@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { getPublicSports } from '@/lib/api';
 import { PageHeader, Spinner, EmptyState } from '@/components/ui';
 
+function formatGenderLabel(gender?: string | null) {
+  if (!gender) return 'Mixed';
+  return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+}
+
 export default function SportsPage() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ['public', 'sports'],
@@ -22,13 +27,19 @@ export default function SportsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {data.map((s) => (
             <div key={s.id} className="bg-surface border border-border rounded-lg p-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <h3 className="font-semibold text-gray-900">{s.name}</h3>
-                <span className="px-2 py-0.5 rounded-full bg-blue-50 text-primary text-xs font-semibold">
+                <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wide">
                   {s.category.replace('_', ' ')}
                 </span>
               </div>
-              <p className="text-xs text-muted mt-1 capitalize">{s.gender.toLowerCase()}</p>
+
+              <div className="mt-2 flex items-center gap-2">
+                <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-700">
+                  {formatGenderLabel(s.gender)}
+                </span>
+              </div>
+
               <div className="mt-4 flex gap-4 text-sm text-muted">
                 <span>{s._count.teams} team{s._count.teams === 1 ? '' : 's'}</span>
                 <span>{s._count.matches} match{s._count.matches === 1 ? '' : 'es'}</span>

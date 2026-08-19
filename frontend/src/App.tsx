@@ -21,6 +21,7 @@ import DocumentsPage from '@/pages/DocumentsPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import ReportsPage from '@/pages/ReportsPage';
 import NewsManagePage from '@/pages/NewsManagePage';
+import SlidesManagePage from '@/pages/SlidesManagePage';
 import EquipmentPage from '@/pages/EquipmentPage';
 import HomePage from '@/pages/public/HomePage';
 import PublicFixturesPage from '@/pages/public/FixturesPage';
@@ -90,6 +91,7 @@ function AppRoutes() {
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/news/manage" element={<NewsManagePage />} />
+        <Route path="/slides/manage" element={<SlidesManagePage />} />
         <Route
           path="/equipment"
           element={

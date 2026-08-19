@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { getPublicTeams, getPublicSports } from '@/lib/api';
 import { PageHeader, Spinner, EmptyState } from '@/components/ui';
 
+function formatGenderLabel(gender?: string | null) {
+  if (!gender) return 'Mixed';
+  return gender.charAt(0).toUpperCase() + gender.slice(1).toLowerCase();
+}
+
 export default function TeamsPage() {
   const teams = useQuery({ queryKey: ['public', 'teams'], queryFn: getPublicTeams });
   const sports = useQuery({ queryKey: ['public', 'sports'], queryFn: getPublicSports });
@@ -31,10 +36,10 @@ export default function TeamsPage() {
                       to={`/teams/${t.id}`}
                       className="bg-surface border border-border rounded-lg p-5 hover:border-primary/40 hover:shadow-sm transition"
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <h4 className="font-semibold text-gray-900">{t.name}</h4>
-                        <span className="px-2 py-0.5 rounded-full bg-gray-100 text-xs font-semibold text-muted capitalize">
-                          {t.gender.toLowerCase()}
+                        <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wide">
+                          {formatGenderLabel(t.gender)}
                         </span>
                       </div>
                       <p className="text-xs text-muted mt-1">
