@@ -47,13 +47,15 @@ const PublicEventDetailPage = lazy(() => import('./pages/public/EventDetailPage'
 const PublicNewsPage = lazy(() => import('./pages/public/NewsPage'));
 const PublicNewsDetailPage = lazy(() => import('./pages/public/NewsDetailPage'));
 
-const ProtectedLayout = (
-  <ErrorBoundary>
-    <ProtectedRoute>
-      <AppLayout />
-    </ProtectedRoute>
-  </ErrorBoundary>
-);
+function ProtectedLayout() {
+  return (
+    <ErrorBoundary>
+      <ProtectedRoute>
+        <AppLayout />
+      </ProtectedRoute>
+    </ErrorBoundary>
+  );
+}
 
 function App() {
   return (
@@ -85,77 +87,77 @@ function App() {
             <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
           </Route>
 
-          <Route path="/dashboard" element={ProtectedLayout}>
+          <Route path="/dashboard" element={<ProtectedLayout />}>
             <Route index element={<DashboardPage />} />
           </Route>
 
-          <Route path="/athletes" element={ProtectedLayout}>
+          <Route path="/athletes" element={<ProtectedLayout />}>
             <Route index element={<AthletesPage />} />
             <Route path="new" element={<AthleteFormPage />} />
             <Route path=":id" element={<AthleteDetailPage />} />
           </Route>
 
-          <Route path="/sports-admin" element={ProtectedLayout}>
+          <Route path="/sports-admin" element={<ProtectedLayout />}>
             <Route index element={<SportsAdminPage />} />
           </Route>
 
-          <Route path="/teams-admin" element={ProtectedLayout}>
+          <Route path="/teams-admin" element={<ProtectedLayout />}>
             <Route index element={<TeamsPage />} />
           </Route>
 
-          <Route path="/events-admin" element={ProtectedLayout}>
+          <Route path="/events-admin" element={<ProtectedLayout />}>
             <Route index element={<EventsPage />} />
           </Route>
 
-          <Route path="/tournaments/new" element={ProtectedLayout}>
+          <Route path="/tournaments/new" element={<ProtectedLayout />}>
             <Route index element={<TournamentCreatePage />} />
           </Route>
 
-          <Route path="/matches" element={ProtectedLayout}>
+          <Route path="/matches" element={<ProtectedLayout />}>
             <Route index element={<MatchesPage />} />
           </Route>
 
-          <Route path="/academic" element={ProtectedLayout}>
+          <Route path="/academic" element={<ProtectedLayout />}>
             <Route index element={<AcademicPage />} />
           </Route>
 
-          <Route path="/scholarships" element={ProtectedLayout}>
+          <Route path="/scholarships" element={<ProtectedLayout />}>
             <Route index element={<ScholarshipsPage />} />
           </Route>
 
-          <Route path="/contracts" element={ProtectedLayout}>
+          <Route path="/contracts" element={<ProtectedLayout />}>
             <Route index element={<ContractsPage />} />
           </Route>
 
-          <Route path="/prospects" element={ProtectedLayout}>
+          <Route path="/prospects" element={<ProtectedLayout />}>
             <Route index element={<ProspectsPage />} />
           </Route>
 
-          <Route path="/trials" element={ProtectedLayout}>
+          <Route path="/trials" element={<ProtectedLayout />}>
             <Route index element={<TrialsPage />} />
           </Route>
 
-          <Route path="/documents" element={ProtectedLayout}>
+          <Route path="/documents" element={<ProtectedLayout />}>
             <Route index element={<DocumentsPage />} />
           </Route>
 
-          <Route path="/notifications" element={ProtectedLayout}>
+          <Route path="/notifications" element={<ProtectedLayout />}>
             <Route index element={<NotificationsPage />} />
           </Route>
 
-          <Route path="/reports" element={ProtectedLayout}>
+          <Route path="/reports" element={<ProtectedLayout />}>
             <Route index element={<ReportsPage />} />
           </Route>
 
-          <Route path="/news/manage" element={ProtectedLayout}>
+          <Route path="/news/manage" element={<ProtectedLayout />}>
             <Route index element={<NewsManagePage />} />
           </Route>
 
-          <Route path="/slides/manage" element={ProtectedLayout}>
+          <Route path="/slides/manage" element={<ProtectedLayout />}>
             <Route index element={<SlidesManagePage />} />
           </Route>
 
-          <Route path="/equipment" element={ProtectedLayout}>
+          <Route path="/equipment" element={<ProtectedLayout />}>
             <Route index element={<EquipmentPage />} />
           </Route>
 
