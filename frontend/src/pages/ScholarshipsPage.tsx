@@ -297,7 +297,7 @@ export default function ScholarshipsPage() {
 
   const { data: dashboard } = useQuery<Dashboard>({
     queryKey: ['scholarships-dashboard'],
-    queryFn: async () => (await api.get('/scholarships/dashboard')).data.data,
+    queryFn: async () => (await api.get('/scholarships/dashboard')).data,
   });
 
   const { data, isLoading } = useQuery({

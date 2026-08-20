@@ -5,30 +5,39 @@ export const equipmentService = {
     const cleaned = params
       ? Object.fromEntries(Object.entries(params).filter(([, v]) => v !== undefined))
       : undefined;
-    return api.get('/equipment', { params: cleaned });
+    const res = await api.get('/equipment', { params: cleaned });
+    return res.data;
   },
   async getById(id: string) {
-    return api.get(`/equipment/${id}`);
+    const res = await api.get(`/equipment/${id}`);
+    return res.data;
   },
   async create(data: Record<string, unknown>) {
-    return api.post('/equipment', data);
+    const res = await api.post('/equipment', data);
+    return res.data;
   },
   async update(id: string, data: Record<string, unknown>) {
-    return api.patch(`/equipment/${id}`, data);
+    const res = await api.patch(`/equipment/${id}`, data);
+    return res.data;
   },
   async delete(id: string) {
-    return api.delete(`/equipment/${id}`);
+    const res = await api.delete(`/equipment/${id}`);
+    return res.data;
   },
   async assign(id: string, data: Record<string, unknown>) {
-    return api.post(`/equipment/${id}/assign`, data);
+    const res = await api.post(`/equipment/${id}/assign`, data);
+    return res.data;
   },
   async returnItem(assignmentId: string, data: Record<string, unknown>) {
-    return api.post(`/equipment/assignments/${assignmentId}/return`, data);
+    const res = await api.post(`/equipment/assignments/${assignmentId}/return`, data);
+    return res.data;
   },
   async deleteAssignment(assignmentId: string) {
-    return api.delete(`/equipment/assignments/${assignmentId}`);
+    const res = await api.delete(`/equipment/assignments/${assignmentId}`);
+    return res.data;
   },
   async getAssignments(id: string) {
-    return api.get(`/equipment/${id}/assignments`);
+    const res = await api.get(`/equipment/${id}/assignments`);
+    return res.data;
   },
 };

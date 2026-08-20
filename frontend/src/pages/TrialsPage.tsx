@@ -59,7 +59,7 @@ function TrialModal({ trial, onClose }: { trial: Trial | null; onClose: () => vo
   const { data: sports } = useQuery({
     queryKey: ['sports-select'],
     queryFn: async () =>
-      (await api.get('/sports', { params: { pageSize: 100 } })).data.sports as {
+      (await api.get('/sports', { params: { pageSize: 100 } })).data as {
         id: string; name: string;
       }[],
   });
@@ -67,7 +67,7 @@ function TrialModal({ trial, onClose }: { trial: Trial | null; onClose: () => vo
   const { data: seasons } = useQuery({
     queryKey: ['seasons-select'],
     queryFn: async () =>
-      (await api.get('/seasons', { params: { pageSize: 20 } })).data.seasons as {
+      (await api.get('/seasons', { params: { pageSize: 20 } })).data as {
         id: string; name: string;
       }[],
   });
@@ -252,7 +252,7 @@ function TrialDetailPanel({ trialId, onClose }: { trialId: string; onClose: () =
 
   const { data: trial, isLoading } = useQuery<TrialDetail>({
     queryKey: ['trial-detail', trialId],
-    queryFn: async () => (await api.get(`/recruitment/trials/${trialId}`)).data.data,
+    queryFn: async () => (await api.get(`/recruitment/trials/${trialId}`)).data,
   });
 
   const markAttendance = useMutation({
@@ -373,7 +373,7 @@ export default function TrialsPage() {
   const { data: sports } = useQuery({
     queryKey: ['sports-select'],
     queryFn: async () =>
-      (await api.get('/sports', { params: { pageSize: 100 } })).data.sports as {
+      (await api.get('/sports', { params: { pageSize: 100 } })).data as {
         id: string; name: string;
       }[],
   });

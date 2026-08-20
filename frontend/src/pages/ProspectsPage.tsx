@@ -40,7 +40,7 @@ function ProspectModal({ prospect, onClose }: { prospect: Prospect | null; onClo
   const { data: sports } = useQuery({
     queryKey: ['sports-select'],
     queryFn: async () =>
-      (await api.get('/sports', { params: { pageSize: 100 } })).data.sports as {
+      (await api.get('/sports', { params: { pageSize: 100 } })).data as {
         id: string; name: string;
       }[],
   });
@@ -271,7 +271,7 @@ export default function ProspectsPage() {
   const { data: sports } = useQuery({
     queryKey: ['sports-select'],
     queryFn: async () =>
-      (await api.get('/sports', { params: { pageSize: 100 } })).data.sports as {
+      (await api.get('/sports', { params: { pageSize: 100 } })).data as {
         id: string; name: string;
       }[],
   });

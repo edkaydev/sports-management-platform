@@ -2,18 +2,23 @@ import api from '@/lib/api';
 
 export const sportService = {
   async getAll(params?: Record<string, unknown>) {
-    return api.get('/sports', { params });
+    const res = await api.get('/sports', { params });
+    return res.data;
   },
   async getById(id: string) {
-    return api.get(`/sports/${id}`);
+    const res = await api.get(`/sports/${id}`);
+    return res.data;
   },
   async create(data: Record<string, unknown>) {
-    return api.post('/sports', data);
+    const res = await api.post('/sports', data);
+    return res.data;
   },
   async update(id: string, data: Record<string, unknown>) {
-    return api.patch(`/sports/${id}`, data);
+    const res = await api.patch(`/sports/${id}`, data);
+    return res.data;
   },
   async delete(id: string) {
-    return api.delete(`/sports/${id}`);
+    const res = await api.delete(`/sports/${id}`);
+    return res.data;
   },
 };

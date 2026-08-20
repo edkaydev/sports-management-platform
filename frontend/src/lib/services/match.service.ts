@@ -2,18 +2,23 @@ import api from '@/lib/api';
 
 export const matchService = {
   async getAll(params?: Record<string, unknown>) {
-    return api.get('/matches', { params });
+    const res = await api.get('/matches', { params });
+    return res.data;
   },
   async getById(id: string) {
-    return api.get(`/matches/${id}`);
+    const res = await api.get(`/matches/${id}`);
+    return res.data;
   },
   async create(data: Record<string, unknown>) {
-    return api.post('/matches', data);
+    const res = await api.post('/matches', data);
+    return res.data;
   },
   async update(id: string, data: Record<string, unknown>) {
-    return api.patch(`/matches/${id}`, data);
+    const res = await api.patch(`/matches/${id}`, data);
+    return res.data;
   },
   async delete(id: string) {
-    return api.delete(`/matches/${id}`);
+    const res = await api.delete(`/matches/${id}`);
+    return res.data;
   },
 };

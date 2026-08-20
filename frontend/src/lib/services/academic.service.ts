@@ -2,25 +2,31 @@ import api from '@/lib/api';
 
 export const academicService = {
   async getAll(params?: Record<string, unknown>) {
-    return api.get('/academic-records', { params });
+    const res = await api.get('/academic-records', { params });
+    return res.data;
   },
   async getById(id: string) {
-    return api.get(`/academic-records/${id}`);
+    const res = await api.get(`/academic-records/${id}`);
+    return res.data;
   },
   async create(data: Record<string, unknown>) {
-    return api.post('/academic-records', data);
+    const res = await api.post('/academic-records', data);
+    return res.data;
   },
   async update(id: string, data: Record<string, unknown>) {
-    return api.patch(`/academic-records/${id}`, data);
+    const res = await api.patch(`/academic-records/${id}`, data);
+    return res.data;
   },
   async delete(id: string) {
-    return api.delete(`/academic-records/${id}`);
+    const res = await api.delete(`/academic-records/${id}`);
+    return res.data;
   },
   async importCsv(file: File) {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/academic-records/import', formData, {
+    const res = await api.post('/academic-records/import', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
+    return res.data;
   },
 };

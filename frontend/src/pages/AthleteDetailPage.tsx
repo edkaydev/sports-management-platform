@@ -8,12 +8,12 @@ export default function AthleteDetailPage() {
 
   const { data: athlete, isLoading } = useQuery({
     queryKey: ['athlete', id],
-    queryFn: async () => (await api.get(`/athletes/${id}`)).data.data,
+    queryFn: async () => (await api.get(`/athletes/${id}`)).data,
   });
 
   const { data: performance } = useQuery({
     queryKey: ['athlete', id, 'performance'],
-    queryFn: async () => (await api.get(`/athletes/${id}/performances`)).data.data,
+    queryFn: async () => (await api.get(`/athletes/${id}/performances`)).data,
     enabled: !!id,
   });
 

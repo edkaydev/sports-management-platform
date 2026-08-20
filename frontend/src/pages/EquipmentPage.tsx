@@ -85,18 +85,18 @@ export default function EquipmentPage() {
 
   const { data: sports } = useQuery({
     queryKey: ['sports'],
-    queryFn: async () => (await api.get('/sports')).data.data as SportOption[],
+    queryFn: async () => (await api.get('/sports')).data as SportOption[],
   });
 
   const { data: athletes } = useQuery({
     queryKey: ['athlete-options'],
-    queryFn: async () => (await api.get('/athletes', { params: { pageSize: 500 } })).data.data as AthleteOption[],
+    queryFn: async () => (await api.get('/athletes', { params: { pageSize: 500 } })).data as AthleteOption[],
     enabled: !!assignItem,
   });
 
   const { data: teams } = useQuery({
     queryKey: ['team-options'],
-    queryFn: async () => (await api.get('/teams', { params: { isActive: true } })).data.data as TeamOption[],
+    queryFn: async () => (await api.get('/teams', { params: { isActive: true } })).data as TeamOption[],
     enabled: !!assignItem,
   });
 

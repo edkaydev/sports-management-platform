@@ -42,7 +42,7 @@ export default function AthletesPage() {
       </div>
       {isLoading ? (
         <Spinner />
-      ) : !data?.athletes?.length ? (
+      ) : !(Array.isArray(data) ? data : data?.athletes ?? []).length ? (
         <EmptyState message="No athletes match these filters." />
       ) : (
         <>
@@ -50,7 +50,7 @@ export default function AthletesPage() {
             <Table
               headers={['Name', 'Reg. No.', 'Sport', 'Type', 'Status']}
             >
-              {data.athletes.map((a: any) => (
+              {(Array.isArray(data) ? data : data?.athletes ?? []).map((a: any) => (
                 <tr key={a.id} className="hover:bg-gray-50">
                   <td className="px-4 py-2.5">
                     <Link to={`/athletes/${a.id}`} className="font-medium text-primary hover:underline">
@@ -71,7 +71,7 @@ export default function AthletesPage() {
           </div>
           <div className="mt-4 flex items-center justify-between text-sm text-muted">
             <span>
-              Showing page {data.pagination.page} of {data.pagination.totalPages || 1}
+              Showing page {data?.pagination?.page ?? 1} of {data?.pagination?.totalPages || 1}
             </span>
             <div className="flex gap-2">
               <Button
@@ -85,7 +85,7 @@ export default function AthletesPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                disabled={page >= (data.pagination.totalPages || 1)}
+                disabled={page >= (data?.pagination?.totalPages || 1)}
                 onClick={() => setPage((p) => p + 1)}
               >
                 Next

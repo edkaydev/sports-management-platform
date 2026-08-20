@@ -31,6 +31,18 @@ export default function ChangePasswordPage() {
       setError('New password must be at least 8 characters.');
       return;
     }
+    if (!/[A-Z]/.test(form.next)) {
+      setError('Password must include at least one uppercase letter.');
+      return;
+    }
+    if (!/[a-z]/.test(form.next)) {
+      setError('Password must include at least one lowercase letter.');
+      return;
+    }
+    if (!/[0-9]/.test(form.next)) {
+      setError('Password must include at least one number.');
+      return;
+    }
     if (form.next === form.current) {
       setError('New password must be different from your current password.');
       return;
@@ -134,7 +146,7 @@ export default function ChangePasswordPage() {
                   {show.next ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-1">Minimum 8 characters</p>
+              <p className="text-xs text-gray-400 mt-1">Min 8 chars, uppercase, lowercase, number</p>
             </div>
 
             {/* Confirm */}

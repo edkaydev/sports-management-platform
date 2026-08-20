@@ -44,7 +44,7 @@ export default function NewsManagePage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['news'],
-    queryFn: async () => (await api.get('/news')).data.data,
+    queryFn: async () => (await api.get('/news')).data,
   });
 
   const save = useMutation({

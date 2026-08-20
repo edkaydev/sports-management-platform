@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui';
+import { CardContent, CardHeader, CardTitle, Badge } from '@/components/ui';
 import { PageLoader } from '@/components/PageLoader';
 import { Users, Calendar, Trophy, AlertTriangle, MapPin } from 'lucide-react';
 import {
@@ -14,19 +14,17 @@ const PIE_COLORS = ['#16a34a', '#f59e0b', '#ef4444', '#3b82f6', '#6b7280'];
 
 function StatCard({ title, value, icon: Icon, color }: { title: string; value: number | string; icon: any; color: string }) {
   return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">{title}</p>
-            <p className="text-2xl font-bold mt-1">{value}</p>
-          </div>
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
+    <div className="rounded-m3-xl border border-outline-variant/60 bg-white p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[13px] font-medium text-on-surface-variant">{title}</p>
+          <p className="text-2xl font-bold text-on-surface mt-1">{value}</p>
         </div>
-      </CardContent>
-    </Card>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${color}`}>
+          <Icon className="w-6 h-6 text-white" />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -64,10 +62,10 @@ export default function DashboardPage() {
 
   if (loadingAthletes) return <PageLoader />;
 
-  const totalAthletes = athletesRes?.pagination?.total ?? 0;
-  const eventsList = Array.isArray(events) ? events : events?.data ?? [];
-  const matchesList = Array.isArray(matches) ? matches : matches?.data ?? [];
-  const sportsList = Array.isArray(sports) ? sports : sports?.data ?? [];
+  const totalAthletes = athletesRes?.pagination?.total ?? (Array.isArray(athletesRes) ? athletesRes.length : 0);
+  const eventsList = Array.isArray(events) ? events : [];
+  const matchesList = Array.isArray(matches) ? matches : [];
+  const sportsList = Array.isArray(sports) ? sports : [];
 
   const upcoming = matchesList.filter(
     (m: any) => (m.status === 'SCHEDULED' || m.status === 'IN_PROGRESS') && new Date(m.scheduledDate) >= new Date()
@@ -79,7 +77,7 @@ export default function DashboardPage() {
       0
     ) ?? 0;
 
-  const standingData = academic?.byStanding?.map((s: any) => ({
+  const standingData = (Array.isArray(academic?.byStanding) ? academic.byStanding : []).map((s: any) => ({
     name: s.standing?.replace(/_/g, ' ') ?? 'Unknown',
     value: s.count ?? 0,
   })) ?? [];
@@ -102,8 +100,8 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-sm text-muted-foreground mt-1">2025/2026 Season Overview</p>
+          <h1 className="text-[22px] font-semibold text-on-surface tracking-tight">Dashboard</h1>
+          <p className="text-[13px] text-on-surface-variant mt-1">2025/2026 Season Overview</p>
         </div>
       </div>
 
@@ -115,7 +113,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Academic Standing Distribution</CardTitle>
           </CardHeader>
@@ -133,12 +131,12 @@ export default function DashboardPage() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-10">No academic data available</p>
+              <p className="text-sm text-on-surface-variant text-center py-10">No academic data available</p>
             )}
           </CardContent>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Teams per Sport</CardTitle>
           </CardHeader>
@@ -153,67 +151,67 @@ export default function DashboardPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-10">No sports data available</p>
+              <p className="text-sm text-on-surface-variant text-center py-10">No sports data available</p>
             )}
           </CardContent>
-        </Card>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Attention Required</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="divide-y divide-border text-sm">
+            <ul className="divide-y divide-outline-variant/40 text-sm">
               <li className="py-3 flex justify-between items-center">
-                <span className="text-gray-700">Academic Warnings</span>
+                <span className="text-on-surface">Academic Warnings</span>
                 <div className="flex items-center gap-2">
                   <Badge variant="destructive">{warningCount} athletes</Badge>
-                  <Link to="/academic" className="text-sm text-primary hover:underline">View</Link>
+                  <Link to="/academic" className="text-sm text-umu-red hover:underline">View</Link>
                 </div>
               </li>
               <li className="py-3 flex justify-between items-center">
-                <span className="text-gray-700">Scholarships Expiring</span>
+                <span className="text-on-surface">Scholarships Expiring</span>
                 <div className="flex items-center gap-2">
                   <Badge variant="destructive">{scholarships?.expiringWithin30Days ?? 0} records</Badge>
-                  <Link to="/scholarships" className="text-sm text-primary hover:underline">View</Link>
+                  <Link to="/scholarships" className="text-sm text-umu-red hover:underline">View</Link>
                 </div>
               </li>
               <li className="py-3 flex justify-between items-center">
-                <span className="text-gray-700">Active Scholarships</span>
+                <span className="text-on-surface">Active Scholarships</span>
                 <div className="flex items-center gap-2">
                   <Badge variant="secondary">{scholarships?.active ?? 0}</Badge>
-                  <Link to="/scholarships" className="text-sm text-primary hover:underline">View</Link>
+                  <Link to="/scholarships" className="text-sm text-umu-red hover:underline">View</Link>
                 </div>
               </li>
               <li className="py-3 flex justify-between items-center">
-                <span className="text-gray-700">Total Events</span>
+                <span className="text-on-surface">Total Events</span>
                 <div className="flex items-center gap-2">
                   <Badge>{eventsList.length}</Badge>
-                  <Link to="/events" className="text-sm text-primary hover:underline">View</Link>
+                  <Link to="/events" className="text-sm text-umu-red hover:underline">View</Link>
                 </div>
               </li>
             </ul>
           </CardContent>
-        </Card>
+        </div>
 
-        <Card>
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white shadow-sm">
           <CardHeader className="pb-2">
             <CardTitle className="text-base">Upcoming Fixtures</CardTitle>
           </CardHeader>
           <CardContent>
             {upcomingFixtures.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-10">No upcoming fixtures</p>
+              <p className="text-sm text-on-surface-variant text-center py-10">No upcoming fixtures</p>
             ) : (
-              <ul className="divide-y divide-border text-sm">
+              <ul className="divide-y divide-outline-variant/40 text-sm">
                 {upcomingFixtures.map((m: any) => (
                   <li key={m.id} className="py-3 flex justify-between items-center gap-3">
                     <div className="min-w-0">
-                      <div className="font-medium text-gray-900 truncate">
+                      <div className="font-medium text-on-surface truncate">
                         {m.homeTeam?.name ?? 'TBD'} vs {m.awayTeam?.name ?? 'TBD'}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                      <div className="flex items-center gap-1.5 text-xs text-on-surface-variant mt-0.5">
                         <MapPin className="w-3 h-3" />
                         {m.venue ?? 'TBD'} &middot; {new Date(m.scheduledDate).toLocaleDateString()}
                       </div>
@@ -224,7 +222,7 @@ export default function DashboardPage() {
               </ul>
             )}
           </CardContent>
-        </Card>
+        </div>
       </div>
     </div>
   );

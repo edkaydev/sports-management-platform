@@ -5,23 +5,23 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    --foreground: 0 0% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
-    --primary: 0 100% 50%;
+    --card-foreground: 0 0% 12%;
+    --primary: 2 71% 50%;
     --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 9%;
+    --secondary-foreground: 0 0% 12%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84% 60%;
+    --accent-foreground: 0 0% 12%;
+    --destructive: 2 71% 50%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 0 100% 50%;
-    --radius: 0.5rem;
+    --ring: 2 71% 50%;
+    --radius: 16px;
   }
 
   * {
@@ -30,7 +30,9 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   :focus-visible {
@@ -42,6 +44,16 @@
   }
 }
 
+@layer utilities {
+  .text-google-blue { color: #1A73E8; }
+  .text-google-red { color: #D93025; }
+  .text-google-green { color: #1E8E3E; }
+  .text-google-yellow { color: #F9AB00; }
+  .bg-google-blue { background-color: #1A73E8; }
+  .bg-google-red { background-color: #D93025; }
+  .bg-google-surface { background-color: #F8F9FA; }
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -49,11 +61,11 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #DADCE0;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #9AA0A6;
 }
 
 @media (prefers-reduced-motion: reduce) {

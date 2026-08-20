@@ -25,86 +25,83 @@ export default function EventDetailPage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14">
       {isLoading ? (
         <div className="py-16 flex justify-center"><Spinner /></div>
       ) : isError || !data ? (
         <div className="py-16">
           <EmptyState message="Event not found" />
           <div className="text-center mt-4">
-            <Link to="/events" className="text-sm font-semibold text-primary hover:underline">
-              ← Back to all events
-            </Link>
+            <Link to="/events" className="text-[14px] font-medium text-umu-red hover:underline">&larr; Back to all events</Link>
           </div>
         </div>
       ) : (
         <>
-          <Link to="/events" className="text-sm font-semibold text-primary hover:underline">
-            ← All events
-          </Link>
-          <header className="mt-4 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg px-6 py-8">
+          <Link to="/events" className="text-[13px] font-medium text-umu-red hover:underline">&larr; All events</Link>
+          <header className="mt-4 rounded-m3-xl bg-surface-dim p-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h1 className="text-3xl font-bold">{data.event.name}</h1>
-                <p className="mt-1 text-blue-100 capitalize">
+                <h1 className="text-[32px] font-semibold text-on-surface tracking-tight">{data.event.name}</h1>
+                <p className="mt-1 text-[14px] text-on-surface-variant capitalize">
                   {data.event.sport?.name ? `${data.event.sport.name} · ` : ''}
                   {data.event.type.replace('_', ' ')} · {data.event.level.replace('_', ' ')} · {data.event.format.replace('_', ' ')}
                 </p>
               </div>
-              <span className="px-3 py-1 rounded-full bg-white/15 text-xs font-semibold uppercase tracking-wide">
+              <span className="shrink-0 px-3 py-1 rounded-full bg-umu-red-light text-[12px] font-medium text-umu-red capitalize">
                 {data.event.status.replace('_', ' ')}
               </span>
             </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-3 text-sm text-blue-100">
-              <div>
-                <span className="text-blue-300">Start:</span>{' '}
-                {data.event.startDate ? new Date(data.event.startDate).toLocaleDateString() : 'TBD'}
+            <div className="mt-4 grid gap-3 sm:grid-cols-3 text-[13px]">
+              <div className="rounded-m3-sm bg-white/60 p-3">
+                <div className="text-[11px] font-medium text-on-surface-variant mb-0.5">Start</div>
+                <div className="text-on-surface">{data.event.startDate ? new Date(data.event.startDate).toLocaleDateString() : 'TBD'}</div>
               </div>
-              <div>
-                <span className="text-blue-300">End:</span>{' '}
-                {data.event.endDate ? new Date(data.event.endDate).toLocaleDateString() : 'TBD'}
+              <div className="rounded-m3-sm bg-white/60 p-3">
+                <div className="text-[11px] font-medium text-on-surface-variant mb-0.5">End</div>
+                <div className="text-on-surface">{data.event.endDate ? new Date(data.event.endDate).toLocaleDateString() : 'TBD'}</div>
               </div>
-              <div>
-                <span className="text-blue-300">Venue:</span> {data.event.venue ?? 'TBD'}
+              <div className="rounded-m3-sm bg-white/60 p-3">
+                <div className="text-[11px] font-medium text-on-surface-variant mb-0.5">Venue</div>
+                <div className="text-on-surface">{data.event.venue ?? 'TBD'}</div>
               </div>
             </div>
             {data.event.description && (
-              <p className="mt-4 max-w-2xl text-blue-100 text-sm">{data.event.description}</p>
+              <p className="mt-4 max-w-2xl text-[14px] text-on-surface-variant leading-relaxed">{data.event.description}</p>
             )}
           </header>
 
           {data.standings.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Standings</h2>
-              <div className="bg-surface border border-border rounded-lg overflow-x-auto">
-                <table className="w-full text-sm">
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Standings</h2>
+              <div className="rounded-m3-lg border border-outline-variant bg-white overflow-x-auto">
+                <table className="w-full text-[13px]">
                   <thead>
-                    <tr className="text-left text-xs uppercase tracking-wide text-muted border-b border-border">
-                      <th className="px-4 py-2">#</th>
-                      <th className="px-4 py-2">Team</th>
-                      <th className="px-4 py-2 text-center">P</th>
-                      <th className="px-4 py-2 text-center">W</th>
-                      <th className="px-4 py-2 text-center">D</th>
-                      <th className="px-4 py-2 text-center">L</th>
-                      <th className="px-4 py-2 text-center">GF</th>
-                      <th className="px-4 py-2 text-center">GA</th>
-                      <th className="px-4 py-2 text-center">GD</th>
-                      <th className="px-4 py-2 text-center">Pts</th>
+                    <tr className="text-left text-[11px] uppercase tracking-wide text-on-surface-variant border-b border-outline-variant">
+                      <th className="px-4 py-3">#</th>
+                      <th className="px-4 py-3">Team</th>
+                      <th className="px-4 py-3 text-center">P</th>
+                      <th className="px-4 py-3 text-center">W</th>
+                      <th className="px-4 py-3 text-center">D</th>
+                      <th className="px-4 py-3 text-center">L</th>
+                      <th className="px-4 py-3 text-center">GF</th>
+                      <th className="px-4 py-3 text-center">GA</th>
+                      <th className="px-4 py-3 text-center">GD</th>
+                      <th className="px-4 py-3 text-center">Pts</th>
                     </tr>
                   </thead>
                   <tbody>
                     {standingsWithNames(data).map((row, i) => (
-                      <tr key={row.teamId} className="border-b border-border last:border-0">
-                        <td className="px-4 py-2 font-semibold text-muted">{i + 1}</td>
-                        <td className="px-4 py-2 font-medium text-gray-900">{row.name}</td>
-                        <td className="px-4 py-2 text-center">{row.played}</td>
-                        <td className="px-4 py-2 text-center">{row.won}</td>
-                        <td className="px-4 py-2 text-center">{row.drawn}</td>
-                        <td className="px-4 py-2 text-center">{row.lost}</td>
-                        <td className="px-4 py-2 text-center">{row.goalsFor}</td>
-                        <td className="px-4 py-2 text-center">{row.goalsAgainst}</td>
-                        <td className="px-4 py-2 text-center">{row.goalsFor - row.goalsAgainst}</td>
-                        <td className="px-4 py-2 text-center font-bold text-primary">{row.points}</td>
+                      <tr key={row.teamId} className="border-b border-outline-variant last:border-0">
+                        <td className="px-4 py-3 text-on-surface-variant font-medium">{i + 1}</td>
+                        <td className="px-4 py-3 font-medium text-on-surface">{row.name}</td>
+                        <td className="px-4 py-3 text-center">{row.played}</td>
+                        <td className="px-4 py-3 text-center">{row.won}</td>
+                        <td className="px-4 py-3 text-center">{row.drawn}</td>
+                        <td className="px-4 py-3 text-center">{row.lost}</td>
+                        <td className="px-4 py-3 text-center">{row.goalsFor}</td>
+                        <td className="px-4 py-3 text-center">{row.goalsAgainst}</td>
+                        <td className="px-4 py-3 text-center">{row.goalsFor - row.goalsAgainst}</td>
+                        <td className="px-4 py-3 text-center font-semibold text-umu-red">{row.points}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -114,28 +111,21 @@ export default function EventDetailPage() {
           )}
 
           {data.fixtures.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Upcoming Fixtures</h2>
-              <ul className="space-y-3">
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Upcoming Fixtures</h2>
+              <ul className="space-y-2.5">
                 {data.fixtures.map((m: any) => (
-                  <li key={m.id} className="bg-surface border border-border rounded-lg p-4 sm:flex sm:items-center sm:justify-between gap-4">
+                  <li key={m.id} className="rounded-m3-lg border border-outline-variant bg-white p-5 sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold text-muted uppercase tracking-wide">
-                        {m.round ? `Round ${m.round}` : 'Match'}
-                      </div>
-                      <div className="mt-1 font-medium text-gray-900">
+                      <div className="text-[12px] font-medium text-on-surface-variant mb-1.5">{m.round ? `Round ${m.round}` : 'Match'}</div>
+                      <div className="text-[15px] font-medium text-on-surface">
                         {m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}
-                        <span className="text-muted font-normal"> vs </span>
+                        <span className="mx-2 text-on-surface-variant font-normal">vs</span>
                         {m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}
                       </div>
-                      <div className="text-sm text-muted mt-0.5">
-                        {formatMatchDate(m.scheduledDate)}
-                        {m.venue ? ` · ${m.venue}` : ''}
-                      </div>
+                      <div className="text-[13px] text-on-surface-variant mt-1">{formatMatchDate(m.scheduledDate)}{m.venue ? ` · ${m.venue}` : ''}</div>
                     </div>
-                    <span className="mt-3 sm:mt-0 inline-block px-3 py-1 rounded-full bg-blue-50 text-primary text-xs font-semibold self-start">
-                      {m.status.replace('_', ' ')}
-                    </span>
+                    <span className="mt-3 sm:mt-0 shrink-0 inline-block px-3 py-1 rounded-full bg-surface-dim text-[12px] font-medium text-on-surface-variant capitalize">{m.status.replace('_', ' ')}</span>
                   </li>
                 ))}
               </ul>
@@ -143,29 +133,19 @@ export default function EventDetailPage() {
           )}
 
           {data.results.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Results</h2>
-              <ul className="space-y-3">
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Results</h2>
+              <ul className="space-y-2.5">
                 {data.results.map((m: any) => {
                   const r = m.results;
                   return (
-                    <li key={m.id} className="bg-surface border border-border rounded-lg p-4">
+                    <li key={m.id} className="rounded-m3-lg border border-outline-variant bg-white p-5">
                       <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0 font-medium text-gray-900">
-                          {m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}
-                        </div>
-                        <div className="px-4 py-1 rounded-md bg-gray-100 font-bold text-gray-900 whitespace-nowrap">
-                          {r ? `${r.homeScore} – ${r.awayScore}` : `${m.homeScore ?? 0} – ${m.awayScore ?? 0}`}
-                        </div>
-                        <div className="min-w-0 text-right font-medium text-gray-900">
-                          {m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}
-                        </div>
+                        <div className="min-w-0 text-[15px] font-medium text-on-surface">{m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}</div>
+                        <div className="px-4 py-1.5 rounded-full bg-surface-dim text-[17px] font-semibold text-on-surface whitespace-nowrap">{r ? `${r.homeScore} – ${r.awayScore}` : `${m.homeScore ?? 0} – ${m.awayScore ?? 0}`}</div>
+                        <div className="min-w-0 text-right text-[15px] font-medium text-on-surface">{m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}</div>
                       </div>
-                      <div className="mt-2 text-xs text-muted">
-                        {m.round ? `Round ${m.round} · ` : ''}
-                        {formatMatchDate(m.scheduledDate)}
-                        {m.venue ? ` · ${m.venue}` : ''}
-                      </div>
+                      <div className="mt-2 text-[12px] text-on-surface-variant">{m.round ? `Round ${m.round} · ` : ''}{formatMatchDate(m.scheduledDate)}{m.venue ? ` · ${m.venue}` : ''}</div>
                     </li>
                   );
                 })}
@@ -174,11 +154,11 @@ export default function EventDetailPage() {
           )}
 
           {data.participants.length > 0 && data.standings.length === 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Participants</h2>
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Participants</h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {data.participants.map((p: any) => (
-                  <div key={p.id} className="bg-surface border border-border rounded-lg p-4 font-medium text-gray-900">
+                  <div key={p.id} className="rounded-m3-lg border border-outline-variant bg-white p-5 text-[14px] font-medium text-on-surface">
                     {p.team?.name ?? p.athlete?.fullName ?? 'TBD'}
                   </div>
                 ))}

@@ -57,7 +57,7 @@ function UploadModal({ onClose }: { onClose: () => void }) {
   const { data: athletes } = useQuery({
     queryKey: ['athletes-select'],
     queryFn: async () =>
-      (await api.get('/athletes', { params: { pageSize: 500 } })).data.athletes as {
+      (await api.get('/athletes', { params: { pageSize: 500 } })).data as {
         id: string; fullName: string; registrationNumber: string;
       }[],
   });

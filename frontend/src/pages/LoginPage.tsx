@@ -3,12 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Trophy, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export function LoginPage() {
-  const { login, isLoading } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,39 +41,56 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 px-4">
-      <div className="w-full max-w-md">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
+      {/* Decorative background */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-[-20%] left-[-10%] h-[600px] w-[600px] rounded-full bg-umu-red/[0.04] blur-3xl" />
+        <div className="absolute bottom-[-15%] right-[-8%] h-[500px] w-[500px] rounded-full bg-umu-red/[0.06] blur-3xl" />
+        <div className="absolute top-[20%] right-[15%] h-[300px] w-[300px] rounded-full bg-blue-500/[0.03] blur-3xl" />
+        {/* Subtle dot grid */}
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle, #DADCE0 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+          }}
+        />
+      </div>
+
+      <div className="w-full max-w-[440px] px-5 animate-slide-up">
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-on-surface transition-colors mb-8"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Home
         </Link>
 
-        <Card className="p-8 shadow-xl border-0">
-          <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-umu-red rounded-2xl flex items-center justify-center mb-4 shadow-lg">
-              <Trophy className="w-9 h-9 text-white" />
+        {/* Card */}
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white/70 backdrop-blur-2xl p-8 sm:p-10 shadow-m3-2">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-umu-red-light mb-4 shadow-sm">
+              <Trophy className="w-7 h-7 text-umu-red" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
-            <p className="text-sm text-gray-500 mt-1">Sign in to your UMU Sports account</p>
+            <h1 className="text-[26px] font-semibold text-on-surface tracking-tight">Welcome back</h1>
+            <p className="text-[14px] text-on-surface-variant mt-1.5">Sign in to your UMU Sports account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4" aria-label="Login form">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-label="Login form">
             <div>
-              <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Email Address
+              <label htmlFor="login-email" className="block text-[13px] font-medium text-on-surface mb-2">
+                Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" aria-hidden="true" />
                 <Input
                   id="login-email"
                   type="email"
                   placeholder="you@umu.ac.ug"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10"
+                  className="pl-11 h-11 rounded-full border-outline bg-white/80 text-[14px] focus:bg-white transition-colors"
                   autoComplete="username"
                   required
                   aria-required="true"
@@ -84,18 +100,18 @@ export function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="login-password" className="block text-[13px] font-medium text-on-surface mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" aria-hidden="true" />
                 <Input
                   id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10"
+                  className="pl-11 pr-11 h-11 rounded-full border-outline bg-white/80 text-[14px] focus:bg-white transition-colors"
                   autoComplete="current-password"
                   required
                   aria-required="true"
@@ -104,43 +120,41 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-umu-red focus:ring-offset-2 rounded p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition p-1 rounded-full hover:bg-surface-container"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-[18px] h-[18px]" /> : <Eye className="w-[18px] h-[18px]" />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className="rounded-lg bg-red-50 border border-red-100 px-4 py-3" role="alert">
-                <p className="text-sm text-red-600 font-medium">{error}</p>
+              <div className="rounded-m3-sm bg-umu-red-light border border-red-100 px-4 py-3 animate-fade-in" role="alert">
+                <p className="text-[13px] text-umu-red font-medium">{error}</p>
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full bg-umu-red hover:bg-umu-red-dark text-white"
-              disabled={isSubmitting || isLoading}
+              className="w-full h-11 rounded-full bg-umu-red text-white text-[14px] font-medium transition-all shadow-m3-1 hover:bg-umu-red-dark hover:shadow-m3-2 active:scale-[0.98]"
+              disabled={isSubmitting}
               aria-busy={isSubmitting}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Signing In...
+                  Signing in...
                 </>
               ) : (
-                'Sign In'
+                'Sign in'
               )}
             </Button>
           </form>
+        </div>
 
-          <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-            <p className="text-xs text-gray-400">
-              Uganda Martyrs University &mdash; Sports Management System
-            </p>
-          </div>
-        </Card>
+        <p className="mt-8 text-center text-[12px] text-on-surface-variant">
+          Uganda Martyrs University &mdash; Sports Management System
+        </p>
       </div>
     </div>
   );

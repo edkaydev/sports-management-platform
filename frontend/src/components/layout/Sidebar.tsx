@@ -21,8 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
-import { ROLE_LABELS, ROLE_BADGE_COLORS_DARK } from '@/lib/constants';
-
+import { ROLE_LABELS } from '@/lib/constants';
 
 interface NavItem {
   to: string;
@@ -39,9 +38,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
   },
   {
     title: 'Athletes',
-    items: [
-      { to: '/athletes', label: 'All Athletes', icon: Users },
-    ],
+    items: [{ to: '/athletes', label: 'All Athletes', icon: Users }],
   },
   {
     title: 'Teams & Sports',
@@ -102,27 +99,27 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
   };
 
   const sidebarContent = (
-    <div className="flex h-full flex-col">
-      <div className={cn('flex h-16 items-center border-b border-white/10 px-4', collapsed ? 'justify-center' : 'gap-3 px-6')}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white">
+    <div className="flex h-full flex-col bg-white">
+      <div className={cn('flex h-16 items-center border-b border-outline-variant/40 px-4', collapsed ? 'justify-center' : 'gap-3 px-5')}>
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-lg">
           <img src="/umu-logo.png" alt="UMU" className="h-full w-full object-contain" />
         </div>
         {!collapsed && (
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold tracking-wide text-white">UMU Sports</span>
-            <span className="text-[10px] font-medium uppercase tracking-widest text-umu-gold">Management</span>
+            <span className="text-sm font-bold text-on-surface">UMU Sports</span>
+            <span className="text-[10px] font-medium uppercase tracking-widest text-umu-red">Management</span>
           </div>
         )}
       </div>
 
-      <nav className="mt-4 flex-1 space-y-1 px-3 overflow-y-auto" aria-label="Main navigation">
+      <nav className="mt-3 flex-1 space-y-0.5 px-3 overflow-y-auto" aria-label="Main navigation">
         {navGroups.map((group) => {
           const visibleItems = group.items.filter((item) => !item.tutorOnly || hasRole('TUTOR'));
           if (visibleItems.length === 0) return null;
           return (
             <div key={group.title || 'main'}>
               {group.title && (
-                <p className={cn('mb-1 mt-4 text-[10px] font-semibold uppercase tracking-wider text-gray-500', collapsed && 'text-center')}>
+                <p className={cn('mb-1 mt-4 text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant/60', collapsed && 'text-center')}>
                   {collapsed ? '---' : group.title}
                 </p>
               )}
@@ -134,16 +131,16 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
                   onClick={onMobileClose}
                   className={({ isActive }) =>
                     cn(
-                      'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-umu-red focus:ring-offset-2 focus:ring-offset-gray-900',
+                      'flex items-center gap-3 rounded-full px-3 py-2 text-[13px] font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-umu-red focus:ring-offset-2',
                       collapsed && 'justify-center px-0',
                       isActive
-                        ? 'bg-umu-red text-white'
-                        : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        ? 'bg-umu-red text-white shadow-sm'
+                        : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface'
                     )
                   }
                   title={collapsed ? item.label : undefined}
                 >
-                  <item.icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <item.icon className="h-[18px] w-[18px] shrink-0" aria-hidden="true" />
                   {!collapsed && <span>{item.label}</span>}
                 </NavLink>
               ))}
@@ -152,16 +149,11 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
         })}
       </nav>
 
-      <div className={cn('border-t border-white/10 p-4', collapsed && 'px-2')}>
+      <div className={cn('border-t border-outline-variant/40 p-4', collapsed && 'px-2')}>
         {!collapsed && user && (
-          <div className="mb-3 rounded-lg bg-gray-800 px-3 py-2.5">
-            <p className="truncate text-sm font-medium text-white">{user.fullName}</p>
-            <span
-              className={cn(
-                'mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white',
-                ROLE_BADGE_COLORS_DARK[user.role] || 'bg-gray-500'
-              )}
-            >
+          <div className="mb-3 rounded-2xl bg-surface-container p-3">
+            <p className="truncate text-[13px] font-semibold text-on-surface">{user.fullName}</p>
+            <span className="mt-1 inline-block rounded-full bg-umu-red-light px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-umu-red">
               {ROLE_LABELS[user.role] || user.role}
             </span>
           </div>
@@ -169,13 +161,13 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
         <button
           onClick={handleLogout}
           className={cn(
-            'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-gray-300 transition-colors hover:bg-gray-800 hover:text-white',
+            'flex w-full items-center gap-3 rounded-full px-3 py-2 text-[13px] font-medium text-on-surface-variant transition-all duration-150 hover:bg-surface-container hover:text-on-surface',
             collapsed && 'justify-center px-0'
           )}
           title={collapsed ? 'Logout' : undefined}
         >
-          <LogOut className="h-5 w-5 shrink-0" />
-          {!collapsed && <span>Logout</span>}
+          <LogOut className="h-[18px] w-[18px] shrink-0" />
+          {!collapsed && <span>Sign out</span>}
         </button>
       </div>
     </div>
@@ -185,7 +177,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
     <>
       <aside
         className={cn(
-          'hidden flex-shrink-0 bg-gray-900 text-white transition-all duration-200 lg:block',
+          'hidden flex-shrink-0 border-r border-outline-variant/40 bg-white transition-all duration-200 lg:block',
           collapsed ? 'w-20' : 'w-64'
         )}
         aria-label="Sidebar"
@@ -194,12 +186,12 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
       </aside>
 
       <div className={cn('lg:hidden', mobileOpen ? 'block' : 'hidden')}>
-        <div className="fixed inset-0 z-40 bg-black/50" onClick={onMobileClose} aria-hidden="true" />
-        <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-gray-900 text-white transition-transform duration-200" aria-label="Mobile navigation">
+        <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={onMobileClose} aria-hidden="true" />
+        <aside className="fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-white shadow-xl transition-transform duration-200" aria-label="Mobile navigation">
           <div className="absolute right-2 top-3.5">
             <button
               onClick={onMobileClose}
-              className="rounded-md p-1.5 text-gray-400 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-2 focus:ring-umu-red"
+              className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-umu-red"
               aria-label="Close navigation menu"
             >
               <X className="h-5 w-5" aria-hidden="true" />

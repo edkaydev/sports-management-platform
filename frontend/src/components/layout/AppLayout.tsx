@@ -8,7 +8,7 @@ export function AppLayout() {
   const location = useLocation();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-100">
+    <div className="flex h-screen overflow-hidden bg-white">
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
@@ -24,7 +24,7 @@ export function AppLayout() {
 
         <main
           id="main-content"
-          className="flex-1 overflow-y-auto p-4 lg:p-6"
+          className="flex-1 overflow-y-auto bg-gray-50/50 p-4 lg:p-6"
           role="main"
           aria-label="Page content"
           key={location.pathname}

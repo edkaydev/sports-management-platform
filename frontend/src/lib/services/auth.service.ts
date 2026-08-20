@@ -10,21 +10,26 @@ interface LoginResponse {
 
 export const authService = {
   async login(email: string, password: string): Promise<LoginResponse> {
-    return api.post('/auth/login', { email, password }) as Promise<LoginResponse>;
+    const res = await api.post('/auth/login', { email, password });
+    return res.data;
   },
   async logout() {
-    return api.post('/auth/logout');
+    await api.post('/auth/logout');
   },
   async getMe(): Promise<MeResponse> {
-    return api.get('/auth/me') as Promise<MeResponse>;
+    const res = await api.get('/auth/me');
+    return res.data;
   },
   async refresh() {
-    return api.post('/auth/refresh');
+    const res = await api.post('/auth/refresh');
+    return res.data;
   },
   async changePassword(currentPassword: string, newPassword: string) {
-    return api.post('/auth/change-password', { currentPassword, newPassword });
+    const res = await api.post('/auth/change-password', { currentPassword, newPassword });
+    return res.data;
   },
   async forceChangePassword(currentPassword: string, newPassword: string) {
-    return api.post('/auth/force-change-password', { currentPassword, newPassword });
+    const res = await api.post('/auth/force-change-password', { currentPassword, newPassword });
+    return res.data;
   },
 };

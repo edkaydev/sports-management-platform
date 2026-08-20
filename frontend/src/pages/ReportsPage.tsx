@@ -9,26 +9,26 @@ export default function ReportsPage() {
 
   const { data: overview } = useQuery({
     queryKey: ['reports', 'overview'],
-    queryFn: async () => (await api.get('/reports/overview')).data.data,
+    queryFn: async () => (await api.get('/reports/overview')).data,
     enabled: report === 'overview',
   });
 
   const { data: academic, isLoading: loadingAcademic } = useQuery({
     queryKey: ['reports', 'academic', season],
     queryFn: async () =>
-      (await api.get('/reports/academic-standing', { params: { season } })).data.data,
+      (await api.get('/reports/academic-standing', { params: { season } })).data,
     enabled: report === 'academic',
   });
 
   const { data: scholarships } = useQuery({
     queryKey: ['reports', 'scholarships'],
-    queryFn: async () => (await api.get('/reports/scholarships')).data.data,
+    queryFn: async () => (await api.get('/reports/scholarships')).data,
     enabled: report === 'scholarships',
   });
 
   const { data: athletes, isLoading: loadingAthletes } = useQuery({
     queryKey: ['reports', 'athletes'],
-    queryFn: async () => (await api.get('/reports/athletes')).data.data,
+    queryFn: async () => (await api.get('/reports/athletes')).data,
     enabled: report === 'athletes',
   });
 

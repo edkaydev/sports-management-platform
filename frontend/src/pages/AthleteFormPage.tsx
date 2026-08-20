@@ -29,12 +29,12 @@ export default function AthleteFormPage() {
 
   const { data: sports } = useQuery({
     queryKey: ['sports'],
-    queryFn: async () => (await api.get('/sports')).data.data,
+    queryFn: async () => (await api.get('/sports')).data,
   });
 
   const { data: teams } = useQuery({
     queryKey: ['teams'],
-    queryFn: async () => (await api.get('/teams')).data.data,
+    queryFn: async () => (await api.get('/teams')).data,
   });
 
   function set<K extends keyof typeof form>(key: K, value: string) {

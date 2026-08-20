@@ -243,11 +243,11 @@ export default function NotificationsPage() {
 
       {showBroadcast && canBroadcast && <BroadcastPanel />}
 
-      {!data?.notifications?.length ? (
+      {!data?.length ? (
         <EmptyState message="No notifications." />
       ) : (
         <div className="bg-surface border border-border rounded-lg divide-y divide-border">
-          {data.notifications.map((n: any) => (
+          {(Array.isArray(data) ? data : data?.notifications ?? []).map((n: any) => (
             <div
               key={n.id}
               className={`px-4 py-3 flex justify-between gap-4 ${n.isRead ? '' : 'bg-blue-50/40'}`}

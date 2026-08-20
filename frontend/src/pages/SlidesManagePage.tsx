@@ -35,7 +35,7 @@ export default function SlidesManagePage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['slides'],
-    queryFn: async () => (await api.get('/slides')).data.data as SliderSlide[],
+    queryFn: async () => (await api.get('/slides')).data as SliderSlide[],
   });
 
   const save = useMutation({

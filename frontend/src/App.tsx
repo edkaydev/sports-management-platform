@@ -4,6 +4,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageLoader } from '@/components/PageLoader';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
+import PublicLayout from './components/layout/PublicLayout';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
@@ -70,17 +71,19 @@ function App() {
           <Route path="/not-found" element={<NotFoundErrorPage />} />
           <Route path="/server-error" element={<ServerErrorPage />} />
 
-          <Route path="/" element={<HomePage />} />
-          <Route path="/fixtures" element={<PublicFixturesPage />} />
-          <Route path="/results" element={<PublicResultsPage />} />
-          <Route path="/sports" element={<PublicSportsPage />} />
-          <Route path="/sports/:id" element={<PublicSportDetailPage />} />
-          <Route path="/teams" element={<PublicTeamsPage />} />
-          <Route path="/teams/:id" element={<PublicTeamDetailPage />} />
-          <Route path="/events" element={<PublicEventsPage />} />
-          <Route path="/events/:id" element={<PublicEventDetailPage />} />
-          <Route path="/news" element={<PublicNewsPage />} />
-          <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/fixtures" element={<PublicFixturesPage />} />
+            <Route path="/results" element={<PublicResultsPage />} />
+            <Route path="/sports" element={<PublicSportsPage />} />
+            <Route path="/sports/:id" element={<PublicSportDetailPage />} />
+            <Route path="/teams" element={<PublicTeamsPage />} />
+            <Route path="/teams/:id" element={<PublicTeamDetailPage />} />
+            <Route path="/events" element={<PublicEventsPage />} />
+            <Route path="/events/:id" element={<PublicEventDetailPage />} />
+            <Route path="/news" element={<PublicNewsPage />} />
+            <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
+          </Route>
 
           <Route path="/dashboard" element={ProtectedLayout}>
             <Route index element={<DashboardPage />} />

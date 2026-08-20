@@ -18,68 +18,61 @@ export default function TeamDetailPage() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+    <div className="max-w-6xl mx-auto px-6 sm:px-8 py-14">
       {isLoading ? (
         <div className="py-16 flex justify-center"><Spinner /></div>
       ) : isError || !data ? (
         <div className="py-16">
           <EmptyState message="Team not found" />
           <div className="text-center mt-4">
-            <Link to="/teams" className="text-sm font-semibold text-primary hover:underline">
-              ← Back to all teams
-            </Link>
+            <Link to="/teams" className="text-[14px] font-medium text-umu-red hover:underline">&larr; Back to all teams</Link>
           </div>
         </div>
       ) : (
         <>
-          <Link to="/teams" className="text-sm font-semibold text-primary hover:underline">
-            ← All teams
-          </Link>
-          <header className="mt-4 bg-gradient-to-r from-blue-900 to-blue-700 text-white rounded-lg px-6 py-8">
+          <Link to="/teams" className="text-[13px] font-medium text-umu-red hover:underline">&larr; All teams</Link>
+          <header className="mt-4 rounded-m3-xl bg-surface-dim p-8">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h1 className="text-3xl font-bold">{data.team.name}</h1>
-                <p className="mt-1 text-blue-100 capitalize">
+                <h1 className="text-[32px] font-semibold text-on-surface tracking-tight">{data.team.name}</h1>
+                <p className="mt-1 text-[14px] text-on-surface-variant capitalize">
                   {data.team.sport.name} · {formatGenderLabel(data.team.gender)}
                 </p>
               </div>
-              <div className="flex gap-6 text-center">
+              <div className="flex gap-8 text-center">
                 <div>
-                  <div className="text-2xl font-bold">{data.team._count.squadEntries}</div>
-                  <div className="text-xs text-blue-200 uppercase tracking-wide">Squad</div>
+                  <div className="text-[28px] font-semibold text-on-surface">{data.team._count.squadEntries}</div>
+                  <div className="text-[11px] font-medium text-on-surface-variant uppercase tracking-wide">Squad</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">
+                  <div className="text-[28px] font-semibold text-on-surface">
                     {data.team._count.homeMatches + data.team._count.awayMatches}
                   </div>
-                  <div className="text-xs text-blue-200 uppercase tracking-wide">Matches</div>
+                  <div className="text-[11px] font-medium text-on-surface-variant uppercase tracking-wide">Matches</div>
                 </div>
               </div>
             </div>
             {data.team.homeVenue && (
-              <p className="mt-4 text-blue-100 text-sm">Home venue: {data.team.homeVenue}</p>
+              <p className="mt-4 text-[14px] text-on-surface-variant">Home venue: {data.team.homeVenue}</p>
             )}
           </header>
 
           {data.squad.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Squad</h2>
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Squad</h2>
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {data.squad.map((s: any) => (
-                  <li key={s.id} className="bg-surface border border-border rounded-lg p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-50 text-primary flex items-center justify-center font-bold text-sm shrink-0">
+                  <li key={s.id} className="rounded-m3-lg border border-outline-variant bg-white p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-umu-red-light text-umu-red flex items-center justify-center font-semibold text-[14px] shrink-0">
                       {s.jerseyNumber ?? (s.isCaptain ? 'C' : '•')}
                     </div>
                     <div className="min-w-0">
-                      <div className="font-semibold text-gray-900 truncate">
+                      <div className="text-[14px] font-medium text-on-surface truncate">
                         {s.athlete.fullName}
-                        {s.isCaptain && <span className="ml-1 text-xs text-primary">(C)</span>}
-                        {s.isViceCaptain && <span className="ml-1 text-xs text-primary">(VC)</span>}
+                        {s.isCaptain && <span className="ml-1 text-[11px] text-umu-red font-medium">(C)</span>}
+                        {s.isViceCaptain && <span className="ml-1 text-[11px] text-umu-red font-medium">(VC)</span>}
                       </div>
-                      <div className="text-xs text-muted">
-                        {s.position ?? 'All-rounder'}
-                        {s.jerseyNumber ? ` · #${s.jerseyNumber}` : ''}
-                      </div>
+                      <div className="text-[12px] text-on-surface-variant">{s.position ?? 'All-rounder'}{s.jerseyNumber ? ` · #${s.jerseyNumber}` : ''}</div>
                     </div>
                   </li>
                 ))}
@@ -88,29 +81,24 @@ export default function TeamDetailPage() {
           )}
 
           {data.fixtures.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Upcoming Fixtures</h2>
-              <ul className="space-y-3">
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Upcoming Fixtures</h2>
+              <ul className="space-y-2.5">
                 {data.fixtures.map((m: any) => (
-                  <li key={m.id} className="bg-surface border border-border rounded-lg p-4 sm:flex sm:items-center sm:justify-between gap-4">
+                  <li key={m.id} className="rounded-m3-lg border border-outline-variant bg-white p-5 sm:flex sm:items-center sm:justify-between gap-4">
                     <div className="min-w-0">
-                      <div className="text-xs font-semibold text-muted uppercase tracking-wide">
-                        {m.event?.name ?? 'Match'}
-                        {m.round ? ` · ${m.round}` : ''}
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="text-[12px] font-medium text-on-surface-variant">{m.event?.name ?? 'Match'}</span>
+                        {m.round && <span className="text-[12px] text-on-surface-variant">· {m.round}</span>}
                       </div>
-                      <div className="mt-1 font-medium text-gray-900">
+                      <div className="text-[15px] font-medium text-on-surface">
                         {m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}
-                        <span className="text-muted font-normal"> vs </span>
+                        <span className="mx-2 text-on-surface-variant font-normal">vs</span>
                         {m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}
                       </div>
-                      <div className="text-sm text-muted mt-0.5">
-                        {formatMatchDate(m.scheduledDate)}
-                        {m.venue ? ` · ${m.venue}` : ''}
-                      </div>
+                      <div className="text-[13px] text-on-surface-variant mt-1">{formatMatchDate(m.scheduledDate)}{m.venue ? ` · ${m.venue}` : ''}</div>
                     </div>
-                    <span className="mt-3 sm:mt-0 inline-block px-3 py-1 rounded-full bg-blue-50 text-primary text-xs font-semibold self-start">
-                      {m.status.replace('_', ' ')}
-                    </span>
+                    <span className="mt-3 sm:mt-0 shrink-0 inline-block px-3 py-1 rounded-full bg-surface-dim text-[12px] font-medium text-on-surface-variant capitalize">{m.status.replace('_', ' ')}</span>
                   </li>
                 ))}
               </ul>
@@ -118,27 +106,19 @@ export default function TeamDetailPage() {
           )}
 
           {data.results.length > 0 && (
-            <section className="mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Recent Results</h2>
-              <ul className="space-y-3">
+            <section className="mt-10">
+              <h2 className="text-[20px] font-semibold text-on-surface mb-4">Recent Results</h2>
+              <ul className="space-y-2.5">
                 {data.results.map((m: any) => {
                   const r = m.results;
                   return (
-                    <li key={m.id} className="bg-surface border border-border rounded-lg p-4">
+                    <li key={m.id} className="rounded-m3-lg border border-outline-variant bg-white p-5">
                       <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0 font-medium text-gray-900">
-                          {m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}
-                        </div>
-                        <div className="px-4 py-1 rounded-md bg-gray-100 font-bold text-gray-900 whitespace-nowrap">
-                          {r ? `${r.homeScore} – ${r.awayScore}` : `${m.homeScore ?? 0} – ${m.awayScore ?? 0}`}
-                        </div>
-                        <div className="min-w-0 text-right font-medium text-gray-900">
-                          {m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}
-                        </div>
+                        <div className="min-w-0 text-[15px] font-medium text-on-surface">{m.homeTeam?.name ?? m.homeIndividual?.fullName ?? 'TBD'}</div>
+                        <div className="px-4 py-1.5 rounded-full bg-surface-dim text-[17px] font-semibold text-on-surface whitespace-nowrap">{r ? `${r.homeScore} – ${r.awayScore}` : `${m.homeScore ?? 0} – ${m.awayScore ?? 0}`}</div>
+                        <div className="min-w-0 text-right text-[15px] font-medium text-on-surface">{m.awayTeam?.name ?? m.awayIndividual?.fullName ?? 'TBD'}</div>
                       </div>
-                      <div className="mt-2 text-xs text-muted">
-                        {m.event?.name ?? 'Match'} · {formatMatchDate(m.scheduledDate)}
-                      </div>
+                      <div className="mt-2 text-[12px] text-on-surface-variant">{m.event?.name ?? 'Match'} · {formatMatchDate(m.scheduledDate)}</div>
                     </li>
                   );
                 })}

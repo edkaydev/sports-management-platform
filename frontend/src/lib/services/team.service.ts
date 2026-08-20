@@ -2,18 +2,23 @@ import api from '@/lib/api';
 
 export const teamService = {
   async getAll(params?: Record<string, unknown>) {
-    return api.get('/teams', { params });
+    const res = await api.get('/teams', { params });
+    return res.data;
   },
   async getById(id: string) {
-    return api.get(`/teams/${id}`);
+    const res = await api.get(`/teams/${id}`);
+    return res.data;
   },
   async create(data: Record<string, unknown>) {
-    return api.post('/teams', data);
+    const res = await api.post('/teams', data);
+    return res.data;
   },
   async update(id: string, data: Record<string, unknown>) {
-    return api.patch(`/teams/${id}`, data);
+    const res = await api.patch(`/teams/${id}`, data);
+    return res.data;
   },
   async delete(id: string) {
-    return api.delete(`/teams/${id}`);
+    const res = await api.delete(`/teams/${id}`);
+    return res.data;
   },
 };

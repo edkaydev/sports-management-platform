@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { FaChevronLeft, FaChevronRight, FaCircle, FaRegCircle } from 'react-icons/fa6';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6';
 import { getPublicSlides } from '@/lib/api';
 import { Spinner } from '@/components/ui';
 
@@ -33,7 +33,7 @@ export default function HomeSlider() {
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-red-950 via-red-900 to-red-700 h-[28rem] sm:h-[36rem] flex items-center justify-center">
+      <div className="bg-surface-dim h-[28rem] sm:h-[36rem] flex items-center justify-center">
         <Spinner />
       </div>
     );
@@ -41,28 +41,30 @@ export default function HomeSlider() {
 
   if (!slides || slides.length === 0) {
     return (
-      <section className="bg-gradient-to-r from-red-950 via-red-900 to-red-700 text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-          <p className="text-red-200 text-sm font-semibold tracking-widest uppercase mb-3">
-            Uganda Martyrs University
-          </p>
-          <h1 className="text-3xl sm:text-5xl font-bold tracking-tight leading-tight">
-            Home of the UMU Saints
+      <section className="bg-white">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 py-20 sm:py-28 text-center">
+          <div className="inline-flex items-center rounded-full bg-umu-red-light px-4 py-1.5 mb-6">
+            <span className="text-[13px] font-medium text-umu-red">Uganda Martyrs University</span>
+          </div>
+          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-on-surface leading-[1.1]">
+            Home of the{' '}
+            <span className="inline-block rounded-full bg-umu-red-light px-5 py-1 text-umu-red">
+              UMU Saints
+            </span>
           </h1>
-          <p className="mt-4 max-w-2xl text-red-100 text-base sm:text-lg">
-            Follow fixtures, results, teams, and events from the UMU Sports Department — and
-            support our student-athletes across football, netball, basketball, rugby, and more.
+          <p className="mt-5 max-w-2xl mx-auto text-[16px] sm:text-[18px] leading-relaxed text-on-surface-variant">
+            Follow fixtures, results, teams, and events from the UMU Sports Department — and support our student-athletes across football, netball, basketball, rugby, and more.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               to="/fixtures"
-              className="px-6 py-3 rounded-md bg-white text-red-700 font-semibold hover:bg-red-50"
+              className="px-7 py-3 rounded-full bg-umu-red text-white text-[14px] font-medium hover:bg-umu-red-dark hover:shadow-m3-1 transition-all"
             >
               View Fixtures
             </Link>
             <Link
               to="/results"
-              className="px-6 py-3 rounded-md border border-white/40 text-white font-semibold hover:bg-white/10"
+              className="px-7 py-3 rounded-full border border-outline text-on-surface text-[14px] font-medium hover:bg-surface-container transition-all"
             >
               Latest Results
             </Link>
@@ -76,30 +78,30 @@ export default function HomeSlider() {
 
   return (
     <section
-      className="mx-auto max-w-6xl px-4 py-6 sm:px-6"
+      className="mx-auto max-w-6xl px-6 sm:px-8 pt-8 pb-4"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="overflow-hidden rounded-[30px] border border-red-100 bg-white shadow-[0_20px_50px_rgba(127,29,29,0.08)] lg:grid lg:grid-cols-[1.35fr_0.75fr]">
-        <div className="relative h-[24rem] sm:h-[30rem]">
+      <div className="overflow-hidden rounded-m3-xl bg-white shadow-m3-1 lg:grid lg:grid-cols-[1.4fr_0.6fr]">
+        <div className="relative h-[22rem] sm:h-[28rem] lg:h-[32rem]">
           <img
             src={activeSlide.imageUrl}
             alt={activeSlide.title}
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/25 to-black/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-          <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 sm:p-8">
-            <div className="mb-3 inline-flex w-fit items-center rounded-full border border-white/40 bg-black/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-red-100 backdrop-blur-sm">
+          <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 sm:p-10">
+            <div className="mb-3 inline-flex w-fit items-center rounded-full bg-white/90 backdrop-blur-sm px-3.5 py-1 text-[11px] font-medium text-on-surface">
               Featured update
             </div>
 
-            <h2 className="max-w-lg text-2xl font-black tracking-tight text-white sm:text-4xl">
+            <h2 className="max-w-lg text-2xl font-semibold tracking-tight text-white sm:text-3xl lg:text-4xl">
               {activeSlide.title}
             </h2>
 
             {activeSlide.subtitle && (
-              <p className="mt-3 max-w-xl text-sm text-white/80 sm:text-base">
+              <p className="mt-3 max-w-xl text-[14px] text-white/80 sm:text-[15px] leading-relaxed">
                 {activeSlide.subtitle}
               </p>
             )}
@@ -108,27 +110,27 @@ export default function HomeSlider() {
               {activeSlide.linkUrl && (
                 <Link
                   to={activeSlide.linkUrl}
-                  className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-bold text-red-700 transition hover:bg-red-50"
+                  className="inline-flex items-center justify-center rounded-full bg-white px-6 py-2.5 text-[13px] font-medium text-on-surface transition hover:shadow-m3-2"
                 >
                   {activeSlide.linkLabel ?? 'Learn More'}
                 </Link>
               )}
 
               {total > 1 && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <button
                     onClick={prev}
                     aria-label="Previous slide"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white transition hover:bg-black/30"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30"
                   >
-                    <FaChevronLeft className="text-sm" />
+                    <FaChevronLeft className="text-xs" />
                   </button>
                   <button
                     onClick={next}
                     aria-label="Next slide"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/40 bg-black/20 text-white transition hover:bg-black/30"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition hover:bg-white/30"
                   >
-                    <FaChevronRight className="text-sm" />
+                    <FaChevronRight className="text-xs" />
                   </button>
                 </div>
               )}
@@ -137,52 +139,50 @@ export default function HomeSlider() {
         </div>
 
         {total > 1 && (
-          <div className="flex flex-col justify-between bg-[#111827] p-4 sm:p-5">
-            <div className="space-y-3">
+          <div className="flex flex-col justify-between bg-surface-dim p-4 sm:p-5">
+            <div className="space-y-2.5">
               {slides.map((slide, i) => (
                 <button
                   key={slide.id}
                   onClick={() => setCurrent(i)}
-                  className={`group relative flex w-full overflow-hidden rounded-2xl border text-left transition-all ${
+                  className={`group relative flex w-full overflow-hidden rounded-2xl text-left transition-all ${
                     i === current
-                      ? 'border-red-400 shadow-[0_10px_30px_rgba(239,68,68,0.25)]'
-                      : 'border-white/10 opacity-80 hover:border-white/30'
+                      ? 'bg-white shadow-m3-1 ring-1 ring-umu-red/20'
+                      : 'bg-transparent hover:bg-white/60'
                   }`}
                 >
                   <img
                     src={slide.imageUrl}
                     alt={slide.title}
-                    className="h-24 w-24 object-cover sm:h-28 sm:w-28"
+                    className="h-20 w-20 object-cover sm:h-24 sm:w-24 rounded-l-2xl"
                   />
-                  <div className="relative flex flex-1 items-end justify-between bg-gradient-to-r from-black/70 to-black/40 px-3 py-3 sm:px-4">
+                  <div className="flex flex-1 items-center justify-between px-4 py-3">
                     <div>
-                      <div className="text-[9px] font-bold uppercase tracking-[0.18em] text-red-200">
+                      <div className="text-[10px] font-medium text-on-surface-variant">
                         {slide.linkLabel ?? 'Update'}
                       </div>
-                      <p className="mt-1 text-sm font-semibold text-white">{slide.title}</p>
+                      <p className="mt-0.5 text-[13px] font-medium text-on-surface line-clamp-1">{slide.title}</p>
                     </div>
-                    <div className="ml-2 flex h-6 w-6 items-center justify-center rounded-full border border-white/20 bg-white/10 text-[8px] text-white">
-                      {i === current ? 'Now' : i + 1}
-                    </div>
+                    {i === current && (
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-umu-red text-[9px] font-bold text-white">
+                        Now
+                      </span>
+                    )}
                   </div>
                 </button>
               ))}
             </div>
 
-            <div className="mt-5 flex items-center justify-center gap-2">
-              {slides.map((slide, i) => (
+            <div className="mt-4 flex items-center justify-center gap-1.5">
+              {slides.map((_, i) => (
                 <button
-                  key={`${slide.id}-dot`}
+                  key={i}
                   onClick={() => setCurrent(i)}
                   aria-label={`Go to slide ${i + 1}`}
-                  className="flex h-5 w-5 items-center justify-center"
-                >
-                  {i === current ? (
-                    <FaCircle className="text-[10px] text-white" />
-                  ) : (
-                    <FaRegCircle className="text-[10px] text-white/50" />
-                  )}
-                </button>
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === current ? 'w-6 bg-umu-red' : 'w-1.5 bg-outline hover:bg-on-surface-variant'
+                  }`}
+                />
               ))}
             </div>
           </div>
