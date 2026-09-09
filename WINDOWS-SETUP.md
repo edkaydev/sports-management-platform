@@ -7,6 +7,9 @@ This guide has two parts:
 2. **"Setting up on a new PC"** — one-time steps used when the program is first
    put on a computer (usually done by the person who set up the machine).
 
+> The person doing the setup should use **`INSTALLER-CHECKLIST.md`** instead —
+> a short step-by-step checklist for putting the app on the tutor's PC.
+
 ---
 
 ## PART 1 — How to Open the App Every Day (for the non-technical user)

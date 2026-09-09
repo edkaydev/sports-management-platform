@@ -138,6 +138,7 @@ The backend test suite runs against a real MySQL database and covers all 17 feat
 |---|---|
 | `TODO.md` | Full task list by phase |
 | `WINDOWS-SETUP.md` | Step-by-step setup guide for a new Windows PC |
+| `INSTALLER-CHECKLIST.md` | Checklist for the person installing the app on the tutor's PC |
 
 ---
 
