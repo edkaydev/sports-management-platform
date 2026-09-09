@@ -339,7 +339,8 @@ enum EquipmentAssignmentType {
 model User {
   id                  String    @id @default(uuid())
   fullName            String    @map("full_name")
-  email               String    @unique
+  username            String    @unique
+  email               String?   @unique
   passwordHash        String    @map("password_hash")
   role                UserRole
   isActive            Boolean   @default(true) @map("is_active")
@@ -383,6 +384,7 @@ model User {
   newsPosts NewsPost[] @relation("newsPosts")
   equipmentCreated EquipmentItem[] @relation("equipmentCreated")
   equipmentAssigned EquipmentAssignment[] @relation("equipmentAssigned")
+  activityLogs ActivityLog[]
 
   @@map("users")
 }
@@ -1327,4 +1329,24 @@ model SliderSlide {
 
   @@index([isActive, sortOrder])
   @@map("slider_slides")
+}
+
+model ActivityLog {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  userName   String    @map("user_name")
+  action     String
+  summary    String
+  entityType String?   @map("entity_type")
+  entityId   String?   @map("entity_id")
+  fileUrl    String?   @map("file_url")
+  fileName   String?   @map("file_name")
+  note       String?   @db.Text
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("activity_logs")
 }

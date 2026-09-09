@@ -79,6 +79,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
       { to: '/news/manage', label: 'News & Announcements', icon: Newspaper },
       { to: '/slides/manage', label: 'Home Slider', icon: Image },
       { to: '/equipment', label: 'Department Equipment', icon: Package, tutorOnly: true },
+      { to: '/users', label: 'User Accounts', icon: Users, tutorOnly: true },
     ],
   },
 ];
@@ -95,7 +96,7 @@ export function Sidebar({ collapsed, mobileOpen, onMobileClose }: SidebarProps) 
 
   const handleLogout = async () => {
     await logout();
-    navigate('/', { replace: true });
+    navigate('/login', { replace: true });
   };
 
   const sidebarContent = (

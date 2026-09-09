@@ -1,10 +1,14 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
 import { CardContent, CardHeader, CardTitle, Badge } from '@/components/ui';
 import { PageLoader } from '@/components/PageLoader';
-import { Users, Calendar, Trophy, AlertTriangle, MapPin } from 'lucide-react';
+import ActivityHeatmap from '@/components/dashboard/ActivityHeatmap';
+import ActivityFeed from '@/components/dashboard/ActivityFeed';
+import EvidenceUpload from '@/components/dashboard/EvidenceUpload';
+import { getActivityStats, getActivity, deleteActivity } from '@/lib/services/activity.service';
+import { Users, Calendar, Trophy, AlertTriangle, MapPin, Activity, FileText } from 'lucide-react';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -60,6 +64,29 @@ export default function DashboardPage() {
     queryFn: async () => (await api.get('/sports')).data,
   });
 
+  const queryClient = useQueryClient();
+
+  const { data: activityStats, isLoading: loadingActivity } = useQuery({
+    queryKey: ['dashboard', 'activity-stats'],
+    queryFn: () => getActivityStats(),
+  });
+
+  const { data: activityFeed } = useQuery({
+    queryKey: ['dashboard', 'activity'],
+    queryFn: () => getActivity(25),
+  });
+
+  async function handleDeleteActivity(id: string) {
+    await deleteActivity(id);
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity-stats'] });
+  }
+
+  function refreshActivity() {
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard', 'activity-stats'] });
+  }
+
   if (loadingAthletes) return <PageLoader />;
 
   const totalAthletes = athletesRes?.pagination?.total ?? (Array.isArray(athletesRes) ? athletesRes.length : 0);
@@ -110,6 +137,31 @@ export default function DashboardPage() {
         <StatCard title="Competitions" value={eventsList.length} icon={Trophy} color="bg-umu-gold" />
         <StatCard title="Upcoming Matches" value={upcoming} icon={Calendar} color="bg-blue-600" />
         <StatCard title="Academic Warnings" value={warningCount} icon={AlertTriangle} color="bg-amber-500" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatCard title="Total Actions" value={activityStats?.total ?? 0} icon={Activity} color="bg-umu-red" />
+        <StatCard title="Actions Today" value={activityStats?.today ?? 0} icon={Activity} color="bg-green-600" />
+        <StatCard title="Evidence Files" value={activityStats?.filesUploaded ?? 0} icon={FileText} color="bg-blue-600" />
+      </div>
+
+      {loadingActivity ? (
+        <PageLoader />
+      ) : (
+        <ActivityHeatmap daily={activityStats?.daily ?? []} />
+      )}
+
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="rounded-m3-xl border border-outline-variant/60 bg-white shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Recent Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ActivityFeed entries={activityFeed ?? []} onDelete={handleDeleteActivity} />
+          </CardContent>
+        </div>
+
+        <EvidenceUpload onAdded={refreshActivity} />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">

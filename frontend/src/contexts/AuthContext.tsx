@@ -5,7 +5,7 @@ import { authService } from '../lib/services/auth.service';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (username: string, password: string) => Promise<User>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   hasRole: (role: string) => boolean;
@@ -47,10 +47,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(refreshInterval);
   }, [user]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string) => {
     setIsLoading(true);
     try {
-      const response = await authService.login(email, password);
+      const response = await authService.login(username, password);
       const u = response?.user ?? (response as unknown as User);
       if (mountedRef.current) setUser(u);
       return u;

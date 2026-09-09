@@ -16,16 +16,23 @@ export function hashPassword(password: string): Promise<string> {
 export interface AuthUser {
   id: string;
   fullName: string;
-  email: string;
+  username: string;
+  email: string | null;
   role: UserRole;
   mustChangePassword: boolean;
 }
 
 export async function login(input: LoginInput) {
-  const user = await prisma.user.findUnique({ where: { email: input.email.toLowerCase() } });
+  const identifier = (input.username ?? input.email!).trim().toLowerCase();
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ username: identifier }, { email: identifier }],
+      deletedAt: null,
+    },
+  });
 
   if (!user || !user.isActive || user.deletedAt) {
-    throw new AppError(401, 'UNAUTHORIZED', 'Invalid email or password');
+    throw new AppError(401, 'UNAUTHORIZED', 'Invalid username or password');
   }
 
   if (user.lockedUntil && user.lockedUntil > new Date()) {
@@ -171,13 +178,15 @@ export async function forceChangePassword(userId: string, input: ForceChangePass
 export function publicUser(user: {
   id: string;
   fullName: string;
-  email: string;
+  username: string;
+  email: string | null;
   role: UserRole;
   mustChangePassword: boolean;
 }): AuthUser {
   return {
     id: user.id,
     fullName: user.fullName,
+    username: user.username,
     email: user.email,
     role: user.role,
     mustChangePassword: user.mustChangePassword,

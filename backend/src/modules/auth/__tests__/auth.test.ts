@@ -15,12 +15,14 @@ let coachUserId: string;
 beforeAll(async () => {
   const hash = await hashPassword(TEST_ADMIN_PASSWORD);
   const admin = await prisma.user.create({
-    data: { email: TEST_ADMIN_EMAIL, fullName: 'Auth Test Admin', passwordHash: hash, role: UserRole.TUTOR },
+    data: { email: TEST_ADMIN_EMAIL,
+      username: 'auth.test.admin@umu.ac.ug', fullName: 'Auth Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
   adminUserId = admin.id;
 
   const coach = await prisma.user.create({
-    data: { email: TEST_COACH_EMAIL, fullName: 'Auth Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
+    data: { email: TEST_COACH_EMAIL,
+      username: 'auth.test.coach@umu.ac.ug', fullName: 'Auth Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
   });
   coachUserId = coach.id;
 });
@@ -58,6 +60,22 @@ describe('POST /api/auth/login', () => {
     expect(res.body.data.user).toMatchObject({ email: TEST_ADMIN_EMAIL, role: 'TUTOR' });
     expect(res.headers['set-cookie']).toBeDefined();
     expect(res.headers['set-cookie'][0]).toContain('refreshToken');
+  });
+
+  it('logs in with a username and password', async () => {
+    const res = await request(app).post('/api/auth/login').send({
+      username: 'auth.test.admin@umu.ac.ug',
+      password: TEST_ADMIN_PASSWORD,
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.data.user.username).toBe('auth.test.admin@umu.ac.ug');
+    expect(res.body.data.user.role).toBe('TUTOR');
+  });
+
+  it('rejects a username without a password with 422', async () => {
+    const res = await request(app).post('/api/auth/login').send({ username: 'auth.test.admin@umu.ac.ug' });
+    expect(res.status).toBe(422);
+    expect(res.body.error).toBe('VALIDATION_ERROR');
   });
 });
 
@@ -174,7 +192,7 @@ describe('Account lockout', () => {
   it('locks the account after 5 consecutive failed attempts', async () => {
     const email = `lockout.${Date.now()}@umu.ac.ug`;
     const user = await prisma.user.create({
-      data: { email, fullName: 'Lockout User', passwordHash: await hashPassword('Admin@2025'), role: UserRole.SPORTS_REP },
+      data: { username: `lockout.${Date.now()}`, email, fullName: 'Lockout User', passwordHash: await hashPassword('Admin@2025'), role: UserRole.SPORTS_REP },
     });
 
     for (let i = 0; i < 5; i++) {

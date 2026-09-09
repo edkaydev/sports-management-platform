@@ -379,7 +379,7 @@ export async function sendEmailNotification(input: {
       where: { role: input.recipientRole as any, isActive: true },
       select: { email: true },
     });
-    emails = [...emails, ...users.map((u) => u.email)];
+    emails = [...emails, ...users.map((u) => u.email).filter((e): e is string => Boolean(e))];
   }
 
   if (emails.length === 0) {

@@ -281,10 +281,30 @@
 
 ## Phase 14 — Testing & QA
 
-- [x] Unit tests for service layer (Jest)
-- [x] Integration tests for all API endpoints (Supertest)
-- [x] Role/permission tests (each endpoint tested with wrong role)
+- [x] Unit and integration test suites implemented (Jest + Supertest)
+- [x] Role/permission test coverage implemented
+- [ ] Configure an isolated test database (or mocks) so `npm test` runs without a local production/development database
+- [ ] Remove database-module `process.exit()` side effects from the test path
+- [ ] Restore ESLint dependencies/configuration and make `npm run lint` pass in backend and frontend
+- [ ] Add coverage thresholds and publish coverage results
+- [ ] Add CI pipeline: install, lint, backend test, frontend build, and migration validation on every change
 - [ ] Manual QA with Sports Tutor walkthrough
+
+---
+
+## Phase 14b — Reliability & Operations
+
+- [ ] Run `prisma migrate deploy` as a controlled release step before starting the production API
+- [ ] Add API and frontend container health checks; make Nginx route only to healthy services
+- [ ] Add graceful shutdown for HTTP, Socket.IO, and Prisma connections on `SIGTERM`/`SIGINT`
+- [ ] Persist structured application logs outside containers and set log retention
+- [ ] Add uptime, API-error, database-health, disk-space, and backup-failure monitoring with alerting
+- [ ] Schedule daily encrypted database backups to off-site storage
+- [ ] Document and test database restore procedures at regular intervals
+- [ ] Define a deployment rollback procedure, including database-migration compatibility
+- [ ] Validate all required production environment variables at startup; reject the default JWT secret in production
+- [ ] Move uploads to shared/object storage before running multiple API replicas
+- [ ] Define high-availability architecture: multiple API replicas and managed/replicated database
 
 ---
 
@@ -294,6 +314,7 @@
 - [x] Nginx config (reverse proxy + SSL) — `nginx/nginx.conf` + `nginx/conf.d/default.conf`
 - [x] Environment variables secured — `backend/.env.example.prod` template
 - [x] Database backup script (daily cron) — `scripts/backup-db.sh`
+- [ ] Configure and verify the scheduled backup job on the production host
 - [ ] Domain configured (`umu-sports.umu.ac.ug`)
 - [ ] SSL certificate (Let's Encrypt)
 - [ ] Smoke test on production

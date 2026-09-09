@@ -1,10 +1,9 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { PageLoader } from '@/components/PageLoader';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/layout/AppLayout';
-import PublicLayout from './components/layout/PublicLayout';
 
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
@@ -34,23 +33,12 @@ const NewsManagePage = lazy(() => import('./pages/NewsManagePage'));
 const SlidesManagePage = lazy(() => import('./pages/SlidesManagePage'));
 const EquipmentPage = lazy(() => import('./pages/EquipmentPage'));
 const TournamentCreatePage = lazy(() => import('./pages/TournamentCreatePage'));
+const UsersPage = lazy(() => import('./pages/UsersPage'));
 
-const HomePage = lazy(() => import('./pages/public/HomePage'));
-const PublicFixturesPage = lazy(() => import('./pages/public/FixturesPage'));
-const PublicResultsPage = lazy(() => import('./pages/public/ResultsPage'));
-const PublicSportsPage = lazy(() => import('./pages/public/SportsPage'));
-const PublicSportDetailPage = lazy(() => import('./pages/public/SportDetailPage'));
-const PublicTeamsPage = lazy(() => import('./pages/public/TeamsPage'));
-const PublicTeamDetailPage = lazy(() => import('./pages/public/TeamDetailPage'));
-const PublicEventsPage = lazy(() => import('./pages/public/EventsPage'));
-const PublicEventDetailPage = lazy(() => import('./pages/public/EventDetailPage'));
-const PublicNewsPage = lazy(() => import('./pages/public/NewsPage'));
-const PublicNewsDetailPage = lazy(() => import('./pages/public/NewsDetailPage'));
-
-function ProtectedLayout() {
+function ProtectedLayout({ allowedRoles }: { allowedRoles?: string[] }) {
   return (
     <ErrorBoundary>
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={allowedRoles}>
         <AppLayout />
       </ProtectedRoute>
     </ErrorBoundary>
@@ -73,19 +61,7 @@ function App() {
           <Route path="/not-found" element={<NotFoundErrorPage />} />
           <Route path="/server-error" element={<ServerErrorPage />} />
 
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/fixtures" element={<PublicFixturesPage />} />
-            <Route path="/results" element={<PublicResultsPage />} />
-            <Route path="/sports" element={<PublicSportsPage />} />
-            <Route path="/sports/:id" element={<PublicSportDetailPage />} />
-            <Route path="/teams" element={<PublicTeamsPage />} />
-            <Route path="/teams/:id" element={<PublicTeamDetailPage />} />
-            <Route path="/events" element={<PublicEventsPage />} />
-            <Route path="/events/:id" element={<PublicEventDetailPage />} />
-            <Route path="/news" element={<PublicNewsPage />} />
-            <Route path="/news/:slug" element={<PublicNewsDetailPage />} />
-          </Route>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
           <Route path="/dashboard" element={<ProtectedLayout />}>
             <Route index element={<DashboardPage />} />
@@ -159,6 +135,10 @@ function App() {
 
           <Route path="/equipment" element={<ProtectedLayout />}>
             <Route index element={<EquipmentPage />} />
+          </Route>
+
+          <Route path="/users" element={<ProtectedLayout allowedRoles={['TUTOR']} />}>
+            <Route index element={<UsersPage />} />
           </Route>
 
           <Route path="*" element={<NotFoundErrorPage />} />

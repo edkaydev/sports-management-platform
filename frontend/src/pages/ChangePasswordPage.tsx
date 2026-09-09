@@ -7,6 +7,7 @@ import { authService } from '@/lib/services/auth.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import { PasswordStrengthMeter, PASSWORD_REQUIREMENTS } from '@/components/shared/PasswordStrengthMeter';
 
 export default function ChangePasswordPage() {
   const { user, logout } = useAuth();
@@ -31,17 +32,11 @@ export default function ChangePasswordPage() {
       setError('New password must be at least 8 characters.');
       return;
     }
-    if (!/[A-Z]/.test(form.next)) {
-      setError('Password must include at least one uppercase letter.');
-      return;
-    }
-    if (!/[a-z]/.test(form.next)) {
-      setError('Password must include at least one lowercase letter.');
-      return;
-    }
-    if (!/[0-9]/.test(form.next)) {
-      setError('Password must include at least one number.');
-      return;
+    for (const req of PASSWORD_REQUIREMENTS) {
+      if (!req.test(form.next)) {
+        setError(req.label);
+        return;
+      }
     }
     if (form.next === form.current) {
       setError('New password must be different from your current password.');
@@ -146,7 +141,7 @@ export default function ChangePasswordPage() {
                   {show.next ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-1">Min 8 chars, uppercase, lowercase, number</p>
+              <PasswordStrengthMeter password={form.next} />
             </div>
 
             {/* Confirm */}

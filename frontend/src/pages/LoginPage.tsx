@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROLE_HOME } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Trophy, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Trophy, User, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +20,7 @@ export function LoginPage() {
     setError('');
     setIsSubmitting(true);
     try {
-      const loggedInUser = await login(email, password);
+      const loggedInUser = await login(username, password);
       if (loggedInUser.mustChangePassword) {
         navigate('/change-password', { replace: true });
       } else {
@@ -31,7 +31,7 @@ export function LoginPage() {
       if (msg.toLowerCase().includes('suspended')) {
         setError('Your account has been suspended. Please contact your administrator.');
       } else if (msg.toLowerCase().includes('invalid')) {
-        setError('Incorrect email or password. Please check your credentials.');
+        setError('Incorrect username or password. Please check your credentials.');
       } else {
         setError(msg);
       }
@@ -59,14 +59,6 @@ export function LoginPage() {
       </div>
 
       <div className="w-full max-w-[440px] px-5 animate-slide-up">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-[13px] text-on-surface-variant hover:text-on-surface transition-colors mb-8"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Home
-        </Link>
-
         {/* Card */}
         <div className="rounded-m3-xl border border-outline-variant/60 bg-white/70 backdrop-blur-2xl p-8 sm:p-10 shadow-m3-2">
           <div className="text-center mb-8">
@@ -74,25 +66,26 @@ export function LoginPage() {
               <Trophy className="w-7 h-7 text-umu-red" />
             </div>
             <h1 className="text-[26px] font-semibold text-on-surface tracking-tight">Welcome back</h1>
-            <p className="text-[14px] text-on-surface-variant mt-1.5">Sign in to your UMU Sports account</p>
+            <p className="text-[14px] text-on-surface-variant mt-1.5">Sign in to UMU Sports</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5" aria-label="Login form">
             <div>
-              <label htmlFor="login-email" className="block text-[13px] font-medium text-on-surface mb-2">
-                Email
+              <label htmlFor="login-username" className="block text-[13px] font-medium text-on-surface mb-2">
+                Username
               </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" aria-hidden="true" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant" aria-hidden="true" />
                 <Input
-                  id="login-email"
-                  type="email"
-                  placeholder="you@umu.ac.ug"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  id="login-username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="pl-11 h-11 rounded-full border-outline bg-white/80 text-[14px] focus:bg-white transition-colors"
                   autoComplete="username"
                   required
+                  autoFocus
                   aria-required="true"
                   disabled={isSubmitting}
                 />
@@ -153,7 +146,7 @@ export function LoginPage() {
         </div>
 
         <p className="mt-8 text-center text-[12px] text-on-surface-variant">
-          Uganda Martyrs University &mdash; Sports Management System
+          Uganda Martyrs University &mdash; Sports Department Management System
         </p>
       </div>
     </div>

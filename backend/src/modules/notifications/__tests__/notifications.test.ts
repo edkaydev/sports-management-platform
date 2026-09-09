@@ -18,6 +18,7 @@ beforeAll(async () => {
   const admin = await prisma.user.create({
     data: {
       email: ADMIN_EMAIL,
+      username: 'notif.test.admin@umu.ac.ug',
       fullName: 'Notification Test Admin',
       passwordHash: hash,
       role: UserRole.TUTOR,
@@ -98,6 +99,7 @@ describe('PATCH /api/notifications/:id/read', () => {
     const other = await prisma.user.create({
       data: {
         email: 'notif.other@umu.ac.ug',
+        username: 'notif.other@umu.ac.ug',
         fullName: 'Other User',
         passwordHash: await hashPassword(TEST_PASSWORD),
         role: UserRole.SPORTS_REP,

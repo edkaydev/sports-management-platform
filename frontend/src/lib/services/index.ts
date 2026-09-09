@@ -13,3 +13,5 @@ export { notificationService } from './notification.service';
 export { reportService } from './report.service';
 export { equipmentService } from './equipment.service';
 export { newsService, slideService } from './news.service';
+export { userService } from './user.service';
+export * from './activity.service';

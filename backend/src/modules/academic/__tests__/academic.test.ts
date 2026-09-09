@@ -19,6 +19,7 @@ beforeAll(async () => {
   const admin = await prisma.user.create({
     data: {
       email: ADMIN_EMAIL,
+      username: 'academic.test.admin@umu.ac.ug',
       fullName: 'Academic Test Admin',
       passwordHash: hash,
       role: UserRole.TUTOR,
@@ -28,6 +29,7 @@ beforeAll(async () => {
   const coach = await prisma.user.create({
     data: {
       email: COACH_EMAIL,
+      username: 'academic.test.coach@umu.ac.ug',
       fullName: 'Academic Test Coach',
       passwordHash: hash,
       role: UserRole.SPORTS_REP,

@@ -70,17 +70,4 @@ export const queryKeys = {
     all: ['seasons'] as const,
     current: ['seasons', 'current'] as const,
   },
-  public: {
-    fixtures: ['public', 'fixtures'] as const,
-    results: ['public', 'results'] as const,
-    sports: ['public', 'sports'] as const,
-    sportDetail: (id: string) => ['public', 'sports', id] as const,
-    teams: ['public', 'teams'] as const,
-    teamDetail: (id: string) => ['public', 'teams', id] as const,
-    events: ['public', 'events'] as const,
-    eventDetail: (id: string) => ['public', 'events', id] as const,
-    news: ['public', 'news'] as const,
-    newsDetail: (slug: string) => ['public', 'news', slug] as const,
-    slides: ['public', 'slides'] as const,
-  },
 } as const;

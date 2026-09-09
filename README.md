@@ -1,8 +1,8 @@
 # UMU Sports — University Sports & Student-Athlete Management System
 
-A web-based management system for Uganda Martyrs University Sports Department.
+A local-first management system for the Uganda Martyrs University (UMU) Sports Department — designed to run on the Sports Tutor's own computer with username/password sign in.
 
-Manages the full student-athlete lifecycle: sports performance, academic tracking, scholarships, contracts, recruitment, documents, fixtures, and match results.
+Manages the full student-athlete lifecycle: sports performance, academic tracking, scholarships, contracts, recruitment, documents, fixtures, and match results — with CSV and PDF report downloads.
 
 ---
 
@@ -10,8 +10,8 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 
 - **Frontend** — React + TypeScript + Vite + Tailwind CSS + React Router + TanStack Query
 - **Backend** — Node.js + Express + TypeScript + Prisma + Zod (Jest + Supertest for tests)
-- **Database** — MySQL 8
-- **Infrastructure** — Docker + Docker Compose
+- **Database** — MySQL 8 (via Docker)
+- **Deployment** — Local machine, double-click to start (`start.command` on macOS, `start.bat` on Windows)
 
 ---
 
@@ -36,11 +36,11 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 | Reports | `/api/reports` | Department overview, athlete, academic, scholarship, contract reports (JSON/CSV/PDF) |
 | Equipment | `/api/equipment` | Inventory management, assignment/return (TUTOR-only) |
 | News | `/api/news` | News/announcements with draft/published workflow |
-| Public site | `/api/public` | Open catalogue, sports, teams, fixtures, events, news — no login required |
+| Users | `/api/users` | User accounts, roles, reset password (TUTOR-only) |
 
 ---
 
-## Getting Started
+## Getting Started (local, one user)
 
 ### Prerequisites
 
@@ -60,39 +60,31 @@ cd sports-management-platform
 cp backend/.env.example backend/.env
 ```
 
-Edit `backend/.env` if needed (defaults work for local development).
+Edit `backend/.env` if needed (defaults work for local use).
 
-### 3. Start everything
+### 3. Start the app
+
+Double-click **`start.command`** (macOS) or **`start.bat`** (Windows) — it starts the stack, runs migrations, seeds the tutor account, and opens the browser. Alternatively:
 
 ```bash
 docker compose up -d
-```
-
-This starts:
-- MySQL on port `3306`
-- API on port `3000`
-- Client on port `5173`
-
-### 4. Run database migrations and seed demo data
-
-```bash
-docker compose exec api npx prisma migrate dev
+docker compose exec api npx prisma migrate deploy
 docker compose exec api npx prisma db seed
 ```
 
-The seed creates two staff accounts and demo data (sports, teams, athletes, academic records, scholarships, contracts, events, fixtures, training, prospects).
+### 4. First sign in
 
-Two roles are used:
-- **TUTOR** (Sports Tutor / Overall) — full access including user management and record deletion
-- **SPORTS_REP** (Secretary of Sports, University Union) — all content editing, no user management and no record deletion
+The seed creates one **TUTOR** account and demo data (sports, teams, athletes, academic records, scholarships, contracts, events, fixtures, training, prospects).
 
-- **Tutor login:** `tutor@umu.ac.ug` / `Tutor@2025`
-- **Sport Rep login:** `sportrep@umu.ac.ug` / `SportRep@2025`
+- **Sign in:** username `tutor` / password `Tutor@2025`
 
-### 5. Open the app
+On first sign in you are required to set your own password. Once signed in (as Sports Tutor), you can create more user accounts from **User Accounts** in the sidebar — new users must set their own passwords on first sign in, and you can reset any user's password at any time.
 
-- Frontend: http://localhost:5173
-- API health check: http://localhost:3000/api/health
+> Stopping the app keeps all data: double-click **`stop.command`** (macOS) or **`stop.bat`** (Windows).
+>
+> Kiosk / full-screen mode: double-click **`kiosk.command`** (macOS) or **`kiosk.bat`** (Windows).
+
+For a step-by-step setup on a brand-new Windows PC, see **`WINDOWS-SETUP.md`**.
 
 ---
 
@@ -111,15 +103,15 @@ sports-management-platform/
 │   └── src/
 │       ├── components/   # Shared UI + layout components
 │       ├── lib/          # API client (api.ts), auth context (auth.tsx)
-│       └── pages/        # Route pages (admin + public/)
-├── nginx/                # Nginx config (production reverse proxy)
-├── scripts/              # Utility scripts (backup-db.sh)
-├── docs/                 # Specification documents (18 files)
+│       └── pages/        # Route pages (admin)
 ├── docker-compose.yml
-├── docker-compose.prod.yml
-├── TODO.md
-├── COMMANDS.md
-└── DEPLOYMENT.md
+├── start.command         # macOS launcher
+├── stop.command          # macOS stopper
+├── kiosk.command         # macOS full-screen mode
+├── start.bat             # Windows launcher
+├── stop.bat              # Windows stopper
+├── kiosk.bat             # Windows full-screen mode
+└── WINDOWS-SETUP.md      # New-PC Windows setup guide
 ```
 
 ---
@@ -144,14 +136,8 @@ The backend test suite runs against a real MySQL database and covers all 17 feat
 
 | File | Description |
 |---|---|
-| `docs/01-product-overview.md` | What the system does and why |
-| `docs/14-system-architecture.md` | Technical architecture |
-| `docs/15-database-specification.md` | Database schema |
-| `docs/17-api-specification.md` | All API endpoints |
-| `docs/18-ui-ux-specification.md` | UI/UX design guidelines |
 | `TODO.md` | Full task list by phase |
-| `COMMANDS.md` | All useful commands |
-| `DEPLOYMENT.md` | Ubuntu server deployment guide |
+| `WINDOWS-SETUP.md` | Step-by-step setup guide for a new Windows PC |
 
 ---
 
@@ -170,5 +156,3 @@ docker compose logs -f api
 # Open DB browser
 docker compose exec api npx prisma studio
 ```
-
-See `COMMANDS.md` for the full reference.

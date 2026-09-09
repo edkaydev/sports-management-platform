@@ -3,7 +3,8 @@ export type UserRole = 'TUTOR' | 'SPORTS_REP';
 export interface User {
   id: string;
   fullName: string;
-  email: string;
+  username: string;
+  email: string | null;
   role: UserRole;
   isActive: boolean;
   phoneNumber: string | null;

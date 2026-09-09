@@ -16,10 +16,12 @@ beforeAll(async () => {
   const hash = await hashPassword(TEST_PASSWORD);
 
   await prisma.user.create({
-    data: { email: ADMIN_EMAIL, fullName: 'News Test Admin', passwordHash: hash, role: UserRole.TUTOR },
+    data: { email: ADMIN_EMAIL,
+      username: 'news.test.admin@umu.ac.ug', fullName: 'News Test Admin', passwordHash: hash, role: UserRole.TUTOR },
   });
   await prisma.user.create({
-    data: { email: COACH_EMAIL, fullName: 'News Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
+    data: { email: COACH_EMAIL,
+      username: 'news.test.coach@umu.ac.ug', fullName: 'News Test Coach', passwordHash: hash, role: UserRole.SPORTS_REP },
   });
 
   const adminLogin = await request(app).post('/api/auth/login').send({ email: ADMIN_EMAIL, password: TEST_PASSWORD });

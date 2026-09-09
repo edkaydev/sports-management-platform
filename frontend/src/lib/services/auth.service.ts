@@ -9,8 +9,8 @@ interface LoginResponse {
 }
 
 export const authService = {
-  async login(email: string, password: string): Promise<LoginResponse> {
-    const res = await api.post('/auth/login', { email, password });
+  async login(username: string, password: string): Promise<LoginResponse> {
+    const res = await api.post('/auth/login', { username, password });
     return res.data;
   },
   async logout() {

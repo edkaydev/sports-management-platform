@@ -102,69 +102,6 @@ export async function login(email: string, password: string): Promise<{ accessTo
   return res.data.data ?? res.data;
 }
 
-export async function getPublicSlides() {
-  const res = await api.get('/public/slides');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicEvents() {
-  const res = await api.get('/public/events');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicEvent(id: string) {
-  const res = await api.get(`/public/events/${id}`);
-  return (res.data.data ?? res.data) as any;
-}
-
-export interface PublicEventDetail {
-  event: any;
-  participants: any[];
-  standings: any[];
-  fixtures: any[];
-  results: any[];
-}
-
-export async function getPublicFixtures() {
-  const res = await api.get('/public/fixtures');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicResults() {
-  const res = await api.get('/public/results');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicNews() {
-  const res = await api.get('/public/news');
-  return (res.data.data ?? res.data) as any;
-}
-
-export async function getPublicNewsBySlug(slug: string) {
-  const res = await api.get(`/public/news/${slug}`);
-  return (res.data.data ?? res.data) as any;
-}
-
-export async function getPublicSports() {
-  const res = await api.get('/public/sports');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicSport(id: string) {
-  const res = await api.get(`/public/sports/${id}`);
-  return (res.data.data ?? res.data) as any;
-}
-
-export async function getPublicTeams() {
-  const res = await api.get('/public/teams');
-  return (res.data.data ?? res.data) as any[];
-}
-
-export async function getPublicTeam(id: string) {
-  const res = await api.get(`/public/teams/${id}`);
-  return (res.data.data ?? res.data) as any;
-}
-
 export interface SliderSlide {
   id: string;
   title: string;

@@ -24,18 +24,20 @@ const prisma = new PrismaClient();
 const SEASON_NAME = "2025/2026";
 
 async function main(): Promise<void> {
-  const email = (
-    process.env.SEED_ADMIN_EMAIL ?? "tutor@umu.ac.ug"
+  const username = (
+    process.env.SEED_ADMIN_USERNAME ?? "tutor"
   ).toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD ?? "tutor123";
+  const email = (process.env.SEED_ADMIN_EMAIL ?? "tutor@umu.ac.ug").toLowerCase();
+  const password = process.env.SEED_ADMIN_PASSWORD ?? "Tutor@2025";
   const fullName = process.env.SEED_ADMIN_NAME ?? "Sports Tutor";
 
   const passwordHash = await bcrypt.hash(password, 12);
 
   const admin = await prisma.user.upsert({
-    where: { email },
+    where: { username },
     update: {},
     create: {
+      username,
       email,
       fullName,
       passwordHash,
@@ -44,23 +46,7 @@ async function main(): Promise<void> {
     },
   });
 
-  console.log(`TUTOR ready: ${admin.email} (role=${admin.role})`);
-
-  const repEmail = (process.env.SEED_REP_EMAIL ?? "sports@umu.ac.ug").toLowerCase();
-  const repPassword = process.env.SEED_REP_PASSWORD ?? "sports123";
-  const rep = await prisma.user.upsert({
-    where: { email: repEmail },
-    update: {},
-    create: {
-      email: repEmail,
-      fullName: "Sports Representative",
-      passwordHash: await bcrypt.hash(repPassword, 12),
-      role: UserRole.SPORTS_REP,
-      mustChangePassword: true,
-    },
-  });
-
-  console.log(`SPORTS_REP ready: ${rep.email} (role=${rep.role})`);
+  console.log(`TUTOR ready: ${admin.username} (role=${admin.role})`);
 
   await seedSports();
   const season = await seedCurrentSeason(admin.id);
@@ -451,6 +437,7 @@ async function seedStaff(
     where: { email: coachEmail },
     update: {},
     create: {
+      username: "coach",
       email: coachEmail,
       fullName: "Sports Representative",
       passwordHash: await bcrypt.hash(

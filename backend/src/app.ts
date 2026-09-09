@@ -23,12 +23,14 @@ import { matchesRouter } from './modules/matches/matches.routes';
 import { performanceRouter } from './modules/performance/performance.routes';
 import { reportsRouter } from './modules/reports/reports.routes';
 import { newsRouter } from './modules/news/news.routes';
-import { publicRouter } from './modules/public/public.routes';
+import { usersRouter } from './modules/users/users.routes';
 import { slidesRouter } from './modules/slides/slides.routes';
 import { equipmentRouter } from './modules/equipment/equipment.routes';
 import { uploadsRouter } from './modules/uploads/uploads.routes';
+import { activityRouter } from './modules/activity/activity.routes';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
+import { activityLogger } from './middleware/activity.middleware';
 
 const app = express();
 
@@ -64,6 +66,9 @@ app.use(cookieParser());
 // Request logging
 app.use(requestLogger);
 
+// Activity log (auto-records every successful change + manual evidence entries)
+app.use(activityLogger);
+
 // Serve uploaded documents
 app.use(
   '/uploads',
@@ -73,7 +78,6 @@ app.use(
 // Routes
 app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/public', publicRouter);
 app.use('/api/athletes', athletesRouter);
 app.use('/api/seasons', seasonsRouter);
 app.use('/api/sports', sportsRouter);
@@ -89,9 +93,11 @@ app.use('/api/matches', matchesRouter);
 app.use('/api', performanceRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/news', newsRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/slides', slidesRouter);
 app.use('/api/equipment', equipmentRouter);
 app.use('/api/uploads', uploadsRouter);
+app.use('/api/activity', activityRouter);
 
 // 404 handler
 app.use((_req, res) => {
