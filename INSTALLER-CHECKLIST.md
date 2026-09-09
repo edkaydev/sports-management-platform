@@ -81,3 +81,30 @@ docker compose exec api npx prisma db seed
 ```
 
 and the password resets to `tutor` / `Tutor@2025` (they will be asked to change it again).
+
+---
+
+## Useful commands (for the installer)
+
+Run all of these from the project folder (`C:\sports\sports-management-platform`)
+in Command Prompt or PowerShell.
+
+| Task | Command |
+|---|---|
+| Start the app (manual) | `start.bat` |
+| Stop the app (keep data) | `stop.bat` |
+| Start the app over the command line | `docker compose up -d` |
+| Stop the app over the command line | `docker compose down` |
+| See all running containers | `docker compose ps` |
+| Apply database migrations | `docker compose exec api npx prisma migrate deploy` |
+| Reset tutor password / re-seed demo data | `docker compose exec api npx prisma db seed` |
+| Backend logs (live) | `docker compose logs -f api` |
+| Frontend logs (live) | `docker compose logs -f client` |
+| Database logs | `docker compose logs -f db` |
+| Open database browser (Prisma Studio) | `docker compose exec api npx prisma studio` |
+| Rebuild images after code update | `docker compose up -d --build` |
+| Wipe everything and start fresh (deletes data!) | `docker compose down -v` |
+
+> Note: when updating to a newer version of the app after a `git pull`, run
+> `docker compose up -d --build` first, then apply migrations:
+> `docker compose exec api npx prisma migrate deploy`.
