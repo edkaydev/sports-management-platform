@@ -44,13 +44,15 @@ Manages the full student-athlete lifecycle: sports performance, academic trackin
 
 ### Prerequisites
 
+- Node.js and npm (for local commands, migrations, and tests)
 - Docker Desktop installed and running
+- MySQL 8 — provided by `docker-compose.yml`; no separate local install needed
 - Git
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/sports-management-platform.git
+git clone https://github.com/edkaydev/sports-management-platform.git
 cd sports-management-platform
 ```
 
@@ -79,6 +81,8 @@ The seed creates one **TUTOR** account and demo data (sports, teams, athletes, a
 - **Sign in:** username `tutor` / password `Tutor@2025`
 
 On first sign in you are required to set your own password. Once signed in (as Sports Tutor), you can create more user accounts from **User Accounts** in the sidebar — new users must set their own passwords on first sign in, and you can reset any user's password at any time.
+
+> **Security:** `tutor` / `Tutor@2025` are local-only seeded demo credentials. Before any shared deployment, set `SEED_ADMIN_PASSWORD` in `backend/.env` to a strong value (the seed reads it from there) and change the seeded password on first sign in.
 
 > Stopping the app keeps all data: double-click **`stop.command`** (macOS) or **`stop.bat`** (Windows).
 >
